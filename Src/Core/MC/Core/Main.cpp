@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-int main() {
+int main(int argc, char ** argv) {
 	MC_ERROR("test");
 
 	char t;
