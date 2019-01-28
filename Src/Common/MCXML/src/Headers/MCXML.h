@@ -2,33 +2,32 @@
 
 #include <string>
 #include <vector>
-#include "pugixml.h"
 
 namespace MC {
 
-	struct MCXML_NODE {
-	private:
-		pugi::xpath_node *_pNode;
+	class MCXML_Node {
 	public:
-		void Attribute(const char* const name, int   *result) const;
-		void Attribute(const char* const name, float *result) const;
-		void Attribute(const char* const name, const char **result)  const;
+		virtual void Attribute(const char* const name, const int   *result) const = 0;
+		virtual void Attribute(const char* const name, const float *result) const = 0;
+		virtual void Attribute(const char* const name, const char **result) const = 0;
 	};
 
-	struct MCXML_NODE_SET {
-		std::vector<MCXML_NODE> *nodes;
+	class MCXML_NodeSet {
+	private:
+		std::vector<MCXML_Node*> *_pNodes;
+		
+	public:
+		inline MCXML_Node* begin() { return _pNodes->begin(); }
+		inline MCXML_Node* end()   { return _pNodes->end(); }
 	};
 
+	class MCXML_Document {
+	public:
+		virtual MCXML_NODE_SET Get(const char* const xPath) const = 0;
+	};
+	
 	class MCXML {
-	public:
-		MCXML(const char* const filename);
-		~MCXML();
-
-		MCXML_NODE_SET Get(const char* const xPath);
-
-	private:
-		std::string m_filename;
-		pugi::doc
+`	public:
+		MCXML_Document Load(const char* const filename);
 	};
-
 }
