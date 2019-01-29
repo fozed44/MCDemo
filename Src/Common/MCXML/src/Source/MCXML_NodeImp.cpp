@@ -1,9 +1,12 @@
-#include "../Headers/MCXML.h";
-#include "../../../MCLog/src/Headers/MCLog.h";
+#include "../Headers/MCXMLImp.h"
+#include "../../../MCLog/src/Headers/MCLog.h"
 
-namespace MC {
+namespace MCXMLImp {
 
-	void MCXML_NODE::Attribute(const char* const name, int *result) const {
+	MCXML_NodeImp::MCXML_NodeImp(std::unique_ptr<pugi::xpath_node> pNode)
+		: _pNode(std::move(pNode)) {}
+
+	void MCXML_NodeImp::Attribute(const char* const name, int* const result) const {
 
 		MC_TRACE(std::string("reading attribute: ") + name + " as int.");
 
@@ -12,7 +15,7 @@ namespace MC {
 		MC_TRACE(std::string("Value: ") + std::string(*result));
 	}
 
-	void MCXML_NODE::Attribute(const char* const name, float *result) const {
+	void MCXML_NodeImp::Attribute(const char* const name, float* const result) const {
 
 		MC_TRACE(std::string("reading attribute: ") + name + " as float.");
 
@@ -21,7 +24,7 @@ namespace MC {
 		MC_TRACE(std::string("Value: ") + std::string(*result));
 	}
 
-	void MCXML_NODE::Attribute(const char* const name, const char **result) const {
+	void MCXML_NodeImp::Attribute(const char* const name, const char **result) const {
 
 		MC_TRACE(std::string("Reading attribute: ") + name + " as char*.");
 

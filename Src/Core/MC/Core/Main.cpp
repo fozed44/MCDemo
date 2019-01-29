@@ -1,4 +1,4 @@
-#include "../../../Common/MCLog/src/Headers/MCLog.h";
+#include "../../../Common/MCLog/src/Headers/MCLog.h"
 
 #include <iostream>
 

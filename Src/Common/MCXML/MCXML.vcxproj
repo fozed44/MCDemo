@@ -116,13 +116,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Headers\MCXML.h" />
+    <ClInclude Include="src\Headers\MCXMLImp.h" />
     <ClInclude Include="src\Headers\pugiconfig.h" />
     <ClInclude Include="src\Headers\pugixml.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Source\MCXML.cpp" />
-    <ClCompile Include="src\Source\MCXML_NODE.cpp" />
-    <ClCompile Include="src\Source\MCXML_NODE_SET.cpp" />
+    <ClCompile Include="src\Source\MCXML_DocumentImp.cpp" />
+    <ClCompile Include="src\Source\MCXML_NodeImp.cpp" />
     <ClCompile Include="src\Source\pugixml.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
