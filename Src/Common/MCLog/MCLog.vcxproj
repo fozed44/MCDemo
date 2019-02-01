@@ -69,7 +69,18 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(ProjectDir)src\Headers;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(ProjectDir)src\Headers;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(ProjectDir)src\Headers;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(ProjectDir)src\Headers;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -116,6 +127,57 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Headers\MCLog.h" />
+    <ClInclude Include="src\Headers\spdlog\async.h" />
+    <ClInclude Include="src\Headers\spdlog\async_logger.h" />
+    <ClInclude Include="src\Headers\spdlog\common.h" />
+    <ClInclude Include="src\Headers\spdlog\details\async_logger_impl.h" />
+    <ClInclude Include="src\Headers\spdlog\details\circular_q.h" />
+    <ClInclude Include="src\Headers\spdlog\details\console_globals.h" />
+    <ClInclude Include="src\Headers\spdlog\details\file_helper.h" />
+    <ClInclude Include="src\Headers\spdlog\details\fmt_helper.h" />
+    <ClInclude Include="src\Headers\spdlog\details\logger_impl.h" />
+    <ClInclude Include="src\Headers\spdlog\details\log_msg.h" />
+    <ClInclude Include="src\Headers\spdlog\details\mpmc_blocking_q.h" />
+    <ClInclude Include="src\Headers\spdlog\details\null_mutex.h" />
+    <ClInclude Include="src\Headers\spdlog\details\os.h" />
+    <ClInclude Include="src\Headers\spdlog\details\pattern_formatter.h" />
+    <ClInclude Include="src\Headers\spdlog\details\periodic_worker.h" />
+    <ClInclude Include="src\Headers\spdlog\details\registry.h" />
+    <ClInclude Include="src\Headers\spdlog\details\thread_pool.h" />
+    <ClInclude Include="src\Headers\spdlog\fmt\bin_to_hex.h" />
+    <ClInclude Include="src\Headers\spdlog\fmt\bundled\chrono.h" />
+    <ClInclude Include="src\Headers\spdlog\fmt\bundled\color.h" />
+    <ClInclude Include="src\Headers\spdlog\fmt\bundled\core.h" />
+    <ClInclude Include="src\Headers\spdlog\fmt\bundled\format-inl.h" />
+    <ClInclude Include="src\Headers\spdlog\fmt\bundled\format.h" />
+    <ClInclude Include="src\Headers\spdlog\fmt\bundled\locale.h" />
+    <ClInclude Include="src\Headers\spdlog\fmt\bundled\ostream.h" />
+    <ClInclude Include="src\Headers\spdlog\fmt\bundled\posix.h" />
+    <ClInclude Include="src\Headers\spdlog\fmt\bundled\printf.h" />
+    <ClInclude Include="src\Headers\spdlog\fmt\bundled\ranges.h" />
+    <ClInclude Include="src\Headers\spdlog\fmt\bundled\time.h" />
+    <ClInclude Include="src\Headers\spdlog\fmt\fmt.h" />
+    <ClInclude Include="src\Headers\spdlog\fmt\ostr.h" />
+    <ClInclude Include="src\Headers\spdlog\formatter.h" />
+    <ClInclude Include="src\Headers\spdlog\logger.h" />
+    <ClInclude Include="src\Headers\spdlog\sinks\android_sink.h" />
+    <ClInclude Include="src\Headers\spdlog\sinks\ansicolor_sink.h" />
+    <ClInclude Include="src\Headers\spdlog\sinks\base_sink.h" />
+    <ClInclude Include="src\Headers\spdlog\sinks\basic_file_sink.h" />
+    <ClInclude Include="src\Headers\spdlog\sinks\daily_file_sink.h" />
+    <ClInclude Include="src\Headers\spdlog\sinks\dist_sink.h" />
+    <ClInclude Include="src\Headers\spdlog\sinks\msvc_sink.h" />
+    <ClInclude Include="src\Headers\spdlog\sinks\null_sink.h" />
+    <ClInclude Include="src\Headers\spdlog\sinks\ostream_sink.h" />
+    <ClInclude Include="src\Headers\spdlog\sinks\rotating_file_sink.h" />
+    <ClInclude Include="src\Headers\spdlog\sinks\sink.h" />
+    <ClInclude Include="src\Headers\spdlog\sinks\stdout_color_sinks.h" />
+    <ClInclude Include="src\Headers\spdlog\sinks\stdout_sinks.h" />
+    <ClInclude Include="src\Headers\spdlog\sinks\syslog_sink.h" />
+    <ClInclude Include="src\Headers\spdlog\sinks\wincolor_sink.h" />
+    <ClInclude Include="src\Headers\spdlog\spdlog.h" />
+    <ClInclude Include="src\Headers\spdlog\tweakme.h" />
+    <ClInclude Include="src\Headers\spdlog\version.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Source\MCLog.cpp" />

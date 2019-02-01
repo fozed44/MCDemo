@@ -1,19 +1,24 @@
 #include "../Headers/MCLog.h"
+#include "../Headers/spdlog/sinks/stdout_color_sinks.h"
 #include <iostream>
 
 namespace MC {
 
-	MCLog::MCLog()
-	{
+	std::shared_ptr<spdlog::logger> MCLog::s_pCoreLogger;
+	std::shared_ptr<spdlog::logger> MCLog::s_pXMLLogger;
+
+	MCLog::MCLog() {
+		spdlog::set_pattern("%^[%T] %n: %v%$");
+		s_pCoreLogger = spdlog::stdout_color_mt("CORE");
+		s_pCoreLogger->set_level(spdlog::level::trace);
+
+		s_pXMLLogger = spdlog::stdout_color_mt("XML");
+		s_pXMLLogger->set_level(spdlog::level::trace);
 	}
 
 
-	MCLog::~MCLog()
-	{
+	MCLog::~MCLog() {
 	}
 
-	void MCLog::Log(const char* const logger, MC_LOG_LEVEL level, const char* const msg) const {
-		std::cout << logger << ": " << msg << std::endl;
-	}
 
 }

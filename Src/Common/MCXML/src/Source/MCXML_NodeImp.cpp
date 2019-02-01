@@ -3,33 +3,35 @@
 
 namespace MCXMLImp {
 
-	MCXML_NodeImp::MCXML_NodeImp(std::unique_ptr<pugi::xpath_node> pNode)
-		: _pNode(std::move(pNode)) {}
+	MCXML_NodeImp::MCXML_NodeImp(const pugi::xpath_node& node)
+		: _node(node) {}
 
-	void MCXML_NodeImp::Attribute(const char* const name, int* const result) const {
+	MCXML_NodeImp::~MCXML_NodeImp() {}
 
-		MC_TRACE(std::string("reading attribute: ") + name + " as int.");
+	void MCXML_NodeImp::Attribute(const char* const name, int* result) const {
 
-		*result = _pNode->node().attribute(name).as_int();
+		XML_TRACE("Reading attribute: {0} as int", name);
 
-		MC_TRACE(std::string("Value: ") + std::string(*result));
+		*result = _node.node().attribute(name).as_int();
+
+		XML_TRACE("Value: {0:d}", *result);
 	}
 
-	void MCXML_NodeImp::Attribute(const char* const name, float* const result) const {
+	void MCXML_NodeImp::Attribute(const char* const name, float* result) const {
 
-		MC_TRACE(std::string("reading attribute: ") + name + " as float.");
+		XML_TRACE("Reading attribute: {0} as float", name);
 
-		*result = _pNode->node().attribute(name).as_float();
+		*result = _node.node().attribute(name).as_float();
 
-		MC_TRACE(std::string("Value: ") + std::string(*result));
+		XML_TRACE("Value: {0:f}", *result);
 	}
 
 	void MCXML_NodeImp::Attribute(const char* const name, const char **result) const {
 
-		MC_TRACE(std::string("Reading attribute: ") + name + " as char*.");
+		XML_TRACE("Reading attribute: {0} as char*", name);
 
-		*result = _pNode->node().attribute(name).value();
+		*result = _node.node().attribute(name).value();
 
-		MC_TRACE(std::string("Value: ") + std::string(*result));
+		XML_TRACE("Value: {0}", *result);
 	}
 }

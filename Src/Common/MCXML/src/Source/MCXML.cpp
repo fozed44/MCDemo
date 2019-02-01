@@ -1,16 +1,19 @@
 #include "../Headers/MCXMLimp.h"
+#include "../../../MCLog/src/Headers/MCLog.h"
 
 namespace MC {
 
-	std::unique_ptr<MCXML_Document> MCXML::Load(const char* const filename) {
-		std::unique_ptr<pugi::xml_document> document = std::make_unique<pugi::xml_document>();
+	std::unique_ptr<MCXML_Document> Load_MCXML_Document(const char* filename) {
+		auto document = std::make_unique<pugi::xml_document>();
 
-		pugi::xml_parse_result parseResult = document->load_file(filename);
+		XML_TRACE("Opening xml file: {0}", filename);
+
+		auto parseResult = document->load_file(filename);
 
 		if (!parseResult)
-			throw std::exception();
+			return nullptr;
 			
-		return std::make_unique<MCXML_Document>(std::move(document));
+		return std::make_unique<MCXMLImp::MCXML_DocumentImp>(std::move(document));
 	}
 
 }
