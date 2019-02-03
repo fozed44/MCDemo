@@ -18,7 +18,9 @@ namespace MC {
 
 	public:
 		void Init();
-		inline ID3D12Device *GetDevice() { return _pD3DDevice.Get(); }
+		
+		IDXGIAdapter *GetConfiguredAdapter();
+		IDXGIOutput  *GetConfiguredOutput();
 
 	private:
 		DXGIWrapper();

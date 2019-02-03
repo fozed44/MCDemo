@@ -2,7 +2,7 @@
 
 #include "../Headers/DXGIWrapper.h"
 #include "../../../../Common/MCLog/src/Headers/MCLog.h"
-#include "../../../../Common/Headers/Common.h"
+#include "../../../../Common/MCCommon/src/Headers/Utility.h"
 
 namespace MC {
 

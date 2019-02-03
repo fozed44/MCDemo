@@ -3,9 +3,6 @@
 #include <string>
 #include "spdlog/spdlog.h"
 
-#define __LOG_SUB_DIR__ "\\log\\"
-#define __INIT_LOG_FILE_NAME__ "Init.log"
-
 namespace MC {
 
 	class MCLog

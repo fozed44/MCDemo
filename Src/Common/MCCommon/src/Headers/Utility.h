@@ -1,5 +1,15 @@
 #pragma once
 
+#include <string>
+#include "windows.h"
+
+/*
+	General utility methods that don't have a better place to go.
+
+	As better places for these items become available, it may be better to move them.
+*/
+
+
 inline std::string HrToString(HRESULT hr)
 {
 	char s_str[64] = {};

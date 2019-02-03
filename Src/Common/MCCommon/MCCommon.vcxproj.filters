@@ -15,24 +15,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Headers\DXGIWrapper.h">
+    <ClInclude Include="src\Headers\Utility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Headers\D3DWrapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Headers\RenderConfig.h">
+    <ClInclude Include="src\Headers\Paths.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Source\DXGIWrapper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Source\D3DWrapper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Source\RenderConfig.cpp">
+    <ClCompile Include="src\Source\Paths.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

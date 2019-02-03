@@ -20,8 +20,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{0D33C258-4069-4642-B520-B66F3F30FC56}</ProjectGuid>
-    <RootNamespace>MCLog</RootNamespace>
+    <ProjectGuid>{77A101A5-7B87-4F62-AAC9-DF5A6A27CD40}</ProjectGuid>
+    <RootNamespace>MCCommon</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -70,39 +70,35 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(ProjectDir)src\Headers;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)Build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(ProjectDir)src\Headers;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)Build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectDir)src\Headers;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)Build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir)src\Headers;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)Build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
-      <ConformanceMode>false</ConformanceMode>
-    </ClCompile>
-  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <ConformanceMode>false</ConformanceMode>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -112,7 +108,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <ConformanceMode>false</ConformanceMode>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -126,7 +122,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <ConformanceMode>false</ConformanceMode>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -134,66 +130,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Headers\MCLog.h" />
-    <ClInclude Include="src\Headers\spdlog\async.h" />
-    <ClInclude Include="src\Headers\spdlog\async_logger.h" />
-    <ClInclude Include="src\Headers\spdlog\common.h" />
-    <ClInclude Include="src\Headers\spdlog\details\async_logger_impl.h" />
-    <ClInclude Include="src\Headers\spdlog\details\circular_q.h" />
-    <ClInclude Include="src\Headers\spdlog\details\console_globals.h" />
-    <ClInclude Include="src\Headers\spdlog\details\file_helper.h" />
-    <ClInclude Include="src\Headers\spdlog\details\fmt_helper.h" />
-    <ClInclude Include="src\Headers\spdlog\details\logger_impl.h" />
-    <ClInclude Include="src\Headers\spdlog\details\log_msg.h" />
-    <ClInclude Include="src\Headers\spdlog\details\mpmc_blocking_q.h" />
-    <ClInclude Include="src\Headers\spdlog\details\null_mutex.h" />
-    <ClInclude Include="src\Headers\spdlog\details\os.h" />
-    <ClInclude Include="src\Headers\spdlog\details\pattern_formatter.h" />
-    <ClInclude Include="src\Headers\spdlog\details\periodic_worker.h" />
-    <ClInclude Include="src\Headers\spdlog\details\registry.h" />
-    <ClInclude Include="src\Headers\spdlog\details\thread_pool.h" />
-    <ClInclude Include="src\Headers\spdlog\fmt\bin_to_hex.h" />
-    <ClInclude Include="src\Headers\spdlog\fmt\bundled\chrono.h" />
-    <ClInclude Include="src\Headers\spdlog\fmt\bundled\color.h" />
-    <ClInclude Include="src\Headers\spdlog\fmt\bundled\core.h" />
-    <ClInclude Include="src\Headers\spdlog\fmt\bundled\format-inl.h" />
-    <ClInclude Include="src\Headers\spdlog\fmt\bundled\format.h" />
-    <ClInclude Include="src\Headers\spdlog\fmt\bundled\locale.h" />
-    <ClInclude Include="src\Headers\spdlog\fmt\bundled\ostream.h" />
-    <ClInclude Include="src\Headers\spdlog\fmt\bundled\posix.h" />
-    <ClInclude Include="src\Headers\spdlog\fmt\bundled\printf.h" />
-    <ClInclude Include="src\Headers\spdlog\fmt\bundled\ranges.h" />
-    <ClInclude Include="src\Headers\spdlog\fmt\bundled\time.h" />
-    <ClInclude Include="src\Headers\spdlog\fmt\fmt.h" />
-    <ClInclude Include="src\Headers\spdlog\fmt\ostr.h" />
-    <ClInclude Include="src\Headers\spdlog\formatter.h" />
-    <ClInclude Include="src\Headers\spdlog\logger.h" />
-    <ClInclude Include="src\Headers\spdlog\sinks\android_sink.h" />
-    <ClInclude Include="src\Headers\spdlog\sinks\ansicolor_sink.h" />
-    <ClInclude Include="src\Headers\spdlog\sinks\base_sink.h" />
-    <ClInclude Include="src\Headers\spdlog\sinks\basic_file_sink.h" />
-    <ClInclude Include="src\Headers\spdlog\sinks\daily_file_sink.h" />
-    <ClInclude Include="src\Headers\spdlog\sinks\dist_sink.h" />
-    <ClInclude Include="src\Headers\spdlog\sinks\msvc_sink.h" />
-    <ClInclude Include="src\Headers\spdlog\sinks\null_sink.h" />
-    <ClInclude Include="src\Headers\spdlog\sinks\ostream_sink.h" />
-    <ClInclude Include="src\Headers\spdlog\sinks\rotating_file_sink.h" />
-    <ClInclude Include="src\Headers\spdlog\sinks\sink.h" />
-    <ClInclude Include="src\Headers\spdlog\sinks\stdout_color_sinks.h" />
-    <ClInclude Include="src\Headers\spdlog\sinks\stdout_sinks.h" />
-    <ClInclude Include="src\Headers\spdlog\sinks\syslog_sink.h" />
-    <ClInclude Include="src\Headers\spdlog\sinks\wincolor_sink.h" />
-    <ClInclude Include="src\Headers\spdlog\spdlog.h" />
-    <ClInclude Include="src\Headers\spdlog\tweakme.h" />
-    <ClInclude Include="src\Headers\spdlog\version.h" />
+    <ClInclude Include="src\Headers\Paths.h" />
+    <ClInclude Include="src\Headers\Utility.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Source\MCLog.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\MCCommon\MCCommon.vcxproj">
-      <Project>{77a101a5-7b87-4f62-aac9-df5a6a27cd40}</Project>
-    </ProjectReference>
+    <ClCompile Include="src\Source\Paths.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

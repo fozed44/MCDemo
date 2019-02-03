@@ -3,6 +3,7 @@
 #include "../../../Common/MCLog/src/Headers/MCLog.h"
 #include "../../../Common/MCXML/src/Headers/MCXML.h"
 #include "../../../Render/MCD3DRenderEngine/src/Headers/DXGIWrapper.h"
+#include "../../../Render/MCD3DRenderEngine/src/Headers/D3DWrapper.h"
 
 #include <iostream>
 
@@ -30,6 +31,10 @@ int main(int argc, char ** argv) {
 	elem->Attribute("testInt", &x);
 
 	MC::DXGIWrapper::GetInstance().Init();
+
+	MC::D3DWrapper d3dWrapper;
+
+	d3dWrapper.Init();
 
 	char t;
 	std::cin >> t;
