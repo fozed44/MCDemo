@@ -13,6 +13,8 @@
 
 int main(int argc, char ** argv) {
 
+	MC::MCLogHelper::SetDefaultLoggers();
+
 	MC::MCLog::GetInstance().GetCore()->error("test int: {0:d}", 42);
 
 	MC_ERROR("test float: {0:03.2f}", 42.23);

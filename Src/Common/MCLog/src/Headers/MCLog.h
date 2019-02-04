@@ -3,6 +3,10 @@
 #include <string>
 #include "spdlog/spdlog.h"
 
+#define DEFAULT_CORE_LOGGER_NAME "CORE"
+#define DEFAULT_INIT_LOGGER_NAME "INIT"
+#define DEFAULT_XML_LOGGER_NAME "XML"
+
 namespace MC {
 
 	class MCLog
@@ -22,15 +26,38 @@ namespace MC {
 
 		// Singleton... private constructor.
 		MCLog();
-		std::shared_ptr<spdlog::logger> _pCoreLogger;
-		std::shared_ptr<spdlog::logger> _pXMLLogger;
-		std::shared_ptr<spdlog::logger> _pInitLogger;
-
-		std::string GetExecutingDirectory() const;
-		std::string GetInitLogFilename() const;
+		static std::shared_ptr<spdlog::logger> _pCoreLogger;
+		static std::shared_ptr<spdlog::logger> _pXMLLogger;
+		static std::shared_ptr<spdlog::logger> _pInitLogger;
 	public:
 		MCLog(MCLog const&)          = delete;
 		void operator=(MCLog const&) = delete;
+
+	public:
+		friend class MCLogHelper;
+	};
+
+	class MCLogHelper
+	{
+	public:
+		static void SetCoreLogger(std::shared_ptr<spdlog::logger> pLogger);
+		static void SetXMLLogger(std::shared_ptr<spdlog::logger> pLogger);
+		static void SetInitLogger(std::shared_ptr<spdlog::logger> pLogger);
+
+		static void SetDefaultLoggers();
+
+		static const char*GetDefaultConsolePattern();
+		static const char*GetDefaultFilePattern();
+
+		static void SetGlobalPattern(const char *pattern);
+
+		static std::shared_ptr<spdlog::logger> CreateStdLoggerMT(const char* loggerName, const char* pattern = nullptr);
+		static std::shared_ptr<spdlog::logger> CreateFileLoggerMT(const char *loggerName, const char* filename,  const char* pattern = nullptr);
+		static std::shared_ptr<spdlog::logger> CreateDualLoggerMT(
+			const char* loggerName,
+			const char* filename,
+			const char* consolePattern = nullptr,
+			const char* filePattern = nullptr);
 	};
 
 }

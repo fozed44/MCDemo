@@ -189,6 +189,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Source\MCLog.cpp" />
+    <ClCompile Include="src\Source\MCLogHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MCCommon\MCCommon.vcxproj">
