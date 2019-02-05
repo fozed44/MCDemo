@@ -45,6 +45,7 @@ namespace MC {
 		static void SetInitLogger(std::shared_ptr<spdlog::logger> pLogger);
 
 		static void SetDefaultLoggers();
+		static void SetNullLoggers();
 
 		static const char*GetDefaultConsolePattern();
 		static const char*GetDefaultFilePattern();

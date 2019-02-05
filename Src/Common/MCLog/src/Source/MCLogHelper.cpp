@@ -1,6 +1,7 @@
 #include "../Headers/MCLog.h"
 #include "../Headers/spdlog/sinks/stdout_color_sinks.h"
 #include "../Headers/spdlog/sinks/basic_file_sink.h"
+#include "../Headers/spdlog/sinks/null_sink.h"
 #include "../../../MCCommon/src/Headers/Paths.h"
 
 namespace MC {
@@ -77,6 +78,14 @@ namespace MC {
 		SetCoreLogger(CreateStdLoggerMT(DEFAULT_CORE_LOGGER_NAME));
 		SetXMLLogger(CreateStdLoggerMT(DEFAULT_XML_LOGGER_NAME));
 		SetInitLogger(CreateDualLoggerMT(DEFAULT_INIT_LOGGER_NAME, Paths::InitLogFilename()));
+	}
+
+	void MCLogHelper::SetNullLoggers() {
+		auto nullSink = std::make_shared<spdlog::sinks::null_sink_mt>();
+		auto nullLogger = std::shared_ptr<spdlog::logger>(new spdlog::logger("null", { nullSink }));
+		SetCoreLogger(nullLogger);
+		SetXMLLogger(nullLogger);
+		SetInitLogger(nullLogger);
 	}
 
 	void MCLogHelper::SetGlobalPattern(const char *pattern) {

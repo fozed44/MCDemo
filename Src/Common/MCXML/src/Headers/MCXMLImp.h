@@ -38,9 +38,9 @@ namespace MCXMLImp {
 	public:
 		virtual ~MCXML_NodeImp();
 	public:
-		virtual void Attribute(const char* const name, int*   result) const override;
-		virtual void Attribute(const char* const name, float* result) const override;
-		virtual void Attribute(const char* const name, const char **result) const override;
+		virtual bool Attribute(const char* const name, int*   result) const override;
+		virtual bool Attribute(const char* const name, float* result) const override;
+		virtual bool Attribute(const char* const name, std::string *pResult) const override;
 	public:
 		MCXML_NodeImp(const MCXML_NodeImp&)  = delete;
 		MCXML_NodeImp(const MCXML_NodeImp&&) = delete;

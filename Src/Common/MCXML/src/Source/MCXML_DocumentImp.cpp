@@ -15,6 +15,11 @@ namespace MCXMLImp {
 
 		try {
 			resultNodeSet = _pDoc->select_nodes(xPath);
+
+			if (resultNodeSet.size() == 0) {
+				XML_TRACE("No nodes were found for {0}", xPath);
+				return nullptr;
+			}
 		}
 		catch (pugi::xpath_exception *pEx) {
 			XML_WARN("Could not select nodes for {0}, reason: {1}", xPath, pEx->what());

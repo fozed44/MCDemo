@@ -8,9 +8,9 @@ namespace MC {
 
 	class MCXML_Node {
 	public:
-		virtual void Attribute(const char* const name, int*   result)       const = 0;
-		virtual void Attribute(const char* const name, float* result)       const = 0;
-		virtual void Attribute(const char* const name, const char **result) const = 0;
+		virtual bool Attribute(const char* const name, int*   result)       const = 0;
+		virtual bool Attribute(const char* const name, float* result)       const = 0;
+		virtual bool Attribute(const char* const name, std::string *pResult) const = 0;
 		virtual ~MCXML_Node() {};
 	public:
 		MCXML_Node(const MCXML_Node&) = delete;
