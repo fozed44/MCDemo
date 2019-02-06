@@ -40,6 +40,8 @@ public:
 	MCException() = default;
 	MCException(HRESULT hr, const std::string& functionName, const std::string& filename, int lineNunber)
 		: ErrorCode(hr), FunctionName(functionName), Filename(filename), LineNumber(LineNumber) {}
+	MCException(const std::string& info, const std::string& filename, int lineNumber)
+		: Info(info), Filename(filename), LineNumber(lineNumber) {}
 	MCException(HRESULT hr)
 		: ErrorCode(hr) {}
 
@@ -47,15 +49,17 @@ public:
 		char lineNumberBuffer[20];
 		_itoa_s(LineNumber, lineNumberBuffer, 10);
 		return
-			std::string("ErrorCode: ") + HrToString(ErrorCode) + std::string("\n") +
+			std::string("HRESULT (s_ok when not used): ") + HrToString(ErrorCode) + std::string("\n") +
 			std::string("FunctionName: ") + FunctionName + std::string("\n") +
 			std::string("Filename: ") + Filename + std::string("\n") +
-			std::string("Line Number: ") + std::string(lineNumberBuffer);
+			std::string("Line Number: ") + std::string(lineNumberBuffer) + std::string("\n") +
+			std::string("Extra info: ") + Info + std::string("\n");
 	}
 
 	HRESULT      ErrorCode = S_OK;
 	std::string  FunctionName;
 	std::string  Filename;
+	std::string  Info;
 	int          LineNumber = -1;
 };
 
@@ -64,6 +68,7 @@ public:
 #define MCThrowIfFailed(x) \
 { \
 	HRESULT hr__ = (x); \
-	std::string wfn = __FILE__; \
-	if(FAILED(hr__)) { throw MCException(hr__, #x, wfn, __LINE__); } \
+	if(FAILED(hr__)) { throw MCException(hr__, #x, __FILE__, __LINE__); } \
 }
+
+#define MCTHROW(x) throw MCException(x, __FILE__, __LINE__)

@@ -3,6 +3,9 @@
 //#include "dxgi1_6.h"
 #include "d3d12.h"
 #include "wrl.h"
+#include "RenderConfig.h"
+#include "DXGIWrapper.h"
+#include <memory>
 
 using Microsoft::WRL::ComPtr;
 
@@ -14,7 +17,7 @@ namespace MC {
 		~D3DWrapper();
 
 	public:
-		void Init();
+		void Init(const RENDER_CONFIG* pRenderConfig, std::shared_ptr<DXGIWrapper>& pDXGIWrapper);
 
 	private:
 
@@ -25,10 +28,13 @@ namespace MC {
 		ComPtr<ID3D12CommandList> _pCommandList;
 
 	private:
-		void InitDevice();
+		void InitDevice(std::shared_ptr<DXGIWrapper>& pDXGIWrapper);
 		void InitFence();
 		void InitCommandQueue();
 		void InitCommandAllocator();
 		void InitCommandList();
+
+	private:
+		std::shared_ptr<DXGIWrapper> _pDXGIWrapper;
 	};
 }

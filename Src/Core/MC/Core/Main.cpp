@@ -32,11 +32,16 @@ int main(int argc, char ** argv) {
 
 	elem->Attribute("testInt", &x);
 
-	MC::DXGIWrapper::GetInstance().Init();
+	MC::RENDER_CONFIG renderConfig;
+	MC::LoadRenderConfig(&renderConfig);
 
-	MC::D3DWrapper d3dWrapper;
+	auto dxgiWrapper = std::make_shared<MC::DXGIWrapper>();
 
-	d3dWrapper.Init();
+	dxgiWrapper->Init(&renderConfig);
+
+	auto d3dWrapper = std::make_shared<MC::D3DWrapper>();
+
+	d3dWrapper->Init(&renderConfig, dxgiWrapper);
 
 	char t;
 	std::cin >> t;

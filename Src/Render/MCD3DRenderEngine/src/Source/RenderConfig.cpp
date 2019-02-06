@@ -9,20 +9,20 @@ namespace MC {
 
 		auto renderConfigFilename = std::string(Paths::ConfigDirectory()) + RENDER_CONFIG_FILENAME;
 
-		MC_INFO("**Loading render configuration.");
+		MC_INFO("**Loading renderer configuration.");
 
 		auto pRenderConfigDoc = Load_MCXML_Document(renderConfigFilename.c_str());
 
-		auto pRenderElementNodeSet = pRenderConfigDoc->Get("render");
+		auto pRenderElementNodeSet = pRenderConfigDoc->Get("render/output");
 		auto pRenderElement = pRenderElementNodeSet->ElementAt(0);
 
-		pRenderElement->Attribute("adapterOrdinal", &pRenderConfig->ADAPTOR_ORDINAL);
-		pRenderElement->Attribute("outputWidth",    &pRenderConfig->OUTPUT_WIDTH);
-		pRenderElement->Attribute("outputHeight",   &pRenderConfig->OUTPUT_HEIGHT);
-		pRenderElement->Attribute("refreshRateN",   &pRenderConfig->OUTPUT_REFRESH_RATE_NUMERATOR);
-		pRenderElement->Attribute("refreshRateD",   &pRenderConfig->OUTPUT_REFRESH_RATE_DENOMINATOR);
+		pRenderElement->Attribute("adapterDeviceID", &pRenderConfig->ADAPTER_DEVICE_ID);
+		pRenderElement->Attribute("outputWidth",     &pRenderConfig->OUTPUT_WIDTH);
+		pRenderElement->Attribute("outputHeight",    &pRenderConfig->OUTPUT_HEIGHT);
+		pRenderElement->Attribute("refreshRateN",    &pRenderConfig->OUTPUT_REFRESH_RATE_NUMERATOR);
+		pRenderElement->Attribute("refreshRateD",    &pRenderConfig->OUTPUT_REFRESH_RATE_DENOMINATOR);
 
-		MC_INFO("**Loaded render configuration.");
+		MC_INFO("**Loaded renderer configuration.");
 
 	}
 
