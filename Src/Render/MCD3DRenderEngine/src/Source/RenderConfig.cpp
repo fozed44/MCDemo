@@ -19,7 +19,8 @@ namespace MC {
 		pRenderElement->Attribute("adapterOrdinal", &pRenderConfig->ADAPTOR_ORDINAL);
 		pRenderElement->Attribute("outputWidth",    &pRenderConfig->OUTPUT_WIDTH);
 		pRenderElement->Attribute("outputHeight",   &pRenderConfig->OUTPUT_HEIGHT);
-		pRenderElement->Attribute("refreshRate",    &pRenderConfig->OUTPUT_REFRESH_RATE);
+		pRenderElement->Attribute("refreshRateN",   &pRenderConfig->OUTPUT_REFRESH_RATE_NUMERATOR);
+		pRenderElement->Attribute("refreshRateD",   &pRenderConfig->OUTPUT_REFRESH_RATE_DENOMINATOR);
 
 		MC_INFO("**Loaded render configuration.");
 

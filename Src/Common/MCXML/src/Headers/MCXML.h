@@ -43,4 +43,5 @@ namespace MC {
 	};
 	
 	std::unique_ptr<MCXML_Document> Load_MCXML_Document(const char* filename);
+	inline std::unique_ptr<MCXML_Document> Load_MCXML_Document(const std::string& filename) { return Load_MCXML_Document(filename.c_str()); }
 }

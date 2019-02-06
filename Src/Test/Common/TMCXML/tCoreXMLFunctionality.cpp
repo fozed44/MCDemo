@@ -10,32 +10,36 @@
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-#define TEST_DIRECTORY L"C:\\Temp\\"
-#define TEST_FILENAME L"validUnitTest.config"
+#define TEST_DIRECTORY "C:\\Temp\\"
+#define TEST_FILENAME "validUnitTest.config"
+#include <crtdbg.h>
 
 namespace TMCXML
 {		
 
+
+	struct CrtCheckMemory
+	{
+		_CrtMemState state1;
+		_CrtMemState state2;
+		_CrtMemState state3;
+		CrtCheckMemory()
+		{
+			_CrtMemCheckpoint(&state1);
+		}
+		~CrtCheckMemory()
+		{
+			_CrtMemCheckpoint(&state2);			
+			Assert::AreEqual(0, _CrtMemDifference(&state3, &state1, &state2));
+			// else just do this to dump the leaked blocks to stdout.
+			if (_CrtMemDifference(&state3, &state1, &state2))
+				_CrtMemDumpStatistics(&state3);
+		}
+	};
+
 	std::string  g_validTestFilename;
-	std::wstring g_validTestFilenameW;
 
-	std::wstring s2ws(const std::string& str)
-	{
-		using convert_typeX = std::codecvt_utf8<wchar_t>;
-		std::wstring_convert<convert_typeX, wchar_t> converterX;
-
-		return converterX.from_bytes(str);
-	}
-
-	std::string ws2s(const std::wstring& wstr)
-	{
-		using convert_typeX = std::codecvt_utf8<wchar_t>;
-		std::wstring_convert<convert_typeX, wchar_t> converterX;
-
-		return converterX.to_bytes(wstr);
-	}
-
-	void WriteValidTestFile(std::wstring& filename) {
+	void WriteValidTestFile(std::string& filename) {
 		std::ofstream testFile;
 		testFile.open(filename, std::ios::trunc);
 		testFile << "<config>" << std::endl;
@@ -51,20 +55,17 @@ namespace TMCXML
 		testFile.close();
 	}
 
-
-
 	TEST_CLASS(TestLoadXMLDocument)
 	{
 	public:
 
 		TEST_CLASS_INITIALIZE(TestLoadXMLDocumentInitialize) {
 			MC::MCLogHelper::SetNullLoggers();
-			CreateDirectory(TEST_DIRECTORY, NULL);
+			CreateDirectoryA(TEST_DIRECTORY, NULL);
 
-			g_validTestFilenameW = std::wstring(TEST_DIRECTORY) + std::wstring(TEST_FILENAME);
-			g_validTestFilename = ws2s(g_validTestFilenameW.c_str());
+			g_validTestFilename = std::string(TEST_DIRECTORY) + std::string(TEST_FILENAME);
 
-			WriteValidTestFile(g_validTestFilenameW);
+			WriteValidTestFile(g_validTestFilename);
 		}
 
 		/*
@@ -82,7 +83,7 @@ namespace TMCXML
 			Make sure that MC::Load_MCXML_Document() can open a file that we know exists and is valid without throwing any exceptions.
 		*/
 		TEST_METHOD(OpenValidTestFile) {
-			auto document = MC::Load_MCXML_Document(g_validTestFilename.c_str());
+			auto document = MC::Load_MCXML_Document(g_validTestFilename);
 
 			Assert::AreEqual(true, (bool)document);
 		}
@@ -91,7 +92,7 @@ namespace TMCXML
 			Read an integer value from an int typed attribute.
 		*/
 		TEST_METHOD(ReadIntParameterFromValidFile) {
-			auto document = MC::Load_MCXML_Document(g_validTestFilename.c_str());
+			auto document = MC::Load_MCXML_Document(g_validTestFilename);
 			auto nodeSet = document->Get("config/outerElement1/innerElement");
 			auto node = nodeSet->ElementAt(0);
 			int testInt;
@@ -105,7 +106,7 @@ namespace TMCXML
 			Read a float value from a float typed attribute.
 		*/
 		TEST_METHOD(ReadFloatParameterFromValidFile) {
-			auto document = MC::Load_MCXML_Document(g_validTestFilename.c_str());
+			auto document = MC::Load_MCXML_Document(g_validTestFilename);
 			auto nodeSet = document->Get("config/outerElement1/innerElement");
 			auto node = nodeSet->ElementAt(0);
 			float testFloat;
@@ -119,7 +120,7 @@ namespace TMCXML
 			Read a string value from a string typed attribute.
 		*/
 		TEST_METHOD(ReadCharParameterFromValidFile) {
-			auto document = MC::Load_MCXML_Document(g_validTestFilename.c_str());
+			auto document = MC::Load_MCXML_Document(g_validTestFilename);
 			auto nodeSet = document->Get("config/outerElement1/innerElement");
 			auto node = nodeSet->ElementAt(0);
 			std::string testString;
@@ -135,7 +136,7 @@ namespace TMCXML
 			Make sure that no exceptions are thrown.
 		*/
 		TEST_METHOD(GetForMissingXPathCreatesNoException) {
-			auto document = MC::Load_MCXML_Document(g_validTestFilename.c_str());
+			auto document = MC::Load_MCXML_Document(g_validTestFilename);
 			auto nodeSet = document->Get("config/outerElement1/nonExistingElement");
 
 			Assert::AreEqual(false, (bool)nodeSet);
@@ -147,7 +148,7 @@ namespace TMCXML
 			Make sure that no exceptions are thrown.
 		*/
 		TEST_METHOD(ElementAtOutOfBoundsCreatesNoException) {
-			auto document = MC::Load_MCXML_Document(g_validTestFilename.c_str());
+			auto document = MC::Load_MCXML_Document(g_validTestFilename);
 			auto nodeSet = document->Get("config/outerElement1/innerElement");
 
 			auto node = nodeSet->ElementAt(20);
@@ -161,7 +162,7 @@ namespace TMCXML
 			Make sure that no exceptions are thrown.
 		*/
 		TEST_METHOD(AttributeIntNotExistsCreatesNoException) {
-			auto document = MC::Load_MCXML_Document(g_validTestFilename.c_str());
+			auto document = MC::Load_MCXML_Document(g_validTestFilename);
 			auto nodeSet = document->Get("config/outerElement1/innerElement");
 			auto node = nodeSet->ElementAt(0);
 
@@ -177,7 +178,7 @@ namespace TMCXML
 			Make sure that no exceptions are thrown.
 		*/
 		TEST_METHOD(AttributeFloatNotExistsCreatesNoException) {
-			auto document = MC::Load_MCXML_Document(g_validTestFilename.c_str());
+			auto document = MC::Load_MCXML_Document(g_validTestFilename);
 			auto nodeSet = document->Get("config/outerElement1/innerElement");
 			auto node = nodeSet->ElementAt(0);
 
@@ -193,7 +194,7 @@ namespace TMCXML
 			Make sure that no exceptions are thrown.
 		*/
 		TEST_METHOD(AttributeStringNotExistsCreatesNoException) {
-			auto document = MC::Load_MCXML_Document(g_validTestFilename.c_str());
+			auto document = MC::Load_MCXML_Document(g_validTestFilename);
 			auto nodeSet = document->Get("config/outerElement1/innerElement");
 			auto node = nodeSet->ElementAt(0);
 
@@ -209,7 +210,10 @@ namespace TMCXML
 			Make sure that no exceptions are thrown.
 		*/
 		TEST_METHOD(AttributeIntCantParseCreatesNoException) {
-			auto document = MC::Load_MCXML_Document(g_validTestFilename.c_str());
+			CrtCheckMemory();
+
+			int * t = new int[50000];
+			auto document = MC::Load_MCXML_Document(g_validTestFilename);
 			auto nodeSet = document->Get("config/outerElement1/innerElement");
 			auto node = nodeSet->ElementAt(0);
 
@@ -225,7 +229,8 @@ namespace TMCXML
 			Make sure that no exceptions are thrown.
 		*/
 		TEST_METHOD(AttributeFloatCantParseCreatesNoException) {
-			auto document = MC::Load_MCXML_Document(g_validTestFilename.c_str());
+			CrtCheckMemory();
+			auto document = MC::Load_MCXML_Document(g_validTestFilename);
 			auto nodeSet = document->Get("config/outerElement1/innerElement");
 			auto node = nodeSet->ElementAt(0);
 

@@ -25,15 +25,14 @@ namespace MC {
 
 			pAdapter->GetDesc(&desc);
 
-			std::wstring adapterDescW(desc.Description);
-			std::string adapterDesc(adapterDescW.begin(), adapterDescW.end());
+			std::string adapterDesc(ws2s(desc.Description));
 
 			INIT_INFO("***Adapter: {0}", adapterDesc.c_str());
 			INIT_INFO("  Device ID: {0:d}", desc.DeviceId);
 
 			LogAdapterOutputs(pAdapter);
 
-			SAFE_RELEASE(pAdapter);
+			MCSAFE_RELEASE(pAdapter);
 			++i;
 		}
 
@@ -47,14 +46,13 @@ namespace MC {
 			DXGI_OUTPUT_DESC desc;
 			pOutput->GetDesc(&desc);
 
-			std::wstring deviceNameW(desc.DeviceName);
-			std::string deviceName(deviceNameW.begin(), deviceNameW.end());
+			std::string deviceName(ws2s(desc.DeviceName));
 
 			INIT_INFO("   ***Output Device: {0}", deviceName);
 
 			LogOutputDisplayModes(pOutput, DXGI_FORMAT_R8G8B8A8_UNORM);
 
-			SAFE_RELEASE(pOutput);
+			MCSAFE_RELEASE(pOutput);
 			++i;
 		}
 
@@ -78,10 +76,9 @@ namespace MC {
 			UINT n = x.RefreshRate.Numerator;
 			UINT d = x.RefreshRate.Denominator;
 
-			std::wstring logOutW =
-				L"{ " + std::to_wstring(x.Width) + L" x " + std::to_wstring(x.Height) + L" } -- Refresh: " +
-				std::to_wstring(n) + L"/" + std::to_wstring(d);
-			std::string logOut(logOutW.begin(), logOutW.end());
+			std::string logOut =
+				"{ " + std::to_string(x.Width) + " x " + std::to_string(x.Height) + " } -- Refresh: " +
+				std::to_string(n) + "/" + std::to_string(d);
 
 			INIT_INFO("      ***{0}", logOut.c_str());			
 		}
@@ -91,7 +88,7 @@ namespace MC {
 		UINT dxgiCreateFlags = 0;
 
 		INIT_TRACE("Creating DXGIFactory.");
-		ThrowIfFailed(CreateDXGIFactory2(dxgiCreateFlags, __uuidof(_pDXGIFactory), &_pDXGIFactory));
+		MCThrowIfFailed(CreateDXGIFactory2(dxgiCreateFlags, __uuidof(_pDXGIFactory), &_pDXGIFactory));
 		INIT_TRACE("Success.");
 	}
 
