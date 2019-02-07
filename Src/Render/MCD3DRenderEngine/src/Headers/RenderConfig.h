@@ -6,20 +6,31 @@
 
 namespace MC {
 
+	enum RENDER_CONFIG_MULTISAMPLE {
+		RENDER_CONFIG_MULTISAMPLE_NONE = 0,
+		RENDER_CONFIG_MULTISAMPLE_MSAA = 1
+	};
+
 	struct RENDER_CONFIG {
-		int   ADAPTER_DEVICE_ID;
-		int   OUTPUT_WIDTH;
-		int   OUTPUT_HEIGHT;
-		int   OUTPUT_REFRESH_RATE_NUMERATOR;
-		int   OUTPUT_REFRESH_RATE_DENOMINATOR;
+		int   DEBUG_ENABLE_DX_DEBUG;
+		int   DISPLAY_ADAPTER_DEVICE_ID;
+		int   DISPLAY_OUTPUT_WIDTH;
+		int   DISPLAY_OUTPUT_HEIGHT;
+		int   DISPLAY_OUTPUT_REFRESH_RATE_NUMERATOR;
+		int   DISPLAY_OUTPUT_REFRESH_RATE_DENOMINATOR;
+		int   DISPLAY_FULLSCREEN;
+		int   OPTIONS_MULTISAMPLE;
 
 
-		inline void SetDefaults(RENDER_CONFIG &renderConfig) {
-			renderConfig.ADAPTER_DEVICE_ID               = 0;
-			renderConfig.OUTPUT_WIDTH                    = 800;
-			renderConfig.OUTPUT_HEIGHT                   = 600;
-			renderConfig.OUTPUT_REFRESH_RATE_NUMERATOR   = 500;
-			renderConfig.OUTPUT_REFRESH_RATE_DENOMINATOR = 1000;
+		static inline void SetDefaults(RENDER_CONFIG *pRenderConfig) {
+			pRenderConfig->DEBUG_ENABLE_DX_DEBUG                   = 0;
+			pRenderConfig->DISPLAY_ADAPTER_DEVICE_ID               = 0;
+			pRenderConfig->DISPLAY_OUTPUT_WIDTH                    = 800;
+			pRenderConfig->DISPLAY_OUTPUT_HEIGHT                   = 600;
+			pRenderConfig->DISPLAY_OUTPUT_REFRESH_RATE_NUMERATOR   = 500;
+			pRenderConfig->DISPLAY_OUTPUT_REFRESH_RATE_DENOMINATOR = 1000;
+			pRenderConfig->DISPLAY_FULLSCREEN                      = 0;
+			pRenderConfig->OPTIONS_MULTISAMPLE                     = RENDER_CONFIG_MULTISAMPLE_NONE;
 		}
 
 	};

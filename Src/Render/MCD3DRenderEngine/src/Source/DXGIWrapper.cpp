@@ -1,4 +1,4 @@
-#define __ENABLE_INIT_TRACE
+#include "../../../../Common/MCCommon/src/Headers/GlobalSwitches.h"
 
 #include "../Headers/DXGIWrapper.h"
 #include "../../../../Common/MCLog/src/Headers/MCLog.h"
@@ -7,7 +7,8 @@
 namespace MC {
 
 	DXGIWrapper::DXGIWrapper() 
-		: _initialized(false) {}
+		: _initialized(false), _initialConfiguration{} {
+	}
 
 	DXGIWrapper::~DXGIWrapper(){}
 
@@ -98,6 +99,15 @@ namespace MC {
 	void DXGIWrapper::InitDXGIFactory() {
 		UINT dxgiCreateFlags = 0;
 
+		// Note:
+		//	This debug layer is enabled via the _initialCOnfiguration.DEBUG_ENABLE_DX_DEBUG flag
+		//  this flag also triggers CreateConfiguredOrDefault3DDevice to call EnableDebugLayer before
+		//  creating a new device.
+		if (_initialConfiguration.DEBUG_ENABLE_DX_DEBUG) {
+			INIT_INFO("Enabling debug for dxgi factory.");
+			dxgiCreateFlags |= DXGI_CREATE_FACTORY_DEBUG;
+		}
+
 		INIT_TRACE("Creating DXGIFactory.");
 		MCThrowIfFailed(CreateDXGIFactory2(dxgiCreateFlags, __uuidof(_pDXGIFactory), &_pDXGIFactory));
 		INIT_TRACE("Success.");
@@ -152,15 +162,15 @@ namespace MC {
 	}
 
 	IDXGIAdapter *DXGIWrapper::GetConfiguredOrDefaultAdapter() {
-		INIT_INFO("Attempting to get configured adapter: {0:d}", _initialConfiguration.ADAPTER_DEVICE_ID);
-		auto configuredAdapter = GetAdapterByDeviceID(_initialConfiguration.ADAPTER_DEVICE_ID);
+		INIT_INFO("Attempting to get configured adapter: {0:d}", _initialConfiguration.DISPLAY_ADAPTER_DEVICE_ID);
+		auto configuredAdapter = GetAdapterByDeviceID(_initialConfiguration.DISPLAY_ADAPTER_DEVICE_ID);
 
 		if (configuredAdapter != nullptr) {
 			INIT_INFO("Atapter found.");
 			return configuredAdapter;
 		}
 
-		INIT_INFO("Failed to locate adapter: {0:d}", _initialConfiguration.ADAPTER_DEVICE_ID);
+		INIT_INFO("Failed to locate adapter: {0:d}", _initialConfiguration.DISPLAY_ADAPTER_DEVICE_ID);
 		INIT_INFO("Loading default adapter");
 
 		auto defaultAdapter = GetDefaultAdapter();
@@ -172,6 +182,55 @@ namespace MC {
 		INIT_INFO("Loaded default adapter");
 
 		return defaultAdapter;
+	}
+
+	ID3D12Device *DXGIWrapper::CreateConfiguredOrDefault3DDevice() {
+
+		// If there is already a device in existence, release it.
+		MCSAFE_RELEASE(_p3DDevice);
+
+		// Note:
+		//	This debug layer is enabled via the _initialCOnfiguration.DEBUG_ENABLE_DX_DEBUG flag
+		//  this flag also triggers CreateConfiguredOrDefault3DDevice to call EnableDebugLayer before
+		//  creating a new device.
+		if (_initialConfiguration.DEBUG_ENABLE_DX_DEBUG) {
+			INIT_INFO("Enabling debug for d3d12 device.");
+			EnableDXDebugLayer();
+		}
+
+		// TODO:
+		//	We don't really want to be messing with raw com pointers that need to be released.
+		//  FIND AND USE A BETTER SOLUTION.
+		auto pAdapter = GetConfiguredOrDefaultAdapter();
+
+		INIT_INFO("Creating 3D Device.");
+
+		MCThrowIfFailed(D3D12CreateDevice(
+			(IUnknown*)pAdapter,
+			D3D_FEATURE_LEVEL_11_0,
+			__uuidof(_p3DDevice),
+			&_p3DDevice
+		));
+
+		INIT_INFO("Device successfully created.");
+
+		MCSAFE_RELEASE(pAdapter);
+
+		return _p3DDevice.Get();
+	}
+
+	ID3D12Device *DXGIWrapper::Get3DDevice() {
+		assert(_p3DDevice);
+		return _p3DDevice.Get();
+	}
+
+	void DXGIWrapper::EnableDXDebugLayer() {
+		// Enable the debug layer (requires the Graphics Tools "optional feature").
+		// NOTE: Enabling the debug layer after device creation will invalidate the active device.
+		ComPtr<ID3D12Debug> debugController;
+		if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))){
+			debugController->EnableDebugLayer();
+		}
 	}
 
 }

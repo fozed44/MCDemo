@@ -2,6 +2,7 @@
 
 #include <string>
 #include "spdlog/spdlog.h"
+#include "../../../MCCommon/src/Headers/GlobalSwitches.h"
 
 #define DEFAULT_CORE_LOGGER_NAME "CORE"
 #define DEFAULT_INIT_LOGGER_NAME "INIT"

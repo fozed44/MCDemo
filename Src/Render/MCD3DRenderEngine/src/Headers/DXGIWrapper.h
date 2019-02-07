@@ -19,8 +19,11 @@ namespace MC {
 		
 		inline bool Initialized() { return _initialized; }
 
+		ID3D12Device *CreateConfiguredOrDefault3DDevice();
+		ID3D12Device *Get3DDevice();
+
 		IDXGIAdapter *GetConfiguredOrDefaultAdapter();
-		IDXGIOutput  *GetConfiguredOutput();
+		IDXGIOutput  *GetConfiguredOrDefaultOutput();
 
 	private:
 		DXGIWrapper(DXGIWrapper&)  = delete;
@@ -34,11 +37,13 @@ namespace MC {
 		void InitDXGIFactory();
 		void InitConfiguration(const RENDER_CONFIG *pConfig);
 
+		void EnableDXDebugLayer();
+
 		bool _initialized;
 		const RENDER_CONFIG _initialConfiguration;
 
 		ComPtr<IDXGIFactory4> _pDXGIFactory;
-		ComPtr<ID3D12Device>  _pD3DDevice;
+		ComPtr<ID3D12Device>  _p3DDevice;
 	};
 
 }

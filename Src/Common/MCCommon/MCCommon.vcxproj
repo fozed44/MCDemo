@@ -130,6 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Headers\GlobalSwitches.h" />
     <ClInclude Include="src\Headers\Paths.h" />
     <ClInclude Include="src\Headers\Utility.h" />
   </ItemGroup>

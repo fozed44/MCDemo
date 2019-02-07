@@ -1,4 +1,4 @@
-#define __ENABLE_INIT_TRACE__
+#include "../../../Common/MCCommon/src/Headers/GlobalSwitches.h"
 
 #include "../../../Common/MCLog/src/Headers/MCLog.h"
 #include "../../../Common/MCXML/src/Headers/MCXML.h"

@@ -21,11 +21,10 @@ namespace MC {
 
 	private:
 
-		ComPtr<ID3D12Device> _pDevice;
 		ComPtr<ID3D12Fence>  _pFence;
 		ComPtr<ID3D12CommandAllocator> _pCommandAllocator;
 		ComPtr<ID3D12CommandQueue> _pCommandQueue;
-		ComPtr<ID3D12CommandList> _pCommandList;
+		ComPtr<ID3D12GraphicsCommandList> _pCommandList;
 
 	private:
 		void InitDevice(std::shared_ptr<DXGIWrapper>& pDXGIWrapper);
@@ -36,5 +35,10 @@ namespace MC {
 
 	private:
 		std::shared_ptr<DXGIWrapper> _pDXGIWrapper;
+
+		// The device is actually created and owned by the DXGIWrapper. Specifically
+		// calling GXGIWrapper.CreateConfiguredOrDefault3DDevice or if the DXGIWrapper
+		// goes out of scope, this pointer will be destroyed.
+		ID3D12Device *_pDevice;
 	};
 }

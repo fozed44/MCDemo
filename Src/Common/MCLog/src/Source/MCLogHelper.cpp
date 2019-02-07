@@ -56,7 +56,7 @@ namespace MC {
 		auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 		auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(filename, true);
 
-		fileSink->set_level(spdlog::level::trace);
+		fileSink   ->set_level(spdlog::level::trace);
 		consoleSink->set_level(spdlog::level::trace);
 
 		if (consolePattern)
@@ -70,21 +70,23 @@ namespace MC {
 			fileSink->set_pattern(GetDefaultFilePattern());
 
 		auto result = std::shared_ptr<spdlog::logger>(new spdlog::logger(loggerName, { consoleSink, fileSink }));
+		result->flush_on(spdlog::level::trace);
+		result->set_level(spdlog::level::trace);
 		return result;
 	}
 
 	void MCLogHelper::SetDefaultLoggers() {
 		SetGlobalPattern(GetDefaultConsolePattern());
-		SetCoreLogger(CreateStdLoggerMT(DEFAULT_CORE_LOGGER_NAME));
-		SetXMLLogger(CreateStdLoggerMT(DEFAULT_XML_LOGGER_NAME));
+		SetCoreLogger(CreateStdLoggerMT (DEFAULT_CORE_LOGGER_NAME));
+		SetXMLLogger (CreateStdLoggerMT (DEFAULT_XML_LOGGER_NAME));
 		SetInitLogger(CreateDualLoggerMT(DEFAULT_INIT_LOGGER_NAME, Paths::InitLogFilename()));
 	}
 
 	void MCLogHelper::SetNullLoggers() {
-		auto nullSink = std::make_shared<spdlog::sinks::null_sink_mt>();
+		auto nullSink   = std::make_shared<spdlog::sinks::null_sink_mt>();
 		auto nullLogger = std::shared_ptr<spdlog::logger>(new spdlog::logger("null", { nullSink }));
 		SetCoreLogger(nullLogger);
-		SetXMLLogger(nullLogger);
+		SetXMLLogger (nullLogger);
 		SetInitLogger(nullLogger);
 	}
 
