@@ -5,6 +5,7 @@
 #include "../../../Render/MCD3DRenderEngine/src/Headers/DXGIWrapper.h"
 #include "../../../Render/MCD3DRenderEngine/src/Headers/D3DWrapper.h"
 #include "../../../Common/MCCommon/src/Headers/Utility.h"
+#include "../../../Render/MCD3DRenderEngine//src/Headers/WindowWrapper.h"
 
 #include <iostream>
 
@@ -35,11 +36,15 @@ int Sandbox() {
 	MC::RENDER_CONFIG renderConfig;
 	MC::LoadRenderConfig(&renderConfig);
 
+	auto windowWrapper = std::make_unique<MC::WindowWrapper>(renderConfig);
+
+	windowWrapper->Init();
+
 	auto dxgiWrapper = std::make_shared<MC::DXGIWrapper>();
 
 	dxgiWrapper->Init(&renderConfig);
 
-	auto d3dWrapper = std::make_shared<MC::D3DWrapper>();
+	auto d3dWrapper = std::make_unique<MC::D3DWrapper>();
 
 	d3dWrapper->Init(&renderConfig, dxgiWrapper);
 
@@ -55,5 +60,8 @@ int main(int argc, char ** argv) {
 	}
 	catch (MCException *ex) {
 		MessageBox(nullptr, ex->what().c_str(), "MCException", MB_OK);
+	}
+	catch (MCException ex) {
+		MessageBox(nullptr, ex.what().c_str(), "MCException", MB_OK);
 	}
 }

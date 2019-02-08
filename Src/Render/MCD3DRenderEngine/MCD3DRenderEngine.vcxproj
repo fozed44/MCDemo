@@ -133,11 +133,13 @@
     <ClInclude Include="src\Headers\D3DWrapper.h" />
     <ClInclude Include="src\Headers\DXGIWrapper.h" />
     <ClInclude Include="src\Headers\RenderConfig.h" />
+    <ClInclude Include="src\Headers\WindowWrapper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Source\D3DWrapper.cpp" />
     <ClCompile Include="src\Source\DXGIWrapper.cpp" />
     <ClCompile Include="src\Source\RenderConfig.cpp" />
+    <ClCompile Include="src\Source\WindowWrapper.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

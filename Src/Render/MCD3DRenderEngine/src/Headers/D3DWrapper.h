@@ -21,9 +21,9 @@ namespace MC {
 
 	private:
 
-		ComPtr<ID3D12Fence>  _pFence;
-		ComPtr<ID3D12CommandAllocator> _pCommandAllocator;
-		ComPtr<ID3D12CommandQueue> _pCommandQueue;
+		ComPtr<ID3D12Fence>               _pFence;
+		ComPtr<ID3D12CommandAllocator>    _pCommandAllocator;
+		ComPtr<ID3D12CommandQueue>        _pCommandQueue;
 		ComPtr<ID3D12GraphicsCommandList> _pCommandList;
 
 	private:

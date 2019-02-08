@@ -233,4 +233,9 @@ namespace MC {
 		}
 	}
 
+	IDXGISwapChain3 *DXGIWrapper::CreateConfiguredOrDefaltSwapchain(ID3D12CommandQueue *pCommandQueue) {		
+		_pSwapchain.Reset();
+		return nullptr;
+	}
+
 }

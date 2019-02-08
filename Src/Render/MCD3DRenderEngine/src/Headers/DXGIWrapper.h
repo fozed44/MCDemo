@@ -19,8 +19,12 @@ namespace MC {
 		
 		inline bool Initialized() { return _initialized; }
 
+		
 		ID3D12Device *CreateConfiguredOrDefault3DDevice();
 		ID3D12Device *Get3DDevice();
+		
+		IDXGISwapChain3 *CreateConfiguredOrDefaltSwapchain(ID3D12CommandQueue *pCommandQueue);
+		IDXGISwapChain3 *GetSwapChain();
 
 		IDXGIAdapter *GetConfiguredOrDefaultAdapter();
 		IDXGIOutput  *GetConfiguredOrDefaultOutput();
@@ -42,8 +46,9 @@ namespace MC {
 		bool _initialized;
 		const RENDER_CONFIG _initialConfiguration;
 
-		ComPtr<IDXGIFactory4> _pDXGIFactory;
-		ComPtr<ID3D12Device>  _p3DDevice;
+		ComPtr<IDXGIFactory4>   _pDXGIFactory;
+		ComPtr<ID3D12Device>    _p3DDevice;
+		ComPtr<IDXGISwapChain3> _pSwapchain;
 	};
 
 }
