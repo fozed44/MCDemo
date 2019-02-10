@@ -35,13 +35,13 @@ int main(int argc, char ** argv) {
 	MC::RENDER_CONFIG renderConfig;
 	MC::LoadRenderConfig(&renderConfig);
 
-	auto dxgiWrapper = std::make_shared<MC::DXGIWrapper>();
+	/*auto dxgiWrapper = std::make_shared<MC::DXGIWrapper>();
 
 	dxgiWrapper->Init(&renderConfig);
 
 	auto d3dWrapper = std::make_shared<MC::D3DWrapper>();
 
-	d3dWrapper->Init(&renderConfig, dxgiWrapper);
+	d3dWrapper->Init(&renderConfig, dxgiWrapper);*/
 
 	char t;
 	std::cin >> t;

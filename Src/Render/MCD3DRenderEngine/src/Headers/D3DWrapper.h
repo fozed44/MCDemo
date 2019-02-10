@@ -3,9 +3,11 @@
 //#include "dxgi1_6.h"
 #include "d3d12.h"
 #include "wrl.h"
+#include <memory>
+
+#include "MCD3DRenderEngine.h"
 #include "RenderConfig.h"
 #include "DXGIWrapper.h"
-#include <memory>
 
 using Microsoft::WRL::ComPtr;
 
@@ -26,12 +28,35 @@ namespace MC {
 		ComPtr<ID3D12CommandQueue>        _pCommandQueue;
 		ComPtr<ID3D12GraphicsCommandList> _pCommandList;
 
+		// Render target view descriptor heap.
+		ComPtr<ID3D12DescriptorHeap>      _pRTVDescriptorHeap;
+		UINT                              _RTVDescriptorSize;
+
+		// Constant buffer view descriptor heap.
+		ComPtr<ID3D12DescriptorHeap>      _pCBVDescriptorHeap;
+		UINT                              _CBVDescriptorSize;
+
+		// Depth/Stencil buffer view descriptor heap.
+		ComPtr<ID3D12DescriptorHeap>      _pDSVDescriptorHeap;
+		UINT                              _DSVDescriptorSize;
+
+		// Render Target Views
+		ComPtr<ID3D12Resource>            _ppRenderTargets[FRAME_BUFFER_COUNT];
+
+		// Depth Stencil View
+		ComPtr<ID3D12Resource>            _pDepthStencilView;
+
 	private:
-		void InitDevice(std::shared_ptr<DXGIWrapper>& pDXGIWrapper);
+		void Init3DDevice();
 		void InitFence();
 		void InitCommandQueue();
 		void InitCommandAllocator();
 		void InitCommandList();
+		void InitSwapChain();
+		void InitDescriptorHeaps();
+		void InitRenderTargets();
+		void InitRTVHeap();
+		void InitDepthStencilBufferView();
 
 	private:
 		std::shared_ptr<DXGIWrapper> _pDXGIWrapper;

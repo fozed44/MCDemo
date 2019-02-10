@@ -36,17 +36,20 @@ int Sandbox() {
 	MC::RENDER_CONFIG renderConfig;
 	MC::LoadRenderConfig(&renderConfig);
 
-	auto windowWrapper = std::make_unique<MC::WindowWrapper>(renderConfig);
+	auto pWindowWrapper = std::make_shared<MC::WindowWrapper>(renderConfig);
 
-	windowWrapper->Init();
+	pWindowWrapper->Init();
 
 	auto dxgiWrapper = std::make_shared<MC::DXGIWrapper>();
 
-	dxgiWrapper->Init(&renderConfig);
+	dxgiWrapper->Init(&renderConfig, pWindowWrapper);
 
 	auto d3dWrapper = std::make_unique<MC::D3DWrapper>();
 
 	d3dWrapper->Init(&renderConfig, dxgiWrapper);
+
+	MSG msg;
+	while (GetMessage(&msg, 0, 0, 0)) DispatchMessage(&msg);
 
 	char t;
 	std::cin >> t;

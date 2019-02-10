@@ -13,6 +13,8 @@ namespace MC {
 		~WindowWrapper();
 
 		HWND Init();
+		inline bool Initialized() { return _initialized; }
+		inline HWND hWnd()        { return _hwnd; }
 
 	private:
 

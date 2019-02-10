@@ -7,12 +7,24 @@
 namespace MC {
 
 	DXGIWrapper::DXGIWrapper() 
-		: _initialized(false), _initialConfiguration{} {
+		: _initialized(false), _initialConfiguration{}, _pWindowWrapper{ nullptr } {
 	}
 
 	DXGIWrapper::~DXGIWrapper(){}
 
-	void DXGIWrapper::Init(const RENDER_CONFIG *pConfig) {
+	void DXGIWrapper::Init(const RENDER_CONFIG *pConfig, std::shared_ptr<WindowWrapper>& windowWrapper) {
+
+		// save the pointer to the window wrapper for latter. The first place we will use it is
+		// when we create the swap chain. ---- Remember that while CreateConfiguredOrDefaltSwapchain is
+		// defined in the DXGIWrapper, CreateConfiguredOrDefaltSwapchain will actually be called by D3DWrapper
+		// during its initialization.
+		_pWindowWrapper = windowWrapper;
+
+		// Ensure that the window wrapper has been initialized.
+		if (!_pWindowWrapper->Initialized()) {
+			INIT_ERROR("Window wrapper must be initialized before calling DXGIWrapper.Init");
+			MCTHROW("Window wrapper must be initialized before calling DXGIWrapper.Init");
+		}
 
 		MC_INFO("Begin DXGI initialization.");
 
@@ -234,8 +246,64 @@ namespace MC {
 	}
 
 	IDXGISwapChain3 *DXGIWrapper::CreateConfiguredOrDefaltSwapchain(ID3D12CommandQueue *pCommandQueue) {		
-		_pSwapchain.Reset();
-		return nullptr;
+
+		// Ensure that the window configuration is valid... We will be using the dimensions of the window
+		// as the dimensions of the back buffer.
+		EnsureValidWindowConfig();
+
+		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
+		swapChainDesc.BufferCount = 2;
+		swapChainDesc.Width       = _initialConfiguration.DISPLAY_OUTPUT_WIDTH;
+		swapChainDesc.Height      = _initialConfiguration.DISPLAY_OUTPUT_HEIGHT;
+		swapChainDesc.Format      = DXGI_FORMAT_R8G8B8A8_UNORM;
+		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		swapChainDesc.SwapEffect  = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+		swapChainDesc.SampleDesc.Count = 1;
+
+		// TODO:
+		//	Add tearing support.
+
+		ComPtr<IDXGISwapChain1> swapChain;
+
+		MCThrowIfFailed(_pDXGIFactory->CreateSwapChainForHwnd(
+			pCommandQueue,
+			_pWindowWrapper->hWnd(),
+			&swapChainDesc,
+			nullptr,
+			nullptr,
+			&swapChain
+		));
+
+		MCThrowIfFailed(swapChain.As(&_pSwapChain));		
+
+		return _pSwapChain.Get();
+	}
+
+	/*
+	Examine the window width and height in _renderConfig. Throw an exception if the values do not
+	fall within an acceptable range.
+	*/
+	void DXGIWrapper::EnsureValidWindowConfig() {
+		if (_initialConfiguration.DISPLAY_OUTPUT_WIDTH <= 0
+			|| _initialConfiguration.DISPLAY_OUTPUT_WIDTH > MAX_VALID_WINDOW_WIDTH) {
+			INIT_ERROR("Detected an invalid window width ({0:d}) in the config file.", _initialConfiguration.DISPLAY_OUTPUT_WIDTH);
+			MCTHROW("Detected an invalid window width in the config file.");
+		}
+
+		if (_initialConfiguration.DISPLAY_OUTPUT_HEIGHT <= 0
+			|| _initialConfiguration.DISPLAY_OUTPUT_WIDTH > MAX_VALID_WINDOW_HEIGHT) {
+			INIT_ERROR("Detected an invalid window height ({0:d}) in the config file.", _initialConfiguration.DISPLAY_OUTPUT_HEIGHT);
+			MCTHROW("Detected an invalid window height in the config file.");
+		}
+	}
+
+	unsigned int DXGIWrapper::GetCurrentFrameBufferIndex() {
+		assert(_pSwapChain);
+		return _pSwapChain->GetCurrentBackBufferIndex();
+	}
+
+	void DXGIWrapper::GetFrameBuffer(UINT pos, const IID &riid, void **ppSurface) {
+		MCThrowIfFailed(_pSwapChain->GetBuffer(pos, riid, ppSurface));
 	}
 
 }

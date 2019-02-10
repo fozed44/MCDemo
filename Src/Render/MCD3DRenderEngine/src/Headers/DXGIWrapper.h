@@ -3,7 +3,12 @@
 #include "dxgi1_6.h"
 #include "d3d12.h"
 #include "wrl.h"
+#include <memory>
+
+#include "MCD3DRenderEngine.h"
 #include "RenderConfig.h"
+#include "WindowWrapper.h"
+
 
 using Microsoft::WRL::ComPtr;
 
@@ -15,10 +20,9 @@ namespace MC {
 		~DXGIWrapper();
 
 	public:
-		void Init(const RENDER_CONFIG* pConfig);
+		void Init(const RENDER_CONFIG* pConfig, std::shared_ptr<WindowWrapper>& windowWrapper);
 		
 		inline bool Initialized() { return _initialized; }
-
 		
 		ID3D12Device *CreateConfiguredOrDefault3DDevice();
 		ID3D12Device *Get3DDevice();
@@ -28,6 +32,16 @@ namespace MC {
 
 		IDXGIAdapter *GetConfiguredOrDefaultAdapter();
 		IDXGIOutput  *GetConfiguredOrDefaultOutput();
+
+		/*
+			Returns the index of the current back buffer that is being presented by the DXGI.
+		*/
+		inline unsigned int GetCurrentFrameBufferIndex();
+
+		/*
+			Return the swap chain buffer at position pos.
+		*/
+		void GetFrameBuffer(UINT pos, const IID &riid, void **ppSurface);
 
 	private:
 		DXGIWrapper(DXGIWrapper&)  = delete;
@@ -40,15 +54,17 @@ namespace MC {
 		void LogOutputDisplayModes(IDXGIOutput *pOutput, DXGI_FORMAT format);
 		void InitDXGIFactory();
 		void InitConfiguration(const RENDER_CONFIG *pConfig);
+		void EnsureValidWindowConfig();
 
 		void EnableDXDebugLayer();
 
 		bool _initialized;
 		const RENDER_CONFIG _initialConfiguration;
+		std::shared_ptr<WindowWrapper> _pWindowWrapper;
 
 		ComPtr<IDXGIFactory4>   _pDXGIFactory;
 		ComPtr<ID3D12Device>    _p3DDevice;
-		ComPtr<IDXGISwapChain3> _pSwapchain;
+		ComPtr<IDXGISwapChain3> _pSwapChain;
 	};
 
 }

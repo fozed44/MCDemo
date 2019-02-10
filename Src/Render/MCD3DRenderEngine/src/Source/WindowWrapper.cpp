@@ -15,6 +15,9 @@ namespace MC {
 
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		switch (msg) {
+		case WM_LBUTTONDOWN:
+			MC_INFO("Mouse button down at {0:d}, {1:d}", LOWORD(lParam), HIWORD(lParam));
+			break;
 		case WM_DESTROY:
 			PostQuitMessage(0);
 			return 0;
@@ -124,6 +127,7 @@ namespace MC {
 			MCTHROW("Detected an invalid window height in the config file.");
 		}
 	}
+
 
 #pragma endregion
 
