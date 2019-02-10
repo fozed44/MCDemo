@@ -9,11 +9,14 @@
 #include "../../../../Common/MCLog/src/Headers/MCLog.h"
 #include "../../../../Common/MCCommon/src/Headers/Utility.h"
 
+#define MC_DEPTH_STENCIL_FORMAT DXGI_FORMAT_D32_FLOAT
+
 namespace MC {
 
 #pragma region CtorDtor
 
-	D3DWrapper::D3DWrapper() {}
+	D3DWrapper::D3DWrapper(const RENDER_CONFIG& renderConfig) 
+		: _initialConfiguration(renderConfig) {}
 
 	D3DWrapper::~D3DWrapper() {}
 
@@ -21,10 +24,12 @@ namespace MC {
 
 #pragma region Initialization
 
-	void D3DWrapper::Init(const RENDER_CONFIG *pRenderConfig, std::shared_ptr<DXGIWrapper>& pDXGIWrapper) {
+	void D3DWrapper::Init(std::shared_ptr<DXGIWrapper>& pDXGIWrapper) {
 		MC_INFO("Begin render initialization.");
 
 		assert(pDXGIWrapper->Initialized());
+
+		EnsureValidWindowConfig();
 
 		// Store a pointer to the dxgi wrapper.
 		_pDXGIWrapper = pDXGIWrapper;
@@ -38,7 +43,9 @@ namespace MC {
 		InitDescriptorHeaps();
 		InitRenderTargets();
 		InitRTVHeap();
+		InitDepthStencilBuffer();
 		InitDepthStencilBufferView();
+		InitViewPort();
 
 		MC_INFO("End render initialization.");
 	}
@@ -176,10 +183,105 @@ namespace MC {
 		INIT_TRACE("End init RTV Heap.");
 	}
 
-	void D3DWrapper::InitDepthStencilBufferView() {
-		INIT_TRACE("Begin depth stencil buffer view.");
+	void D3DWrapper::InitDepthStencilBuffer() {
+		INIT_TRACE("Init depth stencil buffer.");
 
-		INIT_TRACE("End depth stencil buffer view.");
+		D3D12_RESOURCE_DESC depthStencilBufferDesc = {};
+		depthStencilBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+		depthStencilBufferDesc.Alignment = 0;
+		depthStencilBufferDesc.Width = _initialConfiguration.DISPLAY_OUTPUT_WIDTH;
+		depthStencilBufferDesc.Height = _initialConfiguration.DISPLAY_OUTPUT_HEIGHT;
+		depthStencilBufferDesc.DepthOrArraySize = 1;
+		depthStencilBufferDesc.MipLevels = 1;
+		depthStencilBufferDesc.Format = MC_DEPTH_STENCIL_FORMAT;
+
+		// TODO:
+		//		OPTIONS_MULTISAMPLE need to be verified since it comes from the config file.
+		depthStencilBufferDesc.SampleDesc.Count = _initialConfiguration.OPTIONS_MULTISAMPLE == 1 ? 4 : 1;
+
+		// TODO
+		//	Quality is related to a value that needs to be added to the configuration... We need a OPTIONS_MULTISAMPLE_QUALITY
+		depthStencilBufferDesc.SampleDesc.Quality = 0;
+
+		depthStencilBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+		depthStencilBufferDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+		D3D12_CLEAR_VALUE optClear;
+		
+		optClear.Format = MC_DEPTH_STENCIL_FORMAT;
+		optClear.DepthStencil.Depth = 1.0f;
+		optClear.DepthStencil.Stencil = 0;
+
+		MCThrowIfFailed(_pDevice->CreateCommittedResource(
+			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+			D3D12_HEAP_FLAG_NONE,	
+			&depthStencilBufferDesc,
+			D3D12_RESOURCE_STATE_COMMON,
+			&optClear,
+			__uuidof(_pDepthStencil),
+			&_pDepthStencil
+		));
+
+		INIT_TRACE("End init depth stencil buffer.");
+	}
+
+	void D3DWrapper::InitDepthStencilBufferView() {
+		INIT_TRACE("Begin init depth stencil buffer view.");
+
+		CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHeapHandle(_pDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+		// TODO:
+		//	Unsure about dsvHeapHandle
+		_pDevice->CreateDepthStencilView(
+			_pDepthStencil.Get(),
+			nullptr,
+			dsvHeapHandle
+		);
+
+		_pCommandList->ResourceBarrier(
+			1,
+			&CD3DX12_RESOURCE_BARRIER::Transition(_pDepthStencil.Get(),
+				D3D12_RESOURCE_STATE_COMMON,
+				D3D12_RESOURCE_STATE_DEPTH_WRITE
+			)
+		);
+
+		INIT_TRACE("End init depth stencil buffer view.");
+	}
+
+	void D3DWrapper::InitViewPort() {
+		INIT_TRACE("Begin init view port.");
+
+		D3D12_VIEWPORT vp = {};
+		vp.TopLeftX = 0.0f;
+		vp.TopLeftY = 0.0f;
+		vp.Width    = static_cast<float>(_initialConfiguration.DISPLAY_OUTPUT_WIDTH);
+		vp.Height   = static_cast<float>(_initialConfiguration.DISPLAY_OUTPUT_HEIGHT);
+		vp.MinDepth = 0.0f;
+		vp.MaxDepth = 1.0f;
+
+		_pCommandList->RSSetViewports(1, &vp);
+
+		INIT_TRACE("End view port.");
+	}
+
+
+	/*
+		Examine the window width and height in _initialConfiguration. Throw an exception if the values do not
+		fall within an acceptable range.
+	*/
+	void D3DWrapper::EnsureValidWindowConfig() {
+		if (_initialConfiguration.DISPLAY_OUTPUT_WIDTH <= 0
+			|| _initialConfiguration.DISPLAY_OUTPUT_WIDTH > MAX_VALID_WINDOW_WIDTH) {
+			INIT_ERROR("Detected an invalid window width ({0:d}) in the config file.", _initialConfiguration.DISPLAY_OUTPUT_WIDTH);
+			MCTHROW("Detected an invalid window width in the config file.");
+		}
+
+		if (_initialConfiguration.DISPLAY_OUTPUT_HEIGHT <= 0
+			|| _initialConfiguration.DISPLAY_OUTPUT_WIDTH > MAX_VALID_WINDOW_HEIGHT) {
+			INIT_ERROR("Detected an invalid window height ({0:d}) in the config file.", _initialConfiguration.DISPLAY_OUTPUT_HEIGHT);
+			MCTHROW("Detected an invalid window height in the config file.");
+		}
 	}
 
 #pragma endregion 

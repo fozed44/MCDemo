@@ -44,9 +44,9 @@ int Sandbox() {
 
 	dxgiWrapper->Init(&renderConfig, pWindowWrapper);
 
-	auto d3dWrapper = std::make_unique<MC::D3DWrapper>();
+	auto d3dWrapper = std::make_unique<MC::D3DWrapper>(renderConfig);
 
-	d3dWrapper->Init(&renderConfig, dxgiWrapper);
+	d3dWrapper->Init(dxgiWrapper);
 
 	MSG msg;
 	while (GetMessage(&msg, 0, 0, 0)) DispatchMessage(&msg);

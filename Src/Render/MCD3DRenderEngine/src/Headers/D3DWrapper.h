@@ -15,11 +15,11 @@ namespace MC {
 
 	class D3DWrapper {
 	public:
-		D3DWrapper();
+		D3DWrapper(const RENDER_CONFIG& renderConfig);
 		~D3DWrapper();
 
 	public:
-		void Init(const RENDER_CONFIG* pRenderConfig, std::shared_ptr<DXGIWrapper>& pDXGIWrapper);
+		void Init(std::shared_ptr<DXGIWrapper>& pDXGIWrapper);
 
 	private:
 
@@ -40,11 +40,11 @@ namespace MC {
 		ComPtr<ID3D12DescriptorHeap>      _pDSVDescriptorHeap;
 		UINT                              _DSVDescriptorSize;
 
-		// Render Target Views
+		// Render Targets
 		ComPtr<ID3D12Resource>            _ppRenderTargets[FRAME_BUFFER_COUNT];
 
-		// Depth Stencil View
-		ComPtr<ID3D12Resource>            _pDepthStencilView;
+		// Depth Stencil
+		ComPtr<ID3D12Resource>            _pDepthStencil;
 
 	private:
 		void Init3DDevice();
@@ -56,9 +56,15 @@ namespace MC {
 		void InitDescriptorHeaps();
 		void InitRenderTargets();
 		void InitRTVHeap();
+		void InitDepthStencilBuffer();
 		void InitDepthStencilBufferView();
+		void InitViewPort();
+
+		void EnsureValidWindowConfig();
 
 	private:
+		const RENDER_CONFIG _initialConfiguration;
+
 		std::shared_ptr<DXGIWrapper> _pDXGIWrapper;
 
 		// The device is actually created and owned by the DXGIWrapper. Specifically
