@@ -33,6 +33,9 @@ namespace MC {
 
 		// Store a pointer to the dxgi wrapper.
 		_pDXGIWrapper = pDXGIWrapper;
+
+		// initialize the current fence value
+		_currentFence = 0;
 		
 		Init3DDevice();
 		InitFence();
@@ -46,6 +49,7 @@ namespace MC {
 		InitDepthStencilBuffer();
 		InitDepthStencilBufferView();
 		InitViewPort();
+		InitFinalize();
 
 		MC_INFO("End render initialization.");
 	}
@@ -98,6 +102,8 @@ namespace MC {
 			__uuidof(_pCommandList),
 			&_pCommandList
 		));
+
+		_pCommandList->SetName(L"Default command list");
 
 		// The command queue should begin in a closed state because the render loop
 		// will expect it to be in a closed state.
@@ -222,6 +228,8 @@ namespace MC {
 			&_pDepthStencil
 		));
 
+		_pDepthStencil->SetName(L"Depth stencil");
+
 		INIT_TRACE("End init depth stencil buffer.");
 	}
 
@@ -236,7 +244,33 @@ namespace MC {
 			_pDepthStencil.Get(),
 			nullptr,
 			dsvHeapHandle
-		);
+		);		
+
+		INIT_TRACE("End init depth stencil buffer view.");
+	}
+
+	void D3DWrapper::InitViewPort() {
+		INIT_TRACE("Begin init view port.");
+
+		_viewPort = {};
+		_viewPort.TopLeftX = 0.0f;
+		_viewPort.TopLeftY = 0.0f;
+		_viewPort.Width    = static_cast<float>(_initialConfiguration.DISPLAY_OUTPUT_WIDTH);
+		_viewPort.Height   = static_cast<float>(_initialConfiguration.DISPLAY_OUTPUT_HEIGHT);
+		_viewPort.MinDepth = 0.0f;
+		_viewPort.MaxDepth = 1.0f;
+
+		/*_pCommandList->RSSetViewports(1, &_viewPort);*/
+
+		INIT_TRACE("End view port.");
+	}
+
+	void D3DWrapper::InitFinalize() {
+		INIT_TRACE("Begin init finalize.");
+
+		MCThrowIfFailed(_pCommandAllocator->Reset());
+
+		MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));
 
 		_pCommandList->ResourceBarrier(
 			1,
@@ -246,25 +280,15 @@ namespace MC {
 			)
 		);
 
-		INIT_TRACE("End init depth stencil buffer view.");
+		MCThrowIfFailed(_pCommandList->Close());
+
+		ID3D12CommandList* pCommandList = _pCommandList.Get();
+		_pCommandQueue->ExecuteCommandLists(1, &pCommandList);
+
+		FlushCommandQueue();
+
+		INIT_TRACE("End init finalize.");
 	}
-
-	void D3DWrapper::InitViewPort() {
-		INIT_TRACE("Begin init view port.");
-
-		D3D12_VIEWPORT vp = {};
-		vp.TopLeftX = 0.0f;
-		vp.TopLeftY = 0.0f;
-		vp.Width    = static_cast<float>(_initialConfiguration.DISPLAY_OUTPUT_WIDTH);
-		vp.Height   = static_cast<float>(_initialConfiguration.DISPLAY_OUTPUT_HEIGHT);
-		vp.MinDepth = 0.0f;
-		vp.MaxDepth = 1.0f;
-
-		_pCommandList->RSSetViewports(1, &vp);
-
-		INIT_TRACE("End view port.");
-	}
-
 
 	/*
 		Examine the window width and height in _initialConfiguration. Throw an exception if the values do not
@@ -285,4 +309,98 @@ namespace MC {
 	}
 
 #pragma endregion 
+
+#pragma region QuickDraw
+
+	void D3DWrapper::QuickDraw() {
+
+		MCThrowIfFailed(_pCommandAllocator->Reset());
+
+		MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));
+
+		UINT currentBackBufferIndex = _pDXGIWrapper->GetCurrentBackBufferIndex();
+
+		_pCommandList->ResourceBarrier(
+			1,
+			&CD3DX12_RESOURCE_BARRIER::Transition(
+				_ppRenderTargets[currentBackBufferIndex].Get(),
+				D3D12_RESOURCE_STATE_PRESENT,
+				D3D12_RESOURCE_STATE_RENDER_TARGET
+			)
+		);
+		
+		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHeapHandle(_pRTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+		rtvHeapHandle.Offset(currentBackBufferIndex, _RTVDescriptorSize);
+
+		FLOAT colorBlack[4]{ 0.0f, 0.0f, 0.0f, 1.0f };
+
+		_pCommandList->ClearRenderTargetView(
+			rtvHeapHandle,
+			colorBlack,
+			0,
+			nullptr
+		);
+
+		CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHeapHandle(_pDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+		_pCommandList->ClearDepthStencilView(
+			dsvHeapHandle,
+			D3D12_CLEAR_FLAG_DEPTH,
+			1.0F,
+			0,
+			0,
+			nullptr
+		);
+
+		_pCommandList->OMSetRenderTargets(
+			1,
+			&rtvHeapHandle,
+			true,
+			&dsvHeapHandle
+		);
+
+		_pCommandList->ResourceBarrier(
+			1,
+			&CD3DX12_RESOURCE_BARRIER::Transition(
+				_ppRenderTargets[currentBackBufferIndex].Get(),
+				D3D12_RESOURCE_STATE_RENDER_TARGET,
+				D3D12_RESOURCE_STATE_PRESENT
+			)
+		);
+
+		MCThrowIfFailed(_pCommandList->Close());
+
+		ID3D12CommandList* cmdsLists[] = { _pCommandList.Get() };
+		_pCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
+
+		MCThrowIfFailed(_pDXGIWrapper->Swap());
+
+		FlushCommandQueue();
+	}
+
+	void D3DWrapper::FlushCommandQueue()
+	{
+		// Advance the fence value to mark commands up to this fence point.
+		_currentFence++;
+
+		// Add an instruction to the command queue to set a new fence point.  Because we 
+		// are on the GPU timeline, the new fence point won't be set until the GPU finishes
+		// processing all the commands prior to this Signal().
+		MCThrowIfFailed(_pCommandQueue->Signal(_pFence.Get(), _currentFence));
+
+		// Wait until the GPU has completed commands up to this fence point.
+		if (_pFence->GetCompletedValue() < _currentFence)
+		{
+			HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
+
+			// Fire event when GPU hits current fence.  
+			MCThrowIfFailed(_pFence->SetEventOnCompletion(_currentFence, eventHandle));
+
+			// Wait until the GPU hits current fence event is fired.
+			WaitForSingleObject(eventHandle, INFINITE);
+			CloseHandle(eventHandle);
+		}
+	}
+
+#pragma endregion
 }

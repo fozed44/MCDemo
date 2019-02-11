@@ -27,10 +27,10 @@
     <ClInclude Include="src\Headers\WindowWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Headers\MCD3DRenderEngine.h">
+    <ClInclude Include="src\Headers\d3dx12.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Headers\d3dx12.h">
+    <ClInclude Include="src\Headers\MCD3DRenderEngineConstants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -5,7 +5,7 @@
 #include "wrl.h"
 #include <memory>
 
-#include "MCD3DRenderEngine.h"
+#include "MCD3DRenderEngineConstants.h"
 #include "RenderConfig.h"
 #include "WindowWrapper.h"
 
@@ -29,6 +29,7 @@ namespace MC {
 		
 		IDXGISwapChain3 *CreateConfiguredOrDefaltSwapchain(ID3D12CommandQueue *pCommandQueue);
 		IDXGISwapChain3 *GetSwapChain();
+		HRESULT Swap();
 
 		IDXGIAdapter *GetConfiguredOrDefaultAdapter();
 		IDXGIOutput  *GetConfiguredOrDefaultOutput();
@@ -36,7 +37,7 @@ namespace MC {
 		/*
 			Returns the index of the current back buffer that is being presented by the DXGI.
 		*/
-		inline unsigned int GetCurrentFrameBufferIndex();
+		unsigned int GetCurrentBackBufferIndex();
 
 		/*
 			Return the swap chain buffer at position pos.

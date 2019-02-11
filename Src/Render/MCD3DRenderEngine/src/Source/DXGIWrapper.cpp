@@ -297,13 +297,17 @@ namespace MC {
 		}
 	}
 
-	unsigned int DXGIWrapper::GetCurrentFrameBufferIndex() {
+	unsigned int DXGIWrapper::GetCurrentBackBufferIndex() {
 		assert(_pSwapChain);
 		return _pSwapChain->GetCurrentBackBufferIndex();
 	}
 
 	void DXGIWrapper::GetFrameBuffer(UINT pos, const IID &riid, void **ppSurface) {
 		MCThrowIfFailed(_pSwapChain->GetBuffer(pos, riid, ppSurface));
+	}
+
+	HRESULT DXGIWrapper::Swap() {
+		return _pSwapChain->Present(0, 0);
 	}
 
 }

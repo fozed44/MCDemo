@@ -48,12 +48,21 @@ int Sandbox() {
 
 	d3dWrapper->Init(dxgiWrapper);
 
-	MSG msg;
-	while (GetMessage(&msg, 0, 0, 0)) DispatchMessage(&msg);
-
-	char t;
-	std::cin >> t;
-
+	MSG msg = {};
+	
+	while (msg.message != WM_QUIT)
+	{
+		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		else
+		{
+			d3dWrapper->QuickDraw();
+		}
+	}
+	
 	return 0;
 }
 

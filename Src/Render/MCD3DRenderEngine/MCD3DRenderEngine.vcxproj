@@ -133,7 +133,7 @@
     <ClInclude Include="src\Headers\D3DWrapper.h" />
     <ClInclude Include="src\Headers\d3dx12.h" />
     <ClInclude Include="src\Headers\DXGIWrapper.h" />
-    <ClInclude Include="src\Headers\MCD3DRenderEngine.h" />
+    <ClInclude Include="src\Headers\MCD3DRenderEngineConstants.h" />
     <ClInclude Include="src\Headers\RenderConfig.h" />
     <ClInclude Include="src\Headers\WindowWrapper.h" />
   </ItemGroup>

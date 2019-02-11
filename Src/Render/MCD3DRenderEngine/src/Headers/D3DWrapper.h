@@ -5,7 +5,7 @@
 #include "wrl.h"
 #include <memory>
 
-#include "MCD3DRenderEngine.h"
+#include "MCD3DRenderEngineConstants.h"
 #include "RenderConfig.h"
 #include "DXGIWrapper.h"
 
@@ -21,9 +21,15 @@ namespace MC {
 	public:
 		void Init(std::shared_ptr<DXGIWrapper>& pDXGIWrapper);
 
+		void QuickDraw();
+		void FlushCommandQueue();
+
+
 	private:
 
 		ComPtr<ID3D12Fence>               _pFence;
+		UINT64                            _currentFence;
+
 		ComPtr<ID3D12CommandAllocator>    _pCommandAllocator;
 		ComPtr<ID3D12CommandQueue>        _pCommandQueue;
 		ComPtr<ID3D12GraphicsCommandList> _pCommandList;
@@ -46,6 +52,8 @@ namespace MC {
 		// Depth Stencil
 		ComPtr<ID3D12Resource>            _pDepthStencil;
 
+		D3D12_VIEWPORT                    _viewPort;
+
 	private:
 		void Init3DDevice();
 		void InitFence();
@@ -59,6 +67,7 @@ namespace MC {
 		void InitDepthStencilBuffer();
 		void InitDepthStencilBufferView();
 		void InitViewPort();
+		void InitFinalize();
 
 		void EnsureValidWindowConfig();
 
