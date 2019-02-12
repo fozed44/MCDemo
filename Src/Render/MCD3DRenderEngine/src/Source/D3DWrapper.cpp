@@ -378,6 +378,75 @@ namespace MC {
 		FlushCommandQueue();
 	}
 
+#pragma endregion
+
+#pragma region Utilities
+
+	/*
+		Note:
+			'uploadBuffer' has to be kept alive until AFTER the command list is executed.
+	*/
+	ComPtr<ID3D12Resource> D3DWrapper::CreateDefaultBuffer(void *initData, UINT64 byteSize, ComPtr<ID3D12Resource>& uploadBuffer) {
+
+		// the result.
+		ComPtr<ID3D12Resource> defaultBuffer;
+
+		MCThrowIfFailed(_pDevice->CreateCommittedResource(
+			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+			D3D12_HEAP_FLAG_NONE,
+			&CD3DX12_RESOURCE_DESC::Buffer(byteSize),
+			D3D12_RESOURCE_STATE_COMMON,
+			nullptr,
+			__uuidof(defaultBuffer),
+			&defaultBuffer
+		));
+
+		// In order to copy CPU memory data (initData) into a GPU default buffer (defaultBuffer) an intermediate upload
+		// buffer must be created.
+		MCThrowIfFailed(_pDevice->CreateCommittedResource(
+			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+			D3D12_HEAP_FLAG_NONE,
+			&CD3DX12_RESOURCE_DESC::Buffer(byteSize),
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			__uuidof(uploadBuffer),
+			&uploadBuffer
+		));
+
+		D3D12_SUBRESOURCE_DATA subResourceData = {};
+		subResourceData.pData = initData;
+		subResourceData.RowPitch = byteSize;
+		subResourceData.SlicePitch = subResourceData.RowPitch;
+
+		_pCommandList->ResourceBarrier(
+			1,
+			&CD3DX12_RESOURCE_BARRIER::Transition(
+				defaultBuffer.Get(),
+				D3D12_RESOURCE_STATE_COMMON,
+				D3D12_RESOURCE_STATE_COPY_DEST
+			)
+		);
+		UpdateSubresources<1>(
+			_pCommandList.Get(),
+			defaultBuffer.Get(),
+			uploadBuffer.Get(),
+			0,
+			0,
+			1,
+			&subResourceData
+		);
+		_pCommandList->ResourceBarrier(
+			1,
+			&CD3DX12_RESOURCE_BARRIER::Transition(
+				defaultBuffer.Get(),
+				D3D12_RESOURCE_STATE_COPY_DEST,
+				D3D12_RESOURCE_STATE_GENERIC_READ
+			)
+		);
+
+		return defaultBuffer;
+	}
+
 	void D3DWrapper::FlushCommandQueue()
 	{
 		// Advance the fence value to mark commands up to this fence point.

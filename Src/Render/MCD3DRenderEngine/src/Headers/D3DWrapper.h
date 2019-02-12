@@ -2,6 +2,7 @@
 
 //#include "dxgi1_6.h"
 #include "d3d12.h"
+#include "DirectxMath.h"
 #include "wrl.h"
 #include <memory>
 
@@ -12,6 +13,11 @@
 using Microsoft::WRL::ComPtr;
 
 namespace MC {
+
+	struct MCVertex1Color {
+		DirectX::XMFLOAT3 Position;
+		DirectX::XMFLOAT4 Color;
+	};
 
 	class D3DWrapper {
 	public:
@@ -70,6 +76,10 @@ namespace MC {
 		void InitFinalize();
 
 		void EnsureValidWindowConfig();
+
+	private:
+
+		ComPtr<ID3D12Resource> CreateDefaultBuffer(void *initData, UINT64 byteSize, ComPtr<ID3D12Resource>& uploadBuffer);
 
 	private:
 		const RENDER_CONFIG _initialConfiguration;

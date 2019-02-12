@@ -141,6 +141,7 @@
     <ClCompile Include="src\Source\D3DWrapper.cpp" />
     <ClCompile Include="src\Source\DXGIWrapper.cpp" />
     <ClCompile Include="src\Source\RenderConfig.cpp" />
+    <ClCompile Include="src\Source\TestFunctions.cpp" />
     <ClCompile Include="src\Source\WindowWrapper.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
