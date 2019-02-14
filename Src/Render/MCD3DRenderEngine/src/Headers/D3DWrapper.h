@@ -1,12 +1,7 @@
 #pragma once
 
-//#include "dxgi1_6.h"
-#include "d3d12.h"
-#include "DirectxMath.h"
-#include "wrl.h"
-#include <memory>
+#include "MCD3D12Core.h"
 
-#include "MCD3DRenderEngineConstants.h"
 #include "RenderConfig.h"
 #include "DXGIWrapper.h"
 

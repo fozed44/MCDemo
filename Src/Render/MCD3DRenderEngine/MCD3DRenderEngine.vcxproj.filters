@@ -30,7 +30,10 @@
     <ClInclude Include="src\Headers\d3dx12.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Headers\MCD3DRenderEngineConstants.h">
+    <ClInclude Include="src\Headers\MCUploadBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Headers\MCD3D12Core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

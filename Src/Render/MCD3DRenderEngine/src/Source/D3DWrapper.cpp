@@ -1,5 +1,3 @@
-#pragma once
-
 #include "../../../../Common/MCCommon/src/Headers/GlobalSwitches.h"
 
 #include "../Headers/d3dx12.h"

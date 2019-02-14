@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Windows.h"
+#include "MCD3D12Core.h"
+
 #include "RenderConfig.h"
 namespace MC {
 
