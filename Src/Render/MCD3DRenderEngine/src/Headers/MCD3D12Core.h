@@ -4,6 +4,7 @@
 #include "d3d12.h"
 #include "d3dx12.h"
 #include "DirectxMath.h"
+#include "windows.h"
 #include "wrl.h"
 #include <memory>
 

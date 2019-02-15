@@ -14,7 +14,7 @@ namespace MC {
 #pragma region CtorDtor
 
 	D3DWrapper::D3DWrapper(const RENDER_CONFIG& renderConfig) 
-		: _initialConfiguration(renderConfig) {}
+		: _initialConfiguration(renderConfig), _pObjectConstantBuffer(nullptr){}
 
 	D3DWrapper::~D3DWrapper() {}
 
@@ -43,10 +43,13 @@ namespace MC {
 		InitSwapChain();
 		InitDescriptorHeaps();
 		InitRenderTargets();
-		InitRTVHeap();
+		InitRenderTargetViews();
 		InitDepthStencilBuffer();
 		InitDepthStencilBufferView();
+		InitConstantBuffer();
+		InitConstantBufferView();
 		InitViewPort();
+		InitMatrices();
 		InitFinalize();
 
 		MC_INFO("End render initialization.");
@@ -145,6 +148,7 @@ namespace MC {
 		cbvHeapDesc.NumDescriptors = FRAME_BUFFER_COUNT; // Number of back buffers.
 		cbvHeapDesc.Type  = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 		cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+		cbvHeapDesc.NodeMask = 0;
 		MCThrowIfFailed(_pDevice->CreateDescriptorHeap(&cbvHeapDesc, __uuidof(_pCBVDescriptorHeap), &_pCBVDescriptorHeap));
 
 		// Depth Stencil Buffer Descriptor Heap *************************
@@ -164,17 +168,17 @@ namespace MC {
 	}
 
 	void D3DWrapper::InitRenderTargets() {
-		INIT_TRACE("Begin init render target view.");
+		INIT_TRACE("Begin init render targets.");
 
 		// Create a render target view for each swap chain buffer
 		for (int n = 0; n < FRAME_BUFFER_COUNT; n++) {
 			_pDXGIWrapper->GetFrameBuffer(n, __uuidof(_ppRenderTargets[n]), &_ppRenderTargets[n]);
 		}
 
-		INIT_TRACE("End init render target view.");
+		INIT_TRACE("End init render targets.");
 	}
 
-	void D3DWrapper::InitRTVHeap() {
+	void D3DWrapper::InitRenderTargetViews() {
 		INIT_TRACE("Begin init RTV Heap.");
 
 		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHeapHandle(_pRTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
@@ -247,6 +251,36 @@ namespace MC {
 		INIT_TRACE("End init depth stencil buffer view.");
 	}
 
+	void D3DWrapper::InitConstantBuffer() {
+		INIT_TRACE("Init constant buffer.");
+
+		_pObjectConstantBuffer = std::make_unique<MCUploadBuffer<ObjectConstants>>(_pDevice, 1, true);
+
+		INIT_TRACE("End init constant buffer.");
+	}
+
+	void D3DWrapper::InitConstantBufferView() {
+		INIT_TRACE("Init constant buffer view");
+
+		D3D12_GPU_VIRTUAL_ADDRESS cbAddress = _pObjectConstantBuffer->Resource()->GetGPUVirtualAddress();
+
+		// For the moment we are just getting a view for the box.
+		unsigned int boxConstantBufferCalculatedSize = _pObjectConstantBuffer->CalculatedSize();
+		unsigned int boxConstantBufferIndex = 0;
+		cbAddress += boxConstantBufferIndex * boxConstantBufferCalculatedSize;
+
+		D3D12_CONSTANT_BUFFER_VIEW_DESC boxConstantBufferViewDesc = {};
+		boxConstantBufferViewDesc.BufferLocation = cbAddress;
+		boxConstantBufferViewDesc.SizeInBytes = boxConstantBufferCalculatedSize;
+
+		_pDevice->CreateConstantBufferView(
+			&boxConstantBufferViewDesc,
+			_pCBVDescriptorHeap->GetCPUDescriptorHandleForHeapStart()
+		);
+
+		INIT_TRACE("End init constant buffer view.");
+	}
+
 	void D3DWrapper::InitViewPort() {
 		INIT_TRACE("Begin init view port.");
 
@@ -266,10 +300,13 @@ namespace MC {
 	void D3DWrapper::InitFinalize() {
 		INIT_TRACE("Begin init finalize.");
 
+		INIT_TRACE("--Reset command allocator.");
 		MCThrowIfFailed(_pCommandAllocator->Reset());
 
+		INIT_TRACE("--Reset command list.");
 		MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));
 
+		INIT_TRACE("--Create ds resource barrier.");
 		_pCommandList->ResourceBarrier(
 			1,
 			&CD3DX12_RESOURCE_BARRIER::Transition(_pDepthStencil.Get(),
@@ -278,14 +315,27 @@ namespace MC {
 			)
 		);
 
+		INIT_TRACE("--Close command list.");
 		MCThrowIfFailed(_pCommandList->Close());
 
+		INIT_TRACE("--Execute.");
 		ID3D12CommandList* pCommandList = _pCommandList.Get();
 		_pCommandQueue->ExecuteCommandLists(1, &pCommandList);
 
+		INIT_TRACE("--Flush command queue.");
 		FlushCommandQueue();
 
 		INIT_TRACE("End init finalize.");
+	}
+
+	void D3DWrapper::InitMatrices() {
+		INIT_TRACE("Init matrices.");
+
+		_worldMatrix      = MCMath::Identity4x4();
+		_viewMatrix       = MCMath::Identity4x4();
+		_projectionMatrix = MCMath::Identity4x4();
+
+		INIT_TRACE("End init matrices.");
 	}
 
 	/*

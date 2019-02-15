@@ -22,10 +22,14 @@ public:
 			D3D12_RESOURCE_STATE_GENERIC_READ,
 			nullptr,
 			__uuidof(_buffer),
-			&buffer
+			&_buffer
 		));
 
 		MCThrowIfFailed(_buffer->Map(0, nullptr, reinterpret_cast<void**>(&_mappedData)));
+
+		// The resource can stay mapped as long as the resource exists. However, the CPU must
+		// take care not to write to the buffer while it is in use. Some sort of synchronization will
+		// be required
 	}
 	MCUploadBuffer(const MCUploadBuffer& rhs) = delete;
 	MCUploadBuffer& operator=(const MCUploadBuffer& rhs) = delete;
@@ -40,12 +44,20 @@ public:
 		return _buffer.Get();
 	}
 
+	/*
+		Return the calculated size of the buffer elements. For non-constant buffers, this will just be 
+		sizeof(T). For constant buffers this will be a multiple of the minimum hardware allocation size.
+	*/
+	UINT CalculatedSize() const {
+		return _elementByteSize;
+	}
+
 	void CopyData(int elementIndex, const T& data) {
 		memcpy(&_mappedData[elementIndex*_elementByteSize], &data, sizeof(T));
 	}
 
 private:
-	UINT CalculateConstantBufferSize(UNIT eleSize) {
+	UINT CalculateConstantBufferSize(UINT eleSize) {
 		/*
 			Constant buffers must be a multiple of the minimum hardware allocation size (usually 256 bytes),
 			So round up to the nearest multiple of 256. We do this by adding 255 and then masking off the lower
@@ -58,7 +70,7 @@ private:
 			0x00000200 = 512
 
 		*/
-		return (eleSize+255) & ~255
+		return (eleSize + 255) & ~255;
 	}
 private:
 	ComPtr<ID3D12Resource> _buffer;

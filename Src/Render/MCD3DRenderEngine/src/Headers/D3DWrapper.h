@@ -4,6 +4,8 @@
 
 #include "RenderConfig.h"
 #include "DXGIWrapper.h"
+#include "MCUploadBuffer.h"
+#include "MCMath.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -12,6 +14,10 @@ namespace MC {
 	struct MCVertex1Color {
 		DirectX::XMFLOAT3 Position;
 		DirectX::XMFLOAT4 Color;
+	};
+
+	struct ObjectConstants {
+		DirectX::XMFLOAT4X4 WorldViewProj = MCMath::Identity4x4();
 	};
 
 	class D3DWrapper {
@@ -53,6 +59,14 @@ namespace MC {
 		// Depth Stencil
 		ComPtr<ID3D12Resource>            _pDepthStencil;
 
+		// Buffer to hold the cubes matrix visible to the pipe-line
+		std::unique_ptr<MCUploadBuffer<ObjectConstants>> _pObjectConstantBuffer;
+
+		// Matrices
+		DirectX::XMFLOAT4X4               _worldMatrix;
+		DirectX::XMFLOAT4X4               _viewMatrix;
+		DirectX::XMFLOAT4X4               _projectionMatrix;
+
 		D3D12_VIEWPORT                    _viewPort;
 
 	private:
@@ -64,11 +78,14 @@ namespace MC {
 		void InitSwapChain();
 		void InitDescriptorHeaps();
 		void InitRenderTargets();
-		void InitRTVHeap();
+		void InitRenderTargetViews();
 		void InitDepthStencilBuffer();
 		void InitDepthStencilBufferView();
+		void InitConstantBuffer();
+		void InitConstantBufferView();
 		void InitViewPort();
 		void InitFinalize();
+		void InitMatrices();
 
 		void EnsureValidWindowConfig();
 

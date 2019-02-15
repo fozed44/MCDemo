@@ -36,6 +36,9 @@
     <ClInclude Include="src\Headers\MCD3D12Core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Headers\MCMath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Source\DXGIWrapper.cpp">
@@ -53,5 +56,9 @@
     <ClCompile Include="src\Source\TestFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="src\Source\StandardVertex.hlsl" />
+    <FxCompile Include="src\Source\StandardPixel.hlsl" />
   </ItemGroup>
 </Project>
