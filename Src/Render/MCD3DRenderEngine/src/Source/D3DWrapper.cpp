@@ -7,6 +7,8 @@
 #include "../../../../Common/MCLog/src/Headers/MCLog.h"
 #include "../../../../Common/MCCommon/src/Headers/Utility.h"
 
+#include "../Headers/TestFunctions.h"
+
 #define MC_DEPTH_STENCIL_FORMAT DXGI_FORMAT_D32_FLOAT
 
 namespace MC {
@@ -51,6 +53,8 @@ namespace MC {
 		InitViewPort();
 		InitMatrices();
 		InitFinalize();
+
+		InitTest();
 
 		MC_INFO("End render initialization.");
 	}
@@ -358,6 +362,126 @@ namespace MC {
 
 #pragma endregion 
 
+#pragma region Test
+
+	void D3DWrapper::InitTest() {
+		INIT_TRACE("Begin test initialization.");
+
+		InitBoxGeometry();
+		InitBoxRootSignature();
+
+		INIT_TRACE("End test initialization.");
+	}
+
+	void D3DWrapper::InitBoxGeometry() {
+		INIT_TRACE("Begin box geometry initialization.");
+
+		MCVertex1Color pVerts[8]     = {};
+		std::uint16_t  pIndicies[36] = {};
+
+		INIT_TRACE("--Generating cube geometry.");
+		MCTest::GenerateTestCube(
+			0.0f, 0.0f, 0.0f,
+			1.0f, 1.0f, 1.0f,
+			pVerts,    sizeof(pVerts),
+			pIndicies, sizeof(pIndicies)
+		);
+
+		/*INIT_TRACE("--Reset command allocator.");
+		MCThrowIfFailed(_pCommandAllocator->Reset());
+
+		INIT_TRACE("--Reset command list.");
+		MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));*/
+
+		ComPtr<ID3D12Resource> uploadBuffer;
+
+		INIT_TRACE("--Creating cube vertex resource.");
+
+		ExecSync([_pBoxVerts, pVerts, uploadBuffer]() { _pBoxVerts = CreateDefaultBuffer(pVerts, sizeof(pVerts), uploadBuffer); })
+		_pBoxVerts = CreateDefaultBuffer(pVerts, sizeof(pVerts), uploadBuffer);
+
+		/*INIT_TRACE("--Close command list.");
+		MCThrowIfFailed(_pCommandList->Close());
+
+		INIT_TRACE("--Execute.");
+		ID3D12CommandList* pCommandList = _pCommandList.Get();
+		_pCommandQueue->ExecuteCommandLists(1, &pCommandList);
+
+		INIT_TRACE("--Letting the GPU catch up to release the upload buffer.");
+		FlushCommandQueue();*/
+
+		INIT_TRACE("--Reset command allocator.");
+		MCThrowIfFailed(_pCommandAllocator->Reset());
+
+		INIT_TRACE("--Reset command list.");
+		MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));
+
+		INIT_TRACE("--Creating cube indexes.");
+		_pBoxIndicies = CreateDefaultBuffer(pIndicies, sizeof(pIndicies), uploadBuffer);
+
+		INIT_TRACE("--Close command list.");
+		MCThrowIfFailed(_pCommandList->Close());
+
+		INIT_TRACE("--Execute.");
+		_pCommandQueue->ExecuteCommandLists(1, &pCommandList);
+
+		INIT_TRACE("--Letting the GPU catch up to release the upload buffer.");
+		FlushCommandQueue();
+
+
+		INIT_TRACE("End box geometry initialization.");
+	}
+
+	void D3DWrapper::InitBoxRootSignature() {
+		INIT_TRACE("Begin box root signature initialize.");
+
+		CD3DX12_ROOT_PARAMETER pSlotRootParameter[1];
+
+		// Creating a single parameter that will point to the constant buffer. 
+		CD3DX12_DESCRIPTOR_RANGE constantBufferViewTable;
+		constantBufferViewTable.Init(
+			D3D12_DESCRIPTOR_RANGE_TYPE_CBV,
+			1, // number of DESCRIPTORS
+			0 // base shader register
+		);
+
+		pSlotRootParameter[0].InitAsDescriptorTable(
+			1, // number of descriptor ranges,
+			&constantBufferViewTable
+		);
+
+		CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDescription(
+			1, // number of root parameters,
+			pSlotRootParameter,
+			0, // number of static samplers
+			nullptr, // static sampler description
+			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
+		);
+
+		// Create a root signature with a single slot which pointer to a
+		// descriptor range consisting of a single constant buffer.
+		ComPtr<ID3DBlob> serializedRootSignature = nullptr;
+		ComPtr<ID3DBlob> errorBlob               = nullptr;
+		MCThrowIfFailed(D3D12SerializeRootSignature(
+			&rootSignatureDescription,
+			D3D_ROOT_SIGNATURE_VERSION_1,
+			&serializedRootSignature,
+			&errorBlob
+		));
+
+		MCThrowIfFailed(_pDevice->CreateRootSignature(
+			0,
+			serializedRootSignature->GetBufferPointer(),
+			serializedRootSignature->GetBufferSize(),
+			__uuidof(_pBoxRootSignature),
+			&_pBoxRootSignature
+		));
+
+		INIT_TRACE("End box root signature initialize.");
+	}
+
+#pragma endregion
+
 #pragma region QuickDraw
 
 	void D3DWrapper::QuickDraw() {
@@ -517,6 +641,23 @@ namespace MC {
 			WaitForSingleObject(eventHandle, INFINITE);
 			CloseHandle(eventHandle);
 		}
+	}
+
+	void D3DWrapper::ExecSync(void (*func)()) {
+
+		MCThrowIfFailed(_pCommandAllocator->Reset());
+
+		MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));
+
+		func();
+
+		MCThrowIfFailed(_pCommandList->Close());
+
+		ID3D12CommandList* pCommandList = _pCommandList.Get();
+		_pCommandQueue->ExecuteCommandLists(1, &pCommandList);
+
+		INIT_TRACE("--Letting the GPU catch up to release the upload buffer.");
+		FlushCommandQueue();
 	}
 
 #pragma endregion

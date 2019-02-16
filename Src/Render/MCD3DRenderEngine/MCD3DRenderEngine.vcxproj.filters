@@ -39,6 +39,9 @@
     <ClInclude Include="src\Headers\MCMath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Headers\TestFunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Source\DXGIWrapper.cpp">

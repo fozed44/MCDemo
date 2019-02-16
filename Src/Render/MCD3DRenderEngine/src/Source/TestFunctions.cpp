@@ -1,5 +1,4 @@
-#include "../Headers/D3DWrapper.h"
-#include "DirectXColors.h"
+#include "../Headers/TestFunctions.h"
 
 namespace MCTest {
 	
@@ -10,7 +9,7 @@ namespace MCTest {
 		std::uint16_t *pIndicies, size_t indiciesSize) {
 
 		assert(vertDestSize == sizeof(MC::MCVertex1Color) * 8);
-		assert(indiciesSize == sizeof(std::uint16_t) * 32);
+		assert(indiciesSize == sizeof(std::uint16_t) * 36);
 
 		float xl = centerx - (width / 2.0f);
 		float xr = centerx + (width / 2.0f);

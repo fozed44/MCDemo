@@ -157,6 +157,7 @@
     <ClInclude Include="src\Headers\MCMath.h" />
     <ClInclude Include="src\Headers\MCUploadBuffer.h" />
     <ClInclude Include="src\Headers\RenderConfig.h" />
+    <ClInclude Include="src\Headers\TestFunctions.h" />
     <ClInclude Include="src\Headers\WindowWrapper.h" />
   </ItemGroup>
   <ItemGroup>

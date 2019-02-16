@@ -89,6 +89,26 @@ namespace MC {
 
 		void EnsureValidWindowConfig();
 
+		// Test methods that may be deleted
+		////////////////////////////////////////////////////////////
+
+		/// Main Test init that is called by Init();
+		void InitTest();
+
+
+		// Get test data into _boxVerts and _boxIndicies.
+		void InitBoxGeometry();
+
+		// Create the root signature.
+		void InitBoxRootSignature();
+
+		// execute GPU commands synchronously
+		void ExecSync(void (*func)());
+
+		ComPtr<ID3D12Resource>      _pBoxVerts;
+		ComPtr<ID3D12Resource>      _pBoxIndicies;
+		ComPtr<ID3D12RootSignature> _pBoxRootSignature;
+
 	private:
 
 		ComPtr<ID3D12Resource> CreateDefaultBuffer(void *initData, UINT64 byteSize, ComPtr<ID3D12Resource>& uploadBuffer);
