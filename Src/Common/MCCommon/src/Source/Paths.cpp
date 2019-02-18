@@ -23,6 +23,21 @@ namespace MC {
 		return assetDirectory.c_str();
 	}
 
+	const char *Paths::ShaderDirectory() {
+		static std::string shaderDirectory;
+
+		if (shaderDirectory.length() > 0)
+			return shaderDirectory.c_str();
+
+		std::lock_guard<std::recursive_mutex> lock(__pathsMutex);
+
+		if (shaderDirectory.length() == 0) {
+			shaderDirectory = std::string(InstallDirectory()) + __SHADER_SUB_DIR__;
+		}
+
+		return shaderDirectory.c_str();
+	}
+
 	const char *Paths::ConfigDirectory() {
 		static std::string configDirectory;
 		

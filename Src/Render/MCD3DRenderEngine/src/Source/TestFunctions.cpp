@@ -19,7 +19,7 @@ namespace MCTest {
 		float zb = centerz + (depth / 2.0f);
 
 		pVertDest[0] = { DirectX::XMFLOAT3(xl, yd, zf), DirectX::XMFLOAT4(DirectX::Colors::White) };
-		pVertDest[1] = { DirectX::XMFLOAT3(xl, yu, zf), DirectX::XMFLOAT4(DirectX::Colors::Black) };
+		pVertDest[1] = { DirectX::XMFLOAT3(xl, yu, zf), DirectX::XMFLOAT4(DirectX::Colors::Cyan) };
 		pVertDest[2] = { DirectX::XMFLOAT3(xr, yu, zf), DirectX::XMFLOAT4(DirectX::Colors::Red) };
 		pVertDest[3] = { DirectX::XMFLOAT3(xr, yd, zf), DirectX::XMFLOAT4(DirectX::Colors::Green) };
 
@@ -31,7 +31,7 @@ namespace MCTest {
 		
 		// front face
 		pIndicies[0] = 0; pIndicies[1] = 1; pIndicies[2] = 2;
-		pIndicies[3] = 0; pIndicies[4] = 1; pIndicies[5] = 2;
+		pIndicies[3] = 0; pIndicies[4] = 2; pIndicies[5] = 3;
 
 		// back face
 		pIndicies[6] = 4; pIndicies[7] = 6; pIndicies[8] = 5;

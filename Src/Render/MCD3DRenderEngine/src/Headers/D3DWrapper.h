@@ -68,6 +68,7 @@ namespace MC {
 		DirectX::XMFLOAT4X4               _projectionMatrix;
 
 		D3D12_VIEWPORT                    _viewPort;
+		D3D12_RECT                        _scissorRect;
 
 	private:
 		void Init3DDevice();
@@ -95,23 +96,44 @@ namespace MC {
 		/// Main Test init that is called by Init();
 		void InitTest();
 
-
 		// Get test data into _boxVerts and _boxIndicies.
 		void InitBoxGeometry();
 
+		// Initialize the views to the box geometry.
+		void InitBoxGeometryViews();
+
 		// Create the root signature.
 		void InitBoxRootSignature();
+
+		// Load the vertex and pixel shaders.
+		void InitShaders();
+
+		// Init the pipeline state for the box
+		void InitBoxPSO();
+
+		void TestUpdate();
 
 		// execute GPU commands synchronously
 		void ExecSync(void (*func)());
 
 		ComPtr<ID3D12Resource>      _pBoxVerts;
 		ComPtr<ID3D12Resource>      _pBoxIndicies;
+
+		D3D12_VERTEX_BUFFER_VIEW    _boxVertView;
+		D3D12_INDEX_BUFFER_VIEW     _boxIndexView;
+
 		ComPtr<ID3D12RootSignature> _pBoxRootSignature;
+		D3D12_INPUT_ELEMENT_DESC    _pElementLayoutDescriptions[2];
+		ComPtr<ID3D12PipelineState> _pBoxPSO;
+
+		ComPtr<ID3DBlob>            _pBoxVertexShader;
+		ComPtr<ID3DBlob>            _pBoxPixelShader;
 
 	private:
 
 		ComPtr<ID3D12Resource> CreateDefaultBuffer(void *initData, UINT64 byteSize, ComPtr<ID3D12Resource>& uploadBuffer);
+
+		ComPtr<ID3DBlob> LoadShader(const std::string& filename) const;
 
 	private:
 		const RENDER_CONFIG _initialConfiguration;

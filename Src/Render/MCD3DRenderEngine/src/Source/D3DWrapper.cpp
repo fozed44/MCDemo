@@ -6,8 +6,11 @@
 #include "../Headers/RenderConfig.h"
 #include "../../../../Common/MCLog/src/Headers/MCLog.h"
 #include "../../../../Common/MCCommon/src/Headers/Utility.h"
+#include "../../../../Common/MCCommon/src/Headers/Paths.h"
 
 #include "../Headers/TestFunctions.h"
+#include <fstream>
+#include "d3dcompiler.h"
 
 #define MC_DEPTH_STENCIL_FORMAT DXGI_FORMAT_D32_FLOAT
 
@@ -16,7 +19,9 @@ namespace MC {
 #pragma region CtorDtor
 
 	D3DWrapper::D3DWrapper(const RENDER_CONFIG& renderConfig) 
-		: _initialConfiguration(renderConfig), _pObjectConstantBuffer(nullptr){}
+		: _initialConfiguration(renderConfig),
+		  _pObjectConstantBuffer(nullptr),
+		  _pElementLayoutDescriptions{} {}
 
 	D3DWrapper::~D3DWrapper() {}
 
@@ -296,6 +301,10 @@ namespace MC {
 		_viewPort.MinDepth = 0.0f;
 		_viewPort.MaxDepth = 1.0f;
 
+		_scissorRect.top    = 0;
+		_scissorRect.left   = 0;
+		_scissorRect.right  = _initialConfiguration.DISPLAY_OUTPUT_WIDTH;
+		_scissorRect.bottom = _initialConfiguration.DISPLAY_OUTPUT_HEIGHT;
 		/*_pCommandList->RSSetViewports(1, &_viewPort);*/
 
 		INIT_TRACE("End view port.");
@@ -368,11 +377,36 @@ namespace MC {
 		INIT_TRACE("Begin test initialization.");
 
 		InitBoxGeometry();
+		InitBoxGeometryViews();
 		InitBoxRootSignature();
+		InitShaders();
+
+		INIT_TRACE("--Init input layout.");
+		_pElementLayoutDescriptions[0].SemanticName         = "POSITION";
+		_pElementLayoutDescriptions[0].SemanticIndex        = 0;
+		_pElementLayoutDescriptions[0].Format               = DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT;
+		_pElementLayoutDescriptions[0].InputSlot            = 0;
+		_pElementLayoutDescriptions[0].AlignedByteOffset    = 0;
+		_pElementLayoutDescriptions[0].InputSlotClass       = D3D12_INPUT_CLASSIFICATION::D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+		_pElementLayoutDescriptions[0].InstanceDataStepRate = 0;
+		
+		_pElementLayoutDescriptions[1].SemanticName         = "COLOR";
+		_pElementLayoutDescriptions[1].SemanticIndex        = 0;
+		_pElementLayoutDescriptions[1].Format               = DXGI_FORMAT::DXGI_FORMAT_R32G32B32A32_FLOAT;
+		_pElementLayoutDescriptions[1].InputSlot            = 0;
+		_pElementLayoutDescriptions[1].AlignedByteOffset    = 12;
+		_pElementLayoutDescriptions[1].InputSlotClass       = D3D12_INPUT_CLASSIFICATION::D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+		_pElementLayoutDescriptions[1].InstanceDataStepRate = 0;
+
+		InitBoxPSO();
 
 		INIT_TRACE("End test initialization.");
 	}
 
+	/*
+		Initialize the cube geometry, create an upload buffer for the vertex and index buffers, copy
+		the vertexes and indexes into the buffer.
+	*/
 	void D3DWrapper::InitBoxGeometry() {
 		INIT_TRACE("Begin box geometry initialization.");
 
@@ -387,28 +421,33 @@ namespace MC {
 			pIndicies, sizeof(pIndicies)
 		);
 
-		/*INIT_TRACE("--Reset command allocator.");
+		/////////////////////////////////////////////////////////////////////////
+		// COPY The vertexes into the _pBoxVerts upload buffer.
+
+		INIT_TRACE("--Reset command allocator.");
 		MCThrowIfFailed(_pCommandAllocator->Reset());
 
 		INIT_TRACE("--Reset command list.");
-		MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));*/
+		MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));
 
 		ComPtr<ID3D12Resource> uploadBuffer;
 
 		INIT_TRACE("--Creating cube vertex resource.");
 
-		ExecSync([_pBoxVerts, pVerts, uploadBuffer]() { _pBoxVerts = CreateDefaultBuffer(pVerts, sizeof(pVerts), uploadBuffer); })
 		_pBoxVerts = CreateDefaultBuffer(pVerts, sizeof(pVerts), uploadBuffer);
 
-		/*INIT_TRACE("--Close command list.");
+		INIT_TRACE("--Close command list.");
 		MCThrowIfFailed(_pCommandList->Close());
 
 		INIT_TRACE("--Execute.");
 		ID3D12CommandList* pCommandList = _pCommandList.Get();
 		_pCommandQueue->ExecuteCommandLists(1, &pCommandList);
 
+		/////////////////////////////////////////////////////////////////////////
+		// Copy the indexes into the _pBoxIndicies
+
 		INIT_TRACE("--Letting the GPU catch up to release the upload buffer.");
-		FlushCommandQueue();*/
+		FlushCommandQueue();
 
 		INIT_TRACE("--Reset command allocator.");
 		MCThrowIfFailed(_pCommandAllocator->Reset());
@@ -430,6 +469,32 @@ namespace MC {
 
 
 		INIT_TRACE("End box geometry initialization.");
+	}
+
+	void D3DWrapper::InitBoxGeometryViews() {
+		INIT_TRACE("Begin init of geometry views.");
+
+		_boxVertView.BufferLocation = _pBoxVerts->GetGPUVirtualAddress();
+		_boxVertView.StrideInBytes  = sizeof(MCVertex1Color);
+		_boxVertView.SizeInBytes    = sizeof(MCVertex1Color) * 8;
+
+		_boxIndexView.BufferLocation = _pBoxIndicies->GetGPUVirtualAddress();
+		_boxIndexView.Format = DXGI_FORMAT_R16_UINT;
+		_boxIndexView.SizeInBytes = sizeof(std::uint16_t) * 36;
+
+		INIT_TRACE("End init of geometry views.");
+	}
+
+	void D3DWrapper::InitShaders() {
+		INIT_TRACE("Begin shader init.");
+
+		INIT_TRACE("--Load standard vertex shader.");
+		_pBoxVertexShader = LoadShader("StandardVertex.cso");
+
+		INIT_TRACE("-- Load standard pixel shader.");
+		_pBoxPixelShader = LoadShader("StandardPixel.cso");
+
+		INIT_TRACE("End shader init.");
 	}
 
 	void D3DWrapper::InitBoxRootSignature() {
@@ -480,15 +545,83 @@ namespace MC {
 		INIT_TRACE("End box root signature initialize.");
 	}
 
+	void D3DWrapper::InitBoxPSO() {
+		INIT_TRACE("Begin box pipeline state object init.");
+
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
+		ZeroMemory(&psoDesc, sizeof(psoDesc));
+
+		psoDesc.InputLayout = { _pElementLayoutDescriptions, _countof(_pElementLayoutDescriptions) };
+		psoDesc.pRootSignature = _pBoxRootSignature.Get();
+		psoDesc.VS = { reinterpret_cast<BYTE*>(_pBoxVertexShader->GetBufferPointer()), _pBoxVertexShader->GetBufferSize() };
+		psoDesc.PS = { reinterpret_cast<BYTE*>(_pBoxPixelShader->GetBufferPointer()),  _pBoxPixelShader->GetBufferSize()  };
+		psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+		psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+		psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+		psoDesc.SampleMask = UINT_MAX;
+		psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+		psoDesc.NumRenderTargets = 1;
+		psoDesc.RTVFormats[0] = BACK_BUFFER_FORMAT;
+
+		// TODO: As of now we do not have support for multi-sampling
+		psoDesc.SampleDesc.Count = 1;
+		psoDesc.SampleDesc.Quality = 0;
+
+		psoDesc.DSVFormat = MC_DEPTH_STENCIL_FORMAT;
+
+		_pDevice->CreateGraphicsPipelineState(
+			&psoDesc,
+			__uuidof(_pBoxPSO),
+			&_pBoxPSO
+		);
+
+
+		INIT_TRACE("End box pipeline state object init.");
+	}
+
 #pragma endregion
 
 #pragma region QuickDraw
 
+	void D3DWrapper::TestUpdate() {
+
+		DirectX::XMVECTOR target    = DirectX::XMVectorZero();
+		DirectX::XMVECTOR cameraPos = DirectX::XMVectorSet(0.0f, 0.0f, -5.0f, 1.0f);
+		DirectX::XMVECTOR up        = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+		DirectX::XMMATRIX view = DirectX::XMMatrixLookAtLH(cameraPos, target, up);
+		DirectX::XMStoreFloat4x4(&_viewMatrix, view);
+
+		// TODO::
+		// Aspect ratio needs to be tracked
+		float aspectRation = 1.0f;
+		DirectX::XMMATRIX proj = DirectX::XMMatrixPerspectiveFovLH(0.25f*3.14159f, 1.0f, 1.0f, 1000.0f);
+		DirectX::XMStoreFloat4x4(&_projectionMatrix, proj);
+
+		DirectX::XMMATRIX world = DirectX::XMLoadFloat4x4(&_worldMatrix);
+
+		DirectX::XMMATRIX worldViewProj = world*view*proj;
+
+		ObjectConstants oc;
+		DirectX::XMStoreFloat4x4(&oc.WorldViewProj, XMMatrixTranspose(worldViewProj));
+
+		// TODO:
+		// Tho CopyData function does not appear to take into account the fact that oc is smaller
+		// than the internal elementsize.
+
+		_pObjectConstantBuffer->CopyData(0, oc);
+	}
+
 	void D3DWrapper::QuickDraw() {
+
+		TestUpdate();
 
 		MCThrowIfFailed(_pCommandAllocator->Reset());
 
-		MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));
+		MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), _pBoxPSO.Get()));
+
+		_pCommandList->RSSetViewports(1, &_viewPort);
+		_pCommandList->RSSetScissorRects(1, &_scissorRect);
 
 		UINT currentBackBufferIndex = _pDXGIWrapper->GetCurrentBackBufferIndex();
 
@@ -530,6 +663,19 @@ namespace MC {
 			true,
 			&dsvHeapHandle
 		);
+
+		ID3D12DescriptorHeap* descriptorHeaps[] = { _pCBVDescriptorHeap.Get() };
+		_pCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+
+		_pCommandList->SetGraphicsRootSignature(_pBoxRootSignature.Get());
+
+		_pCommandList->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		_pCommandList->IASetVertexBuffers(0, 1, &_boxVertView);
+		_pCommandList->IASetIndexBuffer(&_boxIndexView);
+
+		_pCommandList->SetGraphicsRootDescriptorTable(0, _pCBVDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+
+		_pCommandList->DrawIndexedInstanced(36, 1, 0, 0, 0);
 
 		_pCommandList->ResourceBarrier(
 			1,
@@ -641,6 +787,28 @@ namespace MC {
 			WaitForSingleObject(eventHandle, INFINITE);
 			CloseHandle(eventHandle);
 		}
+	}
+
+	ComPtr<ID3DBlob> D3DWrapper::LoadShader(const std::string& filename) const {
+
+		// TODO:
+		//	This method has zero error checking.
+
+		auto fullFilename = std::string(Paths::ShaderDirectory()) + filename;
+
+		std::ifstream fin(fullFilename.c_str(), std::ios::binary);
+
+		fin.seekg(0, std::ios_base::end);
+		std::ifstream::pos_type size = (int)fin.tellg();
+		fin.seekg(0, std::ios_base::beg);
+
+		ComPtr<ID3DBlob> blob;
+		MCThrowIfFailed(D3DCreateBlob(size, &blob));
+
+		fin.read((char*)blob->GetBufferPointer(), size);
+		fin.close();
+
+		return blob;
 	}
 
 	void D3DWrapper::ExecSync(void (*func)()) {
