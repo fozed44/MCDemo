@@ -6,6 +6,7 @@
 #include "DXGIWrapper.h"
 #include "MCUploadBuffer.h"
 #include "MCMath.h"
+#include "../../../../Common/MCCommon/src/Headers/MCFrame.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -27,6 +28,8 @@ namespace MC {
 
 	public:
 		void Init(std::shared_ptr<DXGIWrapper>& pDXGIWrapper);
+
+		void RenderFrame(const MCFrame *pFrame);
 
 		void QuickDraw();
 		void FlushCommandQueue();
@@ -111,7 +114,7 @@ namespace MC {
 		// Init the pipeline state for the box
 		void InitBoxPSO();
 
-		void TestUpdate();
+		void TestUpdate(const MCFrame* pFrame);
 
 		// execute GPU commands synchronously
 		void ExecSync(void (*func)());

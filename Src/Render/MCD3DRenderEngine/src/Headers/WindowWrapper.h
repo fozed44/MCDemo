@@ -1,7 +1,7 @@
 #pragma once
 
 #include "MCD3D12Core.h"
-
+#include "DirectXMath.h"
 #include "RenderConfig.h"
 namespace MC {
 
@@ -16,6 +16,15 @@ namespace MC {
 		HWND Init();
 		inline bool Initialized() { return _initialized; }
 		inline HWND hWnd()        { return _hwnd; }
+
+		// Temp Methods that will be deleted
+		float GetPhi()    { return _phi; }
+		float GetTheta()  { return _theta; }
+		float GetRadius() { return _radius; }
+
+		static float _phi;
+		static float _theta;
+		static float _radius;
 
 	private:
 

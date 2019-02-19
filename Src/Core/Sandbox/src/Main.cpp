@@ -6,6 +6,8 @@
 #include "../../../Render/MCD3DRenderEngine/src/Headers/D3DWrapper.h"
 #include "../../../Common/MCCommon/src/Headers/Utility.h"
 #include "../../../Render/MCD3DRenderEngine//src/Headers/WindowWrapper.h"
+#include "../../../Common/MCCommon/src/Headers/MasterTimer.h"
+#include "../../../Common/MCCommon/src/Headers/MCFrame.h"
 
 #include <iostream>
 
@@ -33,6 +35,9 @@ int Sandbox() {
 
 	elem->Attribute("testInt", &x);
 
+	auto masterTimer = std::make_unique<MC::MasterTimer>();
+	masterTimer->Reset();
+
 	MC::RENDER_CONFIG renderConfig;
 	MC::LoadRenderConfig(&renderConfig);
 
@@ -50,6 +55,13 @@ int Sandbox() {
 
 	MSG msg = {};
 	
+	float frameCount = 0;
+
+	MC::MCFrame frame;
+	frame.CameraPosition = { 0.0f, 0.0f, -10.0f, 1.0f };
+	frame.LookAt         = { 0.0f, 0.0f, 0.0f, 0.0f };
+	
+
 	while (msg.message != WM_QUIT)
 	{
 		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
@@ -57,9 +69,25 @@ int Sandbox() {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-		else
-		{
-			d3dWrapper->QuickDraw();
+		else {
+
+			frame.CameraPosition.x = pWindowWrapper->GetRadius()*sinf(pWindowWrapper->GetPhi())*cosf(pWindowWrapper->GetTheta());
+			frame.CameraPosition.z = pWindowWrapper->GetRadius()*sinf(pWindowWrapper->GetPhi())*sinf(pWindowWrapper->GetTheta());
+			frame.CameraPosition.y = pWindowWrapper->GetRadius()*cosf(pWindowWrapper->GetPhi());
+
+
+			d3dWrapper->RenderFrame(&frame);
+
+			frameCount++;
+
+			masterTimer->Tick();
+
+			float fps = frameCount / masterTimer->TotalTime();
+
+			std::string t = std::string("MCDemo Frame(") + std::to_string(frameCount) + std::string(") fps: ") + std::to_string(fps);
+
+			SetWindowTextA(pWindowWrapper->hWnd(), t.c_str());
+
 		}
 	}
 	

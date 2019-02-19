@@ -10,13 +10,43 @@
 #define MAX_VALID_WINDOW_HEIGHT 10000
 
 namespace MC {
+	
+	float WindowWrapper::_theta = 1.5f*3.14159f;
+	float WindowWrapper::_phi = 3.14159f / 4.0f;
+	float WindowWrapper::_radius = 5.0f;
+
+	POINT lastMousePos;
 
 #pragma region window_proc
 
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+		int x = LOWORD(lParam);
+		int y = HIWORD(lParam);
 		switch (msg) {
+
 		case WM_LBUTTONDOWN:
 			MC_INFO("Mouse button down at {0:d}, {1:d}", LOWORD(lParam), HIWORD(lParam));
+			lastMousePos.x = LOWORD(lParam);
+			lastMousePos.y = HIWORD(lParam);
+			SetCapture(hWnd);
+			break;
+		case WM_LBUTTONUP:
+			ReleaseCapture();
+			break;
+		case WM_MOUSEMOVE:
+			if (wParam & MK_LBUTTON) {
+				float dx = DirectX::XMConvertToRadians(0.25f*static_cast<float>(x - lastMousePos.x));
+				float dy = DirectX::XMConvertToRadians(0.25f*static_cast<float>(y - lastMousePos.y));
+				WindowWrapper::_theta += dx;
+				WindowWrapper::_phi += dy;
+				
+				if (WindowWrapper::_phi < 0.1f)
+					WindowWrapper::_phi = 0.1f;
+				if (WindowWrapper::_phi > 3.04159f)
+					WindowWrapper::_phi = 3.04159f;
+			}
+			lastMousePos.x = x;
+			lastMousePos.y = y;
 			break;
 		case WM_DESTROY:
 			PostQuitMessage(0);

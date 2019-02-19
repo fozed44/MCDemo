@@ -131,10 +131,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Headers\GlobalSwitches.h" />
+    <ClInclude Include="src\Headers\MasterTimer.h" />
+    <ClInclude Include="src\Headers\MCFrame.h" />
     <ClInclude Include="src\Headers\Paths.h" />
     <ClInclude Include="src\Headers\Utility.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Source\MasterTimer.cpp" />
     <ClCompile Include="src\Source\Paths.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -583,10 +583,20 @@ namespace MC {
 
 #pragma region QuickDraw
 
-	void D3DWrapper::TestUpdate() {
+	void D3DWrapper::TestUpdate(const MCFrame* pFrame) {
 
-		DirectX::XMVECTOR target    = DirectX::XMVectorZero();
-		DirectX::XMVECTOR cameraPos = DirectX::XMVectorSet(0.0f, 0.0f, -5.0f, 1.0f);
+		DirectX::XMVECTOR target = DirectX::XMVectorSet(
+										pFrame->LookAt.x,
+										pFrame->LookAt.y,
+										pFrame->LookAt.z,
+										pFrame->LookAt.w
+								   );
+		DirectX::XMVECTOR cameraPos = DirectX::XMVectorSet(
+										pFrame->CameraPosition.x,
+										pFrame->CameraPosition.y, 
+										pFrame->CameraPosition.z,
+										pFrame->CameraPosition.w
+								   );
 		DirectX::XMVECTOR up        = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
 		DirectX::XMMATRIX view = DirectX::XMMatrixLookAtLH(cameraPos, target, up);
@@ -613,8 +623,6 @@ namespace MC {
 	}
 
 	void D3DWrapper::QuickDraw() {
-
-		TestUpdate();
 
 		MCThrowIfFailed(_pCommandAllocator->Reset());
 
@@ -694,6 +702,15 @@ namespace MC {
 		MCThrowIfFailed(_pDXGIWrapper->Swap());
 
 		FlushCommandQueue();
+	}
+
+#pragma endregion
+
+#pragma region Render
+
+	void D3DWrapper::RenderFrame(const MCFrame* pFrame) {
+		TestUpdate(pFrame);
+		QuickDraw();
 	}
 
 #pragma endregion
