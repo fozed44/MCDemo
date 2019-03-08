@@ -40,6 +40,21 @@ namespace MC {
 		*/
 		void GetFrameBuffer(UINT pos, const IID &riid, void **ppSurface);
 
+		/*
+			Returns that last calculated aspect ratio. This cached value is updated when the swap chain
+			is either created or resized.
+		*/
+		inline float GetAspectRatio() { return _cachedAspectRatio; }
+
+		/*
+			It is intended that QueueResize can be called from the thread running the message pump.The
+			render thread can then call IsResizeQueued and ForceResize to cause the actual resizing to be
+			controlled by the renderer.
+		*/
+		inline void QueueResize()     { _resizeQueued = true; }
+		inline bool IsResizeQueued()  { return _resizeQueued; }
+		       void ForceResize();
+
 	private:
 		DXGIWrapper(DXGIWrapper&)  = delete;
 		DXGIWrapper(DXGIWrapper&&) = delete;
@@ -55,9 +70,23 @@ namespace MC {
 
 		void EnableDXDebugLayer();
 
-		bool _initialized;
-		const RENDER_CONFIG _initialConfiguration;
+		bool                           _initialized;
+		const RENDER_CONFIG            _initialConfiguration;
 		std::shared_ptr<WindowWrapper> _pWindowWrapper;
+
+		/*
+			Updated when a swapchain is created or resized.
+		*/
+		float                          _cachedAspectRatio;
+
+		/*
+			Set to true by the QueueResize method.
+
+			It is intended that QueueResize can be called from the thread running the message pump. The
+			render thread can then call IsResizeQueued and ForceResize to cause the actual resizing to be
+			controlled by the renderer.
+		*/
+		bool _resizeQueued;
 
 		ComPtr<IDXGIFactory4>   _pDXGIFactory;
 		ComPtr<ID3D12Device>    _p3DDevice;

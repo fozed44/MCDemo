@@ -604,8 +604,8 @@ namespace MC {
 
 		// TODO::
 		// Aspect ratio needs to be tracked
-		float aspectRation = 1.0f;
-		DirectX::XMMATRIX proj = DirectX::XMMatrixPerspectiveFovLH(0.25f*3.14159f, 1.0f, 1.0f, 1000.0f);
+		float aspectRatio = _pDXGIWrapper->GetAspectRatio();
+		DirectX::XMMATRIX proj = DirectX::XMMatrixPerspectiveFovLH(0.25f*3.14159f, aspectRatio, 1.0f, 1000.0f);
 		DirectX::XMStoreFloat4x4(&_projectionMatrix, proj);
 
 		DirectX::XMMATRIX world = DirectX::XMLoadFloat4x4(&_worldMatrix);
@@ -826,6 +826,78 @@ namespace MC {
 		fin.close();
 
 		return blob;
+	}
+
+	void D3DWrapper::Resize() {
+
+		/*
+			The general steps to resize the swap chain buffers are as follows:
+
+			1) Release resources attached to the swap chain
+				a) Flush the command queue.
+				b) Reset the command list.
+				c) Release the frame buffer RESOURCES
+				d) Release the depth stencil buffer RESOURCE
+
+			2) Resize the buffers.
+
+			3) Re-initialize resources.
+				a) re-initialize frame buffer resources.
+				b) re-initialize stencil buffer resource.
+
+		*/
+		
+
+		assert(_pDevice);
+		assert(_pDXGIWrapper);
+		assert(_pCommandAllocator);
+
+		// Make sure the command queue is flushed.
+		FlushCommandQueue();
+
+		// Reset the command list.
+		MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));
+
+		for (int i = 0; i < FRAME_BUFFER_COUNT; ++i)
+			_ppRenderTargets[i].Reset();
+
+		_pDepthStencil.Reset();
+
+		_pDXGIWrapper->ForceResize();
+
+		InitRenderTargets();
+		InitRenderTargetViews();
+
+		InitDepthStencilBuffer();
+		InitDepthStencilBufferView();
+
+		_pCommandList->ResourceBarrier(
+			1,
+			&CD3DX12_RESOURCE_BARRIER::Transition(_pDepthStencil.Get(),
+				D3D12_RESOURCE_STATE_COMMON,
+				D3D12_RESOURCE_STATE_DEPTH_WRITE
+			)
+		);
+
+		MCThrowIfFailed(_pCommandList->Close());
+
+		ID3D12CommandList* pCommandList = _pCommandList.Get();
+		_pCommandQueue->ExecuteCommandLists(1, &pCommandList);
+
+		FlushCommandQueue();
+
+		_viewPort = {};
+		_viewPort.TopLeftX = 0.0f;
+		_viewPort.TopLeftY = 0.0f;
+		_viewPort.Width  = static_cast<float>(_initialConfiguration.DISPLAY_OUTPUT_WIDTH);
+		_viewPort.Height = static_cast<float>(_initialConfiguration.DISPLAY_OUTPUT_HEIGHT);
+		_viewPort.MinDepth = 0.0f;
+		_viewPort.MaxDepth = 1.0f;
+
+		_scissorRect.top    = 0;
+		_scissorRect.left   = 0;
+		_scissorRect.right  = _initialConfiguration.DISPLAY_OUTPUT_WIDTH;
+		_scissorRect.bottom = _initialConfiguration.DISPLAY_OUTPUT_HEIGHT;
 	}
 
 	void D3DWrapper::ExecSync(void (*func)()) {

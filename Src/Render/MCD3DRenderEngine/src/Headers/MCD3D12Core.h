@@ -13,6 +13,6 @@
 #define MAX_VALID_WINDOW_HEIGHT 10000
 
 // Number of frames used in the swap chain
-#define FRAME_BUFFER_COUNT 2
+const int FRAME_BUFFER_COUNT = 2;
 
 #define BACK_BUFFER_FORMAT DXGI_FORMAT_R8G8B8A8_UNORM

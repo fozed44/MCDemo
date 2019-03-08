@@ -138,6 +138,11 @@ namespace MC {
 
 		ComPtr<ID3DBlob> LoadShader(const std::string& filename) const;
 
+		/*
+			Call to resize the swap chain buffers. Will release and restore resources.
+		*/
+		void Resize();
+
 	private:
 		const RENDER_CONFIG _initialConfiguration;
 

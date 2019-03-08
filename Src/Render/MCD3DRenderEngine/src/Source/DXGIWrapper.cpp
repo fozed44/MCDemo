@@ -3,12 +3,16 @@
 #include "../Headers/DXGIWrapper.h"
 #include "../../../../Common/MCLog/src/Headers/MCLog.h"
 #include "../../../../Common/MCCommon/src/Headers/Utility.h"
+#include "../Headers/MCMath.h"
 
 namespace MC {
 
 	DXGIWrapper::DXGIWrapper() 
-		: _initialized(false), _initialConfiguration{}, _pWindowWrapper{ nullptr } {
-	}
+		: _initialized(false),
+		  _initialConfiguration{},
+		  _pWindowWrapper{ nullptr },
+		  _cachedAspectRatio{ 0 }
+	{}
 
 	DXGIWrapper::~DXGIWrapper(){}
 
@@ -252,7 +256,7 @@ namespace MC {
 		EnsureValidWindowConfig();
 
 		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
-		swapChainDesc.BufferCount = 2;
+		swapChainDesc.BufferCount = FRAME_BUFFER_COUNT;
 		swapChainDesc.Width       = _initialConfiguration.DISPLAY_OUTPUT_WIDTH;
 		swapChainDesc.Height      = _initialConfiguration.DISPLAY_OUTPUT_HEIGHT;
 		swapChainDesc.Format      = BACK_BUFFER_FORMAT;
@@ -273,8 +277,11 @@ namespace MC {
 			nullptr,
 			&swapChain
 		));
+		
+		MCThrowIfFailed(swapChain.As(&_pSwapChain));
 
-		MCThrowIfFailed(swapChain.As(&_pSwapChain));		
+		// Update the cached aspect ratio.
+		_cachedAspectRatio = static_cast<float>(swapChainDesc.Width) / static_cast<float>(swapChainDesc.Height);
 
 		return _pSwapChain.Get();
 	}
@@ -310,4 +317,20 @@ namespace MC {
 		return _pSwapChain->Present(0, 0);
 	}
 
+	void DXGIWrapper::ForceResize() {
+		MCThrowIfFailed(_pSwapChain->ResizeBuffers(
+			FRAME_BUFFER_COUNT,
+			0,
+			0,
+			BACK_BUFFER_FORMAT,
+			DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH
+		));
+
+		DXGI_SWAP_CHAIN_DESC swapChainDesc;
+		MCThrowIfFailed(_pSwapChain->GetDesc(&swapChainDesc));
+
+		_cachedAspectRatio =
+			static_cast<float>(swapChainDesc.BufferDesc.Width)
+		  / static_cast<float>(swapChainDesc.BufferDesc.Height);
+	}
 }
