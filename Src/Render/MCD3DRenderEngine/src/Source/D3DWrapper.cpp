@@ -819,6 +819,11 @@ namespace MC {
 		std::ifstream::pos_type size = (int)fin.tellg();
 		fin.seekg(0, std::ios_base::beg);
 
+		auto good = fin.good();
+
+		if (!fin.good() || size == 0)
+			MCTHROW(std::string("Error opening file ") + filename);
+
 		ComPtr<ID3DBlob> blob;
 		MCThrowIfFailed(D3DCreateBlob(size, &blob));
 
