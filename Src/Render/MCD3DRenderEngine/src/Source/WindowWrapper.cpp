@@ -17,6 +17,7 @@ namespace MC {
 
 	POINT lastMousePos;
 
+	std::function<void()> _resizeCallback = nullptr;
 #pragma region window_proc
 
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -51,6 +52,9 @@ namespace MC {
 		case WM_DESTROY:
 			PostQuitMessage(0);
 			return 0;
+		case WM_SIZE:
+			if (_resizeCallback)
+				_resizeCallback();
 		}
 		return DefWindowProc(hWnd, msg, wParam, lParam);
 	}
@@ -60,7 +64,9 @@ namespace MC {
 #pragma region ctor
 
 	WindowWrapper::WindowWrapper(const RENDER_CONFIG& renderConfig)
-		: _initialized(false), _hwnd(0), _renderConfig(renderConfig) {}
+		: _initialized(false),
+		  _hwnd(0),
+		  _renderConfig(renderConfig) {}
 
 	WindowWrapper::~WindowWrapper() {}
 
@@ -158,6 +164,9 @@ namespace MC {
 		}
 	}
 
+	void WindowWrapper::RegisterResizeCallback(std::function<void()> callback) const {
+		_resizeCallback = callback;
+	}
 
 #pragma endregion
 

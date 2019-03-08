@@ -3,6 +3,7 @@
 #include "MCD3D12Core.h"
 #include "DirectXMath.h"
 #include "RenderConfig.h"
+#include <functional>
 namespace MC {
 
 	class WindowWrapper {
@@ -16,6 +17,8 @@ namespace MC {
 		HWND Init();
 		inline bool Initialized() { return _initialized; }
 		inline HWND hWnd()        { return _hwnd; }
+
+		void RegisterResizeCallback(std::function<void()> callback) const;
 
 		// Temp Methods that will be deleted
 		float GetPhi()    { return _phi; }
