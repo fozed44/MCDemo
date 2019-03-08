@@ -53,6 +53,12 @@ int Sandbox() {
 
 	d3dWrapper->Init(dxgiWrapper);
 
+	pWindowWrapper->RegisterResizeCallback(
+		[dxgiWrapper]() {
+			dxgiWrapper->QueueResize();
+		}
+	);
+
 	MSG msg = {};
 	
 	float frameCount = 0;

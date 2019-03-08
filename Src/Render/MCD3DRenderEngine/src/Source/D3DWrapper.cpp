@@ -203,11 +203,15 @@ namespace MC {
 	void D3DWrapper::InitDepthStencilBuffer() {
 		INIT_TRACE("Init depth stencil buffer.");
 
+		int width, height;
+
+		_pDXGIWrapper->GetFrameBufferSize(&width, &height);
+
 		D3D12_RESOURCE_DESC depthStencilBufferDesc = {};
 		depthStencilBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 		depthStencilBufferDesc.Alignment = 0;
-		depthStencilBufferDesc.Width = _initialConfiguration.DISPLAY_OUTPUT_WIDTH;
-		depthStencilBufferDesc.Height = _initialConfiguration.DISPLAY_OUTPUT_HEIGHT;
+		depthStencilBufferDesc.Width = width;
+		depthStencilBufferDesc.Height = height;
 		depthStencilBufferDesc.DepthOrArraySize = 1;
 		depthStencilBufferDesc.MipLevels = 1;
 		depthStencilBufferDesc.Format = MC_DEPTH_STENCIL_FORMAT;
