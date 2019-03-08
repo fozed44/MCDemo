@@ -332,5 +332,17 @@ namespace MC {
 		_cachedAspectRatio =
 			static_cast<float>(swapChainDesc.BufferDesc.Width)
 		  / static_cast<float>(swapChainDesc.BufferDesc.Height);
+
+		_resizeQueued = false;
+	}
+
+	void DXGIWrapper::GetFrameBufferSize(int *pWidth, int *pHeight) {
+		assert(_pSwapChain);
+
+		DXGI_SWAP_CHAIN_DESC swapChainDesc;
+		MCThrowIfFailed(_pSwapChain->GetDesc(&swapChainDesc));
+
+		*pWidth  = swapChainDesc.BufferDesc.Width;
+		*pHeight = swapChainDesc.BufferDesc.Height;
 	}
 }

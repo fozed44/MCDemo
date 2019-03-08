@@ -702,6 +702,9 @@ namespace MC {
 		MCThrowIfFailed(_pDXGIWrapper->Swap());
 
 		FlushCommandQueue();
+
+		if (_pDXGIWrapper->IsResizeQueued())
+			Resize();
 	}
 
 #pragma endregion
@@ -819,8 +822,6 @@ namespace MC {
 		std::ifstream::pos_type size = (int)fin.tellg();
 		fin.seekg(0, std::ios_base::beg);
 
-		auto good = fin.good();
-
 		if (!fin.good() || size == 0)
 			MCTHROW(std::string("Error opening file ") + filename);
 
@@ -891,18 +892,21 @@ namespace MC {
 
 		FlushCommandQueue();
 
+		int newWidth, newHeight;
+		_pDXGIWrapper->GetFrameBufferSize(&newWidth, &newHeight);
+
 		_viewPort = {};
 		_viewPort.TopLeftX = 0.0f;
 		_viewPort.TopLeftY = 0.0f;
-		_viewPort.Width  = static_cast<float>(_initialConfiguration.DISPLAY_OUTPUT_WIDTH);
-		_viewPort.Height = static_cast<float>(_initialConfiguration.DISPLAY_OUTPUT_HEIGHT);
+		_viewPort.Width  = static_cast<float>(newWidth);
+		_viewPort.Height = static_cast<float>(newHeight);
 		_viewPort.MinDepth = 0.0f;
 		_viewPort.MaxDepth = 1.0f;
 
 		_scissorRect.top    = 0;
 		_scissorRect.left   = 0;
-		_scissorRect.right  = _initialConfiguration.DISPLAY_OUTPUT_WIDTH;
-		_scissorRect.bottom = _initialConfiguration.DISPLAY_OUTPUT_HEIGHT;
+		_scissorRect.right  = newWidth;
+		_scissorRect.bottom = newHeight;
 	}
 
 	void D3DWrapper::ExecSync(void (*func)()) {

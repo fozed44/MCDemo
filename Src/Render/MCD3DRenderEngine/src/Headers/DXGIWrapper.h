@@ -55,6 +55,12 @@ namespace MC {
 		inline bool IsResizeQueued()  { return _resizeQueued; }
 		       void ForceResize();
 
+		/*
+			Get the dimensions of (one of) the framebuffer. The number of buffers actually being used by
+			the swapchain is not relevant because they all must be the same size.
+		*/
+		void GetFrameBufferSize(int *pWidth, int *pHeight);
+
 	private:
 		DXGIWrapper(DXGIWrapper&)  = delete;
 		DXGIWrapper(DXGIWrapper&&) = delete;
