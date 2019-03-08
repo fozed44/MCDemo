@@ -38,8 +38,8 @@ class MCException
 {
 public:
 	MCException() = default;
-	MCException(HRESULT hr, const std::string& functionName, const std::string& filename, int lineNunber)
-		: ErrorCode(hr), FunctionName(functionName), Filename(filename), LineNumber(LineNumber) {}
+	MCException(HRESULT hr, const std::string& functionName, const std::string& filename, int lineNumber)
+		: ErrorCode(hr), FunctionName(functionName), Filename(filename), LineNumber(lineNumber) {}
 	MCException(const std::string& info, const std::string& filename, int lineNumber)
 		: Info(info), Filename(filename), LineNumber(lineNumber) {}
 	MCException(HRESULT hr)
