@@ -826,7 +826,7 @@ namespace MC {
 		std::ifstream::pos_type size = (int)fin.tellg();
 		fin.seekg(0, std::ios_base::beg);
 
-		if (!fin.good() || size == 0)
+		if (!fin.good())
 			MCTHROW(std::string("Error opening file ") + filename);
 
 		ComPtr<ID3DBlob> blob;
