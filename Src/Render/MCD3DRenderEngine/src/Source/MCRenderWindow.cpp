@@ -1,4 +1,4 @@
-#include "../Headers/WindowWrapper.h"
+#include "../Headers/MCRenderWindow.h"
 #include "../../../../Common/MCLog/src/Headers/MCLog.h"
 #include "../../../../Common/MCCommon/src/Headers/Utility.h"
 
@@ -11,9 +11,9 @@
 
 namespace MC {
 	
-	float WindowWrapper::_theta = 1.5f*3.14159f;
-	float WindowWrapper::_phi = 3.14159f / 4.0f;
-	float WindowWrapper::_radius = 5.0f;
+	float MCRenderWindow::_theta = 1.5f*3.14159f;
+	float MCRenderWindow::_phi = 3.14159f / 4.0f;
+	float MCRenderWindow::_radius = 5.0f;
 
 	POINT lastMousePos;
 
@@ -38,13 +38,13 @@ namespace MC {
 			if (wParam & MK_LBUTTON) {
 				float dx = DirectX::XMConvertToRadians(0.25f*static_cast<float>(x - lastMousePos.x));
 				float dy = DirectX::XMConvertToRadians(0.25f*static_cast<float>(y - lastMousePos.y));
-				WindowWrapper::_theta += dx;
-				WindowWrapper::_phi += dy;
+				MCRenderWindow::_theta += dx;
+				MCRenderWindow::_phi += dy;
 				
-				if (WindowWrapper::_phi < 0.1f)
-					WindowWrapper::_phi = 0.1f;
-				if (WindowWrapper::_phi > 3.04159f)
-					WindowWrapper::_phi = 3.04159f;
+				if (MCRenderWindow::_phi < 0.1f)
+					MCRenderWindow::_phi = 0.1f;
+				if (MCRenderWindow::_phi > 3.04159f)
+					MCRenderWindow::_phi = 3.04159f;
 			}
 			lastMousePos.x = x;
 			lastMousePos.y = y;
@@ -63,12 +63,12 @@ namespace MC {
 
 #pragma region ctor
 
-	WindowWrapper::WindowWrapper(const RENDER_CONFIG& renderConfig)
+	MCRenderWindow::MCRenderWindow(const RENDER_CONFIG& renderConfig)
 		: _initialized(false),
 		  _hwnd(0),
 		  _renderConfig(renderConfig) {}
 
-	WindowWrapper::~WindowWrapper() {}
+	MCRenderWindow::~MCRenderWindow() {}
 
 #pragma endregion
 
@@ -77,7 +77,7 @@ namespace MC {
 	/*
 		Register and create a render window.
 	*/
-	HWND WindowWrapper::Init() {
+	HWND MCRenderWindow::Init() {
 		RegisterMCWindowClass();
 		CreateMCWindow();		
 
@@ -92,7 +92,7 @@ namespace MC {
 	/*
 		Registers the actual rendering window.
 	*/
-	void WindowWrapper::RegisterMCWindowClass() {
+	void MCRenderWindow::RegisterMCWindowClass() {
 		WNDCLASS wc;
 
 		wc.style         = CS_HREDRAW | CS_VREDRAW;
@@ -119,7 +119,7 @@ namespace MC {
 	/*
 		Create the actual rendering window.
 	*/
-	void WindowWrapper::CreateMCWindow() {
+	void MCRenderWindow::CreateMCWindow() {
 		INIT_INFO("Creating window.");
 
 		EnsureValidWindowConfig();
@@ -150,7 +150,7 @@ namespace MC {
 		Examine the window width and height in _renderConfig. Throw an exception if the values do not
 		fall within an acceptable range.
 	*/
-	void WindowWrapper::EnsureValidWindowConfig() {
+	void MCRenderWindow::EnsureValidWindowConfig() {
 		if (_renderConfig.DISPLAY_OUTPUT_WIDTH <= 0
 			|| _renderConfig.DISPLAY_OUTPUT_WIDTH > MAX_VALID_WINDOW_WIDTH) {
 			INIT_ERROR("Detected an invalid window width ({0:d}) in the config file.", _renderConfig.DISPLAY_OUTPUT_WIDTH);
@@ -164,7 +164,7 @@ namespace MC {
 		}
 	}
 
-	void WindowWrapper::RegisterResizeCallback(std::function<void()> callback) const {
+	void MCRenderWindow::RegisterResizeCallback(std::function<void()> callback) const {
 		_resizeCallback = callback;
 	}
 

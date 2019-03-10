@@ -6,13 +6,13 @@
 #include <functional>
 namespace MC {
 
-	class WindowWrapper {
+	class MCRenderWindow {
 	public:
-		WindowWrapper(const RENDER_CONFIG& renderConfig);
-		WindowWrapper(const WindowWrapper&)            = delete;
-		WindowWrapper(const WindowWrapper&&)           = delete;
-		WindowWrapper& operator=(const WindowWrapper&) = delete;
-		~WindowWrapper();
+		MCRenderWindow(const RENDER_CONFIG& renderConfig);
+		MCRenderWindow(const MCRenderWindow&)            = delete;
+		MCRenderWindow(const MCRenderWindow&&)           = delete;
+		MCRenderWindow& operator=(const MCRenderWindow&) = delete;
+		~MCRenderWindow();
 
 		HWND Init();
 		inline bool Initialized() { return _initialized; }

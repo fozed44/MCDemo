@@ -3,7 +3,7 @@
 
 #include "MCD3D12Core.h"
 #include "RenderConfig.h"
-#include "WindowWrapper.h"
+#include "MCRenderWindow.h"
 
 
 using Microsoft::WRL::ComPtr;
@@ -16,7 +16,7 @@ namespace MC {
 		~DXGIWrapper();
 
 	public:
-		void Init(const RENDER_CONFIG* pConfig, std::shared_ptr<WindowWrapper>& windowWrapper);
+		void Init(const RENDER_CONFIG* pConfig, std::shared_ptr<MCRenderWindow>& renderWindow);
 		
 		inline bool Initialized() { return _initialized; }
 		
@@ -76,9 +76,9 @@ namespace MC {
 
 		void EnableDXDebugLayer();
 
-		bool                           _initialized;
-		const RENDER_CONFIG            _initialConfiguration;
-		std::shared_ptr<WindowWrapper> _pWindowWrapper;
+		bool                            _initialized;
+		const RENDER_CONFIG             _initialConfiguration;
+		std::shared_ptr<MCRenderWindow> _pRenderWindow;
 
 		/*
 			Updated when a swapchain is created or resized.

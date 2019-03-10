@@ -10,22 +10,22 @@ namespace MC {
 	DXGIWrapper::DXGIWrapper() 
 		: _initialized(false),
 		  _initialConfiguration{},
-		  _pWindowWrapper{ nullptr },
+		  _pRenderWindow{ nullptr },
 		  _cachedAspectRatio{ 0 }
 	{}
 
 	DXGIWrapper::~DXGIWrapper(){}
 
-	void DXGIWrapper::Init(const RENDER_CONFIG *pConfig, std::shared_ptr<WindowWrapper>& windowWrapper) {
+	void DXGIWrapper::Init(const RENDER_CONFIG *pConfig, std::shared_ptr<MCRenderWindow>& renderWindow) {
 
-		// save the pointer to the window wrapper for latter. The first place we will use it is
+		// save the pointer to the window wrapper for later. The first place we will use it is
 		// when we create the swap chain. ---- Remember that while CreateConfiguredOrDefaltSwapchain is
 		// defined in the DXGIWrapper, CreateConfiguredOrDefaltSwapchain will actually be called by D3DWrapper
 		// during its initialization.
-		_pWindowWrapper = windowWrapper;
+		_pRenderWindow = renderWindow;
 
-		// Ensure that the window wrapper has been initialized.
-		if (!_pWindowWrapper->Initialized()) {
+		// Ensure that the render window has been initialized.
+		if (!_pRenderWindow->Initialized()) {
 			INIT_ERROR("Window wrapper must be initialized before calling DXGIWrapper.Init");
 			MCTHROW("Window wrapper must be initialized before calling DXGIWrapper.Init");
 		}
@@ -271,7 +271,7 @@ namespace MC {
 
 		MCThrowIfFailed(_pDXGIFactory->CreateSwapChainForHwnd(
 			pCommandQueue,
-			_pWindowWrapper->hWnd(),
+			_pRenderWindow->hWnd(),
 			&swapChainDesc,
 			nullptr,
 			nullptr,

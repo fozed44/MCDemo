@@ -158,14 +158,14 @@
     <ClInclude Include="src\Headers\MCUploadBuffer.h" />
     <ClInclude Include="src\Headers\RenderConfig.h" />
     <ClInclude Include="src\Headers\TestFunctions.h" />
-    <ClInclude Include="src\Headers\WindowWrapper.h" />
+    <ClInclude Include="src\Headers\MCRenderWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Source\D3DWrapper.cpp" />
     <ClCompile Include="src\Source\DXGIWrapper.cpp" />
     <ClCompile Include="src\Source\RenderConfig.cpp" />
     <ClCompile Include="src\Source\TestFunctions.cpp" />
-    <ClCompile Include="src\Source\WindowWrapper.cpp" />
+    <ClCompile Include="src\Source\MCRenderWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\Source\StandardPixel.hlsl">

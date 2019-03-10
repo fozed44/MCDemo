@@ -24,9 +24,6 @@
     <ClInclude Include="src\Headers\RenderConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Headers\WindowWrapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Headers\d3dx12.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -42,6 +39,9 @@
     <ClInclude Include="src\Headers\TestFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Headers\MCRenderWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Source\DXGIWrapper.cpp">
@@ -53,10 +53,10 @@
     <ClCompile Include="src\Source\RenderConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Source\WindowWrapper.cpp">
+    <ClCompile Include="src\Source\TestFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Source\TestFunctions.cpp">
+    <ClCompile Include="src\Source\MCRenderWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

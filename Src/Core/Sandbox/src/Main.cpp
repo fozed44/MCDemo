@@ -5,7 +5,7 @@
 #include "../../../Render/MCD3DRenderEngine/src/Headers/DXGIWrapper.h"
 #include "../../../Render/MCD3DRenderEngine/src/Headers/D3DWrapper.h"
 #include "../../../Common/MCCommon/src/Headers/Utility.h"
-#include "../../../Render/MCD3DRenderEngine//src/Headers/WindowWrapper.h"
+#include "../../../Render/MCD3DRenderEngine//src/Headers/MCRenderWindow.h"
 #include "../../../Common/MCCommon/src/Headers/MasterTimer.h"
 #include "../../../Common/MCCommon/src/Headers/MCFrame.h"
 
@@ -41,19 +41,19 @@ int Sandbox() {
 	MC::RENDER_CONFIG renderConfig;
 	MC::LoadRenderConfig(&renderConfig);
 
-	auto pWindowWrapper = std::make_shared<MC::WindowWrapper>(renderConfig);
+	auto pRenderWindow = std::make_shared<MC::MCRenderWindow>(renderConfig);
 
-	pWindowWrapper->Init();
+	pRenderWindow->Init();
 
 	auto dxgiWrapper = std::make_shared<MC::DXGIWrapper>();
 
-	dxgiWrapper->Init(&renderConfig, pWindowWrapper);
+	dxgiWrapper->Init(&renderConfig, pRenderWindow);
 
 	auto d3dWrapper = std::make_unique<MC::D3DWrapper>(renderConfig);
 
 	d3dWrapper->Init(dxgiWrapper);
 
-	pWindowWrapper->RegisterResizeCallback(
+	pRenderWindow->RegisterResizeCallback(
 		[dxgiWrapper]() {
 			dxgiWrapper->QueueResize();
 		}
@@ -77,9 +77,9 @@ int Sandbox() {
 		}
 		else {
 
-			frame.CameraPosition.x = pWindowWrapper->GetRadius()*sinf(pWindowWrapper->GetPhi())*cosf(pWindowWrapper->GetTheta());
-			frame.CameraPosition.z = pWindowWrapper->GetRadius()*sinf(pWindowWrapper->GetPhi())*sinf(pWindowWrapper->GetTheta());
-			frame.CameraPosition.y = pWindowWrapper->GetRadius()*cosf(pWindowWrapper->GetPhi());
+			frame.CameraPosition.x = pRenderWindow->GetRadius()*sinf(pRenderWindow->GetPhi())*cosf(pRenderWindow->GetTheta());
+			frame.CameraPosition.z = pRenderWindow->GetRadius()*sinf(pRenderWindow->GetPhi())*sinf(pRenderWindow->GetTheta());
+			frame.CameraPosition.y = pRenderWindow->GetRadius()*cosf(pRenderWindow->GetPhi());
 
 
 			d3dWrapper->RenderFrame(&frame);
@@ -92,7 +92,7 @@ int Sandbox() {
 
 			std::string t = std::string("MCDemo Frame(") + std::to_string(frameCount) + std::string(") fps: ") + std::to_string(fps);
 
-			SetWindowTextA(pWindowWrapper->hWnd(), t.c_str());
+			SetWindowTextA(pRenderWindow->hWnd(), t.c_str());
 
 		}
 	}
