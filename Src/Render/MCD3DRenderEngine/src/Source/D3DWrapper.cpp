@@ -72,6 +72,7 @@ namespace MC {
 			__uuidof(_pFence),
 			&_pFence
 		));
+		_pFence->SetName(L"D3DWrapper fence.");
 		INIT_TRACE("End d3d12 fence init.");
 	}
 	void D3DWrapper::InitCommandQueue() {
@@ -87,6 +88,8 @@ namespace MC {
 			&_pCommandQueue
 		));
 
+		_pCommandQueue->SetName(L"Command Queue");
+
 		INIT_TRACE("End d3d12 command queue init.");
 	}
 	void D3DWrapper::InitCommandAllocator() {
@@ -97,6 +100,8 @@ namespace MC {
 			__uuidof(_pCommandAllocator),
 			&_pCommandAllocator
 		));
+
+		_pCommandAllocator->SetName(L"Command Allocator");
 
 		INIT_TRACE("End d3d12 command allocator queue inti.");
 	}
@@ -208,21 +213,14 @@ namespace MC {
 		_pDXGIWrapper->GetFrameBufferSize(&width, &height);
 
 		D3D12_RESOURCE_DESC depthStencilBufferDesc = {};
-		depthStencilBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-		depthStencilBufferDesc.Alignment = 0;
-		depthStencilBufferDesc.Width = width;
-		depthStencilBufferDesc.Height = height;
+		depthStencilBufferDesc.Dimension        = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+		depthStencilBufferDesc.Alignment        = 0;
+		depthStencilBufferDesc.Width            = width;
+		depthStencilBufferDesc.Height           = height;
 		depthStencilBufferDesc.DepthOrArraySize = 1;
-		depthStencilBufferDesc.MipLevels = 1;
-		depthStencilBufferDesc.Format = MC_DEPTH_STENCIL_FORMAT;
-
-		// TODO:
-		//		OPTIONS_MULTISAMPLE need to be verified since it comes from the config file.
-		depthStencilBufferDesc.SampleDesc.Count = _initialConfiguration.OPTIONS_MULTISAMPLE == 1 ? 4 : 1;
-
-		// TODO
-		//	Quality is related to a value that needs to be added to the configuration... We need a OPTIONS_MULTISAMPLE_QUALITY
-		depthStencilBufferDesc.SampleDesc.Quality = 0;
+		depthStencilBufferDesc.MipLevels        = 1;
+		depthStencilBufferDesc.Format           = MC_DEPTH_STENCIL_FORMAT;
+		depthStencilBufferDesc.SampleDesc.Count = 1;
 
 		depthStencilBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 		depthStencilBufferDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
@@ -579,6 +577,7 @@ namespace MC {
 			&_pBoxPSO
 		);
 
+		_pBoxPSO->SetName(L"Box PSO");
 
 		INIT_TRACE("End box pipeline state object init.");
 	}
@@ -627,6 +626,9 @@ namespace MC {
 	}
 
 	void D3DWrapper::QuickDraw() {
+
+		if (_pDXGIWrapper->IsResizeQueued())
+			Resize();
 
 		MCThrowIfFailed(_pCommandAllocator->Reset());
 
@@ -707,8 +709,7 @@ namespace MC {
 
 		FlushCommandQueue();
 
-		if (_pDXGIWrapper->IsResizeQueued())
-			Resize();
+		
 	}
 
 #pragma endregion

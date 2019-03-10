@@ -31,12 +31,7 @@ namespace MC {
 		auto pDebugElementNodeSet = pRenderConfigDoc->Get("render/debug");
 		auto pDebugElement = pDebugElementNodeSet->ElementAt(0);
 		
-		pDebugElement->Attribute("enableDXDebug", &pRenderConfig->DEBUG_ENABLE_DX_DEBUG);
-		
-		auto pRenderElementNodeSet = pRenderConfigDoc->Get("render/options");
-		auto pRenderElement = pRenderElementNodeSet->ElementAt(0);
-
-		pRenderElement->Attribute("multisample", &pRenderConfig->OPTIONS_MULTISAMPLE);
+		pDebugElement->Attribute("enableDXDebug", &pRenderConfig->DEBUG_ENABLE_DX_DEBUG);		
 
 		MC_INFO("**Loaded renderer configuration.");
 
