@@ -381,7 +381,7 @@ namespace MC {
 		INIT_TRACE("Begin test initialization.");
 
 		InitBoxGeometry();
-		InitBoxGeometryViews();
+		/*InitBoxGeometryViews();*/
 		InitBoxRootSignature();
 		InitShaders();
 
@@ -434,11 +434,10 @@ namespace MC {
 		INIT_TRACE("--Reset command list.");
 		MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));
 
-		ComPtr<ID3D12Resource> uploadBuffer;
+		INIT_TRACE("--Creating cube mesh resource.");
 
-		INIT_TRACE("--Creating cube vertex resource.");
-
-		_pBoxVerts =  MCD3D12RenderUtilities::CreateDefaultBuffer(_pDevice, _pCommandList.Get(), pVerts, sizeof(pVerts), uploadBuffer);
+		_pBoxMesh = std::make_unique<MCStaticMesh16<MCVertex1Color>>("Box");
+		auto disposer = _pBoxMesh->Upload(_pDevice, _pCommandList.Get(), pVerts, sizeof(pVerts), pIndicies, sizeof(pIndicies));
 
 		INIT_TRACE("--Close command list.");
 		MCThrowIfFailed(_pCommandList->Close());
@@ -453,7 +452,7 @@ namespace MC {
 		INIT_TRACE("--Letting the GPU catch up to release the upload buffer.");
 		FlushCommandQueue();
 
-		INIT_TRACE("--Reset command allocator.");
+		/*INIT_TRACE("--Reset command allocator.");
 		MCThrowIfFailed(_pCommandAllocator->Reset());
 
 		INIT_TRACE("--Reset command list.");
@@ -469,13 +468,13 @@ namespace MC {
 		_pCommandQueue->ExecuteCommandLists(1, &pCommandList);
 
 		INIT_TRACE("--Letting the GPU catch up to release the upload buffer.");
-		FlushCommandQueue();
+		FlushCommandQueue();*/
 
 
 		INIT_TRACE("End box geometry initialization.");
 	}
 
-	void D3DWrapper::InitBoxGeometryViews() {
+	/*void D3DWrapper::InitBoxGeometryViews() {
 		INIT_TRACE("Begin init of geometry views.");
 
 		_boxVertView.BufferLocation = _pBoxVerts->GetGPUVirtualAddress();
@@ -487,7 +486,7 @@ namespace MC {
 		_boxIndexView.SizeInBytes = sizeof(std::uint16_t) * 36;
 
 		INIT_TRACE("End init of geometry views.");
-	}
+	}*/
 
 	void D3DWrapper::InitShaders() {
 		INIT_TRACE("Begin shader init.");
@@ -687,8 +686,8 @@ namespace MC {
 		_pCommandList->SetGraphicsRootSignature(_pBoxRootSignature.Get());
 
 		_pCommandList->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		_pCommandList->IASetVertexBuffers(0, 1, &_boxVertView);
-		_pCommandList->IASetIndexBuffer(&_boxIndexView);
+		_pCommandList->IASetVertexBuffers(0, 1, _pBoxMesh->VertexBufferView());
+		_pCommandList->IASetIndexBuffer(_pBoxMesh->IndexBufferView());
 
 		_pCommandList->SetGraphicsRootDescriptorTable(0, _pCBVDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 

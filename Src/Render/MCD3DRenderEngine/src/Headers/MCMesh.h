@@ -12,7 +12,8 @@ namespace MC {
 
 	template <typename TVERTEX_TYPE>
 	class MCStaticMeshUploaderDisposer {
-		MCStaticMeshUploaderDisposer(MCStaticMesh16<TVERTES_TYPE> *pMesh)
+	public:
+		MCStaticMeshUploaderDisposer(MCStaticMesh16<TVERTEX_TYPE> *pMesh)
 			: _pMesh(pMesh) {}
 		MCStaticMeshUploaderDisposer(MCStaticMeshUploaderDisposer&)            = delete;
 		MCStaticMeshUploaderDisposer& operator=(MCStaticMeshUploaderDisposer&) = delete;
@@ -25,7 +26,7 @@ namespace MC {
 				_pMesh->DisposeUploaders();
 		}
 	private:
-		MCStaticMesh16<TVERTEX_TYPE> _pMesh;
+		MCStaticMesh16<TVERTEX_TYPE> *_pMesh;
 	};
 
 	/*
@@ -35,20 +36,29 @@ namespace MC {
 	template <typename TVERTEX_TYPE>
 	class MCStaticMesh16 {
 	public:
-		MCStaticMesh16(std::string& name, TVERTEX_TYPE *pVert, size_t vSize, unsigned short *pIndicies, size_t iSize) {
-			_name                 = name;
-			_vertexByteStride     = sizeof(TVERTEX_TYPE);
-			_vertexBufferByteSize = vSize;
-			_indexBufferByteSize  = iSize;
+		MCStaticMesh16(std::string& name) {
+			_name = name;
+		}
+		MCStaticMesh16(const char* pName) {
+			_name = std::string(pName);
 		}
 		MCStaticMesh16(MCStaticMesh16&)            = delete;
 		MCStaticMesh16& operator=(MCStaticMesh16&) = delete;
 		~MCStaticMesh16() {}
 
-		MCStaticMeshUploaderDisposer upload(ID3D12Device *pDevice, ID3DGraphicsCommandList *pCommandList) {
-			MCStaticMeshUploaderDisposer<TVERTEX_TYPE> disposer;
-			_vertexBufferGPU = MCD3D12RenderUtilities::CreateDefaultBuffer(pDevice, pCommandList, pVert, vSize, _vertexUploadBuffer);
-			_indexBufferGPU = MCD3D12RenderUtilities::CreateDefaultBuffer(pDevice, pCommandList, pIndicies, iSize, _indexUploadBuffer);
+		MCStaticMeshUploaderDisposer<TVERTEX_TYPE> Upload(ID3D12Device *pDevice, ID3D12GraphicsCommandList *pCommandList, TVERTEX_TYPE *pVert, UINT vSize, unsigned short *pIndicies, UINT iSize) {
+			MCStaticMeshUploaderDisposer<TVERTEX_TYPE> disposer(this);
+			_vertexByteStride     = sizeof(TVERTEX_TYPE);
+			_vertexBufferByteSize = vSize;
+			_indexBufferByteSize  = iSize;
+			_vertexBufferGPU      = MCD3D12RenderUtilities::CreateDefaultBuffer(pDevice, pCommandList, pVert,     vSize, _vertexUploadBuffer);
+			_indexBufferGPU       = MCD3D12RenderUtilities::CreateDefaultBuffer(pDevice, pCommandList, pIndicies, iSize, _indexUploadBuffer);
+
+			_vertexBufferGPU->SetName(s2ws(_name + std::string(" gpu vertex buffer")).c_str());
+			_indexBufferGPU ->SetName(s2ws(_name + std::string(" gpu index buffer")).c_str());
+
+			_vertexUploadBuffer->SetName(s2ws(_name + std::string(" vertex upload buffer")).c_str());
+			_indexUploadBuffer ->SetName(s2ws(_name + std::string(" index upload buffer")).c_str());
 
 			return disposer;
 		}
@@ -88,7 +98,7 @@ namespace MC {
 		UINT        _vertexByteStride;
 		UINT        _vertexBufferByteSize;
 		DXGI_FORMAT _indexFormat = DXGI_FORMAT_R16_UINT;
-		UINT        _indexBufferByteSize;
+	    UINT        _indexBufferByteSize;
 
 	private:
 		D3D12_VERTEX_BUFFER_VIEW _vertexBufferView;

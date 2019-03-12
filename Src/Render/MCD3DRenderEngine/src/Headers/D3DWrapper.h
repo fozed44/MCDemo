@@ -8,6 +8,8 @@
 #include "MCMath.h"
 #include "../../../../Common/MCCommon/src/Headers/MCFrame.h"
 
+#include "MCMesh.h"
+
 using Microsoft::WRL::ComPtr;
 
 namespace MC {
@@ -103,8 +105,8 @@ namespace MC {
 		// Get test data into _boxVerts and _boxIndicies.
 		void InitBoxGeometry();
 
-		// Initialize the views to the box geometry.
-		void InitBoxGeometryViews();
+		//// Initialize the views to the box geometry.
+		//void InitBoxGeometryViews();
 
 		// Create the root signature.
 		void InitBoxRootSignature();
@@ -120,11 +122,13 @@ namespace MC {
 		// execute GPU commands synchronously
 		void ExecSync(void (*func)());
 
-		ComPtr<ID3D12Resource>      _pBoxVerts;
+		/*ComPtr<ID3D12Resource>      _pBoxVerts;
 		ComPtr<ID3D12Resource>      _pBoxIndicies;
 
 		D3D12_VERTEX_BUFFER_VIEW    _boxVertView;
-		D3D12_INDEX_BUFFER_VIEW     _boxIndexView;
+		D3D12_INDEX_BUFFER_VIEW     _boxIndexView;*/
+
+		std::unique_ptr<MCStaticMesh16<MCVertex1Color>> _pBoxMesh;
 
 		ComPtr<ID3D12RootSignature> _pBoxRootSignature;
 		D3D12_INPUT_ELEMENT_DESC    _pElementLayoutDescriptions[2];
