@@ -19,6 +19,7 @@ namespace MC {
 
 	struct ObjectConstants {
 		DirectX::XMFLOAT4X4 WorldViewProj = MCMath::Identity4x4();
+		float  time                      = 1.0;
 	};
 
 	class D3DWrapper {
@@ -133,8 +134,6 @@ namespace MC {
 		ComPtr<ID3DBlob>            _pBoxPixelShader;
 
 	private:
-
-		ComPtr<ID3D12Resource> CreateDefaultBuffer(void *initData, UINT64 byteSize, ComPtr<ID3D12Resource>& uploadBuffer);
 
 		ComPtr<ID3DBlob> LoadShader(const std::string& filename) const;
 

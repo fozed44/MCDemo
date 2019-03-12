@@ -12,6 +12,8 @@
 #include <fstream>
 #include "d3dcompiler.h"
 
+#include "../Headers/MCD3D12RenderUtilities.h"
+
 #define MC_DEPTH_STENCIL_FORMAT DXGI_FORMAT_D32_FLOAT
 
 namespace MC {
@@ -436,7 +438,7 @@ namespace MC {
 
 		INIT_TRACE("--Creating cube vertex resource.");
 
-		_pBoxVerts = CreateDefaultBuffer(pVerts, sizeof(pVerts), uploadBuffer);
+		_pBoxVerts =  MCD3D12RenderUtilities::CreateDefaultBuffer(_pDevice, _pCommandList.Get(), pVerts, sizeof(pVerts), uploadBuffer);
 
 		INIT_TRACE("--Close command list.");
 		MCThrowIfFailed(_pCommandList->Close());
@@ -458,7 +460,7 @@ namespace MC {
 		MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));
 
 		INIT_TRACE("--Creating cube indexes.");
-		_pBoxIndicies = CreateDefaultBuffer(pIndicies, sizeof(pIndicies), uploadBuffer);
+		_pBoxIndicies = MCD3D12RenderUtilities::CreateDefaultBuffer(_pDevice, _pCommandList.Get(), pIndicies, sizeof(pIndicies), uploadBuffer);
 
 		INIT_TRACE("--Close command list.");
 		MCThrowIfFailed(_pCommandList->Close());
@@ -617,6 +619,7 @@ namespace MC {
 
 		ObjectConstants oc;
 		DirectX::XMStoreFloat4x4(&oc.WorldViewProj, XMMatrixTranspose(worldViewProj));
+		oc.time = pFrame->Time;
 
 		// TODO:
 		// Tho CopyData function does not appear to take into account the fact that oc is smaller
@@ -723,72 +726,7 @@ namespace MC {
 
 #pragma endregion
 
-#pragma region Utilities
-
-	/*
-		Note:
-			'uploadBuffer' has to be kept alive until AFTER the command list is executed.
-	*/
-	ComPtr<ID3D12Resource> D3DWrapper::CreateDefaultBuffer(void *initData, UINT64 byteSize, ComPtr<ID3D12Resource>& uploadBuffer) {
-
-		// the result.
-		ComPtr<ID3D12Resource> defaultBuffer;
-
-		MCThrowIfFailed(_pDevice->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-			D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer(byteSize),
-			D3D12_RESOURCE_STATE_COMMON,
-			nullptr,
-			__uuidof(defaultBuffer),
-			&defaultBuffer
-		));
-
-		// In order to copy CPU memory data (initData) into a GPU default buffer (defaultBuffer) an intermediate upload
-		// buffer must be created.
-		MCThrowIfFailed(_pDevice->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
-			D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer(byteSize),
-			D3D12_RESOURCE_STATE_GENERIC_READ,
-			nullptr,
-			__uuidof(uploadBuffer),
-			&uploadBuffer
-		));
-
-		D3D12_SUBRESOURCE_DATA subResourceData = {};
-		subResourceData.pData = initData;
-		subResourceData.RowPitch = byteSize;
-		subResourceData.SlicePitch = subResourceData.RowPitch;
-
-		_pCommandList->ResourceBarrier(
-			1,
-			&CD3DX12_RESOURCE_BARRIER::Transition(
-				defaultBuffer.Get(),
-				D3D12_RESOURCE_STATE_COMMON,
-				D3D12_RESOURCE_STATE_COPY_DEST
-			)
-		);
-		UpdateSubresources<1>(
-			_pCommandList.Get(),
-			defaultBuffer.Get(),
-			uploadBuffer.Get(),
-			0,
-			0,
-			1,
-			&subResourceData
-		);
-		_pCommandList->ResourceBarrier(
-			1,
-			&CD3DX12_RESOURCE_BARRIER::Transition(
-				defaultBuffer.Get(),
-				D3D12_RESOURCE_STATE_COPY_DEST,
-				D3D12_RESOURCE_STATE_GENERIC_READ
-			)
-		);
-
-		return defaultBuffer;
-	}
+#pragma region Utilities	
 
 	void D3DWrapper::FlushCommandQueue()
 	{

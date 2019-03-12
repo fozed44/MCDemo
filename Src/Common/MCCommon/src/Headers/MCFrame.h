@@ -22,6 +22,9 @@ namespace MC {
 
 		// The direction the camera is pointing.
 		MCVector4 LookAt;
+
+		// The current frame time;
+		float Time;
 	};
 
 }

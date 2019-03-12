@@ -150,11 +150,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Headers\MCD3D12RenderUtilities.h" />
     <ClInclude Include="src\Headers\D3DWrapper.h" />
     <ClInclude Include="src\Headers\d3dx12.h" />
     <ClInclude Include="src\Headers\DXGIWrapper.h" />
     <ClInclude Include="src\Headers\MCD3D12Core.h" />
     <ClInclude Include="src\Headers\MCMath.h" />
+    <ClInclude Include="src\Headers\MCMesh.h" />
     <ClInclude Include="src\Headers\MCUploadBuffer.h" />
     <ClInclude Include="src\Headers\RenderConfig.h" />
     <ClInclude Include="src\Headers\TestFunctions.h" />
@@ -163,6 +165,7 @@
   <ItemGroup>
     <ClCompile Include="src\Source\D3DWrapper.cpp" />
     <ClCompile Include="src\Source\DXGIWrapper.cpp" />
+    <ClCompile Include="src\Source\MCD3D12RenderUtilities.cpp" />
     <ClCompile Include="src\Source\RenderConfig.cpp" />
     <ClCompile Include="src\Source\TestFunctions.cpp" />
     <ClCompile Include="src\Source\MCRenderWindow.cpp" />

@@ -76,17 +76,18 @@ int Sandbox() {
 			DispatchMessage(&msg);
 		}
 		else {
+			masterTimer->Tick();
 
 			frame.CameraPosition.x = pRenderWindow->GetRadius()*sinf(pRenderWindow->GetPhi())*cosf(pRenderWindow->GetTheta());
 			frame.CameraPosition.z = pRenderWindow->GetRadius()*sinf(pRenderWindow->GetPhi())*sinf(pRenderWindow->GetTheta());
 			frame.CameraPosition.y = pRenderWindow->GetRadius()*cosf(pRenderWindow->GetPhi());
-
+			frame.Time = masterTimer->TotalTime();
 
 			d3dWrapper->RenderFrame(&frame);
 
 			frameCount++;
 
-			masterTimer->Tick();
+			
 
 			float fps = frameCount / masterTimer->TotalTime();
 
