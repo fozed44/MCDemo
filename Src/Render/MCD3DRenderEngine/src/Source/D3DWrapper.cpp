@@ -429,11 +429,11 @@ namespace MC {
 		std::vector<std::uint16_t>  indicies;
 
 		MCTest::GenerateTestSphere(
-			0.5f,
-			0.0f, 0.0f, 0.0f,
+			1.5f,
+			1.0f, 0.0f, 0.0f,
 			&verts,
 			&indicies,
-			1
+			5
 		);
 
 		/////////////////////////////////////////////////////////////////////////
@@ -538,11 +538,16 @@ namespace MC {
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
 		ZeroMemory(&psoDesc, sizeof(psoDesc));
 
+		auto rasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+		rasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+		rasterizerState.CullMode = D3D12_CULL_MODE_BACK;
+		rasterizerState.AntialiasedLineEnable = false;
+
 		psoDesc.InputLayout = { _pElementLayoutDescriptions, _countof(_pElementLayoutDescriptions) };
 		psoDesc.pRootSignature = _pBoxRootSignature.Get();
 		psoDesc.VS = { reinterpret_cast<BYTE*>(_pBoxVertexShader->GetBufferPointer()), _pBoxVertexShader->GetBufferSize() };
 		psoDesc.PS = { reinterpret_cast<BYTE*>(_pBoxPixelShader->GetBufferPointer()),  _pBoxPixelShader->GetBufferSize()  };
-		psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+		psoDesc.RasterizerState = rasterizerState;
 		psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 		psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 		psoDesc.SampleMask = UINT_MAX;
@@ -668,16 +673,12 @@ namespace MC {
 		_pCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
 		_pCommandList->SetGraphicsRootSignature(_pBoxRootSignature.Get());
+		_pCommandList->SetGraphicsRootDescriptorTable(0, _pCBVDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
 		_pCommandList->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		//_pCommandList->IASetVertexBuffers(0, 1, _pBoxMesh->VertexBufferView());
-		//_pCommandList->IASetIndexBuffer(_pBoxMesh->IndexBufferView());
 
 		_pBoxMesh->SetIABuffers(_pCommandList.Get());
 
-		_pCommandList->SetGraphicsRootDescriptorTable(0, _pCBVDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
-
-		//_pCommandList->DrawIndexedInstanced(36, 1, 0, 0, 0);
 
 		_pBoxMesh->DrawSubMesh("Box", _pCommandList.Get());
 

@@ -95,10 +95,10 @@ namespace MCTest {
 										(v0.Position.z + v1.Position.z) / 2.0f
 									  ),
 									  DirectX::XMFLOAT4(
-										MC::MCMath::Min((v0.Color.x + v1.Color.x / 2.0f), 1.0f),
-										MC::MCMath::Min((v0.Color.y + v1.Color.y / 2.0f), 1.0f),
-										MC::MCMath::Min((v0.Color.z + v1.Color.z / 2.0f), 1.0f),
-										MC::MCMath::Min((v0.Color.w + v1.Color.w / 2.0f), 1.0f)
+										MC::MCMath::Min((v0.Color.x + v1.Color.x) / 2.0f, 1.0f),
+										MC::MCMath::Min((v0.Color.y + v1.Color.y) / 2.0f, 1.0f),
+										MC::MCMath::Min((v0.Color.z + v1.Color.z) / 2.0f, 1.0f),
+										MC::MCMath::Min((v0.Color.w + v1.Color.w) / 2.0f, 1.0f)
 									  )
 			};
 			MC::MCVertex1Color m1 = { DirectX::XMFLOAT3(
@@ -107,10 +107,10 @@ namespace MCTest {
 										(v1.Position.z + v2.Position.z) / 2.0f
 									  ),
 									  DirectX::XMFLOAT4(
-										MC::MCMath::Min((v1.Color.x + v2.Color.x / 2.0f), 1.0f),
-										MC::MCMath::Min((v1.Color.y + v2.Color.y / 2.0f), 1.0f),
-										MC::MCMath::Min((v1.Color.z + v2.Color.z / 2.0f), 1.0f),
-										MC::MCMath::Min((v1.Color.w + v2.Color.w / 2.0f), 1.0f)
+										MC::MCMath::Min((v1.Color.x + v2.Color.x) / 2.0f, 1.0f),
+										MC::MCMath::Min((v1.Color.y + v2.Color.y) / 2.0f, 1.0f),
+										MC::MCMath::Min((v1.Color.z + v2.Color.z) / 2.0f, 1.0f),
+										MC::MCMath::Min((v1.Color.w + v2.Color.w) / 2.0f, 1.0f)
 									  )
 			};
 			MC::MCVertex1Color m2 ={ DirectX::XMFLOAT3(
@@ -119,10 +119,10 @@ namespace MCTest {
 										(v0.Position.z + v2.Position.z) / 2.0f
 									  ),
 									  DirectX::XMFLOAT4(
-										MC::MCMath::Min((v0.Color.x + v2.Color.x / 2.0f), 1.0f),
-										MC::MCMath::Min((v0.Color.y + v2.Color.y / 2.0f), 1.0f),
-										MC::MCMath::Min((v0.Color.z + v2.Color.z / 2.0f), 1.0f),
-										MC::MCMath::Min((v0.Color.w + v2.Color.w / 2.0f), 1.0f)
+										MC::MCMath::Min((v0.Color.x + v2.Color.x) / 2.0f, 1.0f),
+										MC::MCMath::Min((v0.Color.y + v2.Color.y) / 2.0f, 1.0f),
+										MC::MCMath::Min((v0.Color.z + v2.Color.z) / 2.0f, 1.0f),
+										MC::MCMath::Min((v0.Color.w + v2.Color.w) / 2.0f, 1.0f)
 									  )
 			};
 
@@ -194,9 +194,28 @@ namespace MCTest {
 
 		for (int i = 0; i < numSubdivisions; ++i) {
 			Subdivide(pVertDest, pIndDest);
+			if (i < 3) {
+				for (int x = 0; x < pVertDest->size(); ++x) {
+					(*pVertDest)[x].Color.x = MC::MCMath::RandF();
+					(*pVertDest)[x].Color.y = MC::MCMath::RandF();
+					(*pVertDest)[x].Color.z = MC::MCMath::RandF();
+					(*pVertDest)[x].Color.w = MC::MCMath::RandF();
+				}
+			}
 		}
 
+		for (int i = 0; i < pVertDest->size(); ++i) {
 
+			DirectX::XMVECTOR n = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&(*pVertDest)[i].Position));
+			DirectX::XMFLOAT3 r;
+			DirectX::XMStoreFloat3(&r, n);
+
+			(*pVertDest)[i].Position.x = r.x * radius + centerx;
+			(*pVertDest)[i].Position.y = r.y * radius + centery;
+			(*pVertDest)[i].Position.z = r.z * radius + centerz;
+
+
+		}
 
 	}
 	
