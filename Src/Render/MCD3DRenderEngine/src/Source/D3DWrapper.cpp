@@ -414,15 +414,26 @@ namespace MC {
 	void D3DWrapper::InitBoxGeometry() {
 		INIT_TRACE("Begin box geometry initialization.");
 
-		MCVertex1Color pVerts[8]     = {};
-		std::uint16_t  pIndicies[36] = {};
+		//MCVertex1Color pVerts[8]     = {};
+		//std::uint16_t  pIndicies[36] = {};
 
 		INIT_TRACE("--Generating cube geometry.");
-		MCTest::GenerateTestCube(
+		//MCTest::GenerateTestCube(
+		//	0.0f, 0.0f, 0.0f,
+		//	1.0f, 1.0f, 1.0f,
+		//	pVerts,    sizeof(pVerts),
+		//	pIndicies, sizeof(pIndicies)
+		//);
+
+		std::vector<MCVertex1Color> verts;
+		std::vector<std::uint16_t>  indicies;
+
+		MCTest::GenerateTestSphere(
+			0.5f,
 			0.0f, 0.0f, 0.0f,
-			1.0f, 1.0f, 1.0f,
-			pVerts,    sizeof(pVerts),
-			pIndicies, sizeof(pIndicies)
+			&verts,
+			&indicies,
+			1
 		);
 
 		/////////////////////////////////////////////////////////////////////////
@@ -437,7 +448,13 @@ namespace MC {
 		INIT_TRACE("--Creating cube mesh resource.");
 
 		_pBoxMesh = std::make_unique<MCStaticMesh16<MCVertex1Color>>("Box");
-		auto disposer = _pBoxMesh->Upload(_pDevice, _pCommandList.Get(), pVerts, sizeof(pVerts), pIndicies, sizeof(pIndicies));
+		//auto disposer = _pBoxMesh->Upload(_pDevice, _pCommandList.Get(), pVerts, sizeof(pVerts), pIndicies, sizeof(pIndicies));
+		auto disposer = _pBoxMesh->Upload(
+			_pDevice,
+			_pCommandList.Get(),
+			&verts[0], sizeof(MCVertex1Color) * verts.size(),
+			&indicies[0], sizeof(uint16_t) * indicies.size()
+		);
 
 		INIT_TRACE("--Close command list.");
 		MCThrowIfFailed(_pCommandList->Close());
@@ -452,41 +469,8 @@ namespace MC {
 		INIT_TRACE("--Letting the GPU catch up to release the upload buffer.");
 		FlushCommandQueue();
 
-		/*INIT_TRACE("--Reset command allocator.");
-		MCThrowIfFailed(_pCommandAllocator->Reset());
-
-		INIT_TRACE("--Reset command list.");
-		MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));
-
-		INIT_TRACE("--Creating cube indexes.");
-		_pBoxIndicies = MCD3D12RenderUtilities::CreateDefaultBuffer(_pDevice, _pCommandList.Get(), pIndicies, sizeof(pIndicies), uploadBuffer);
-
-		INIT_TRACE("--Close command list.");
-		MCThrowIfFailed(_pCommandList->Close());
-
-		INIT_TRACE("--Execute.");
-		_pCommandQueue->ExecuteCommandLists(1, &pCommandList);
-
-		INIT_TRACE("--Letting the GPU catch up to release the upload buffer.");
-		FlushCommandQueue();*/
-
-
 		INIT_TRACE("End box geometry initialization.");
 	}
-
-	/*void D3DWrapper::InitBoxGeometryViews() {
-		INIT_TRACE("Begin init of geometry views.");
-
-		_boxVertView.BufferLocation = _pBoxVerts->GetGPUVirtualAddress();
-		_boxVertView.StrideInBytes  = sizeof(MCVertex1Color);
-		_boxVertView.SizeInBytes    = sizeof(MCVertex1Color) * 8;
-
-		_boxIndexView.BufferLocation = _pBoxIndicies->GetGPUVirtualAddress();
-		_boxIndexView.Format = DXGI_FORMAT_R16_UINT;
-		_boxIndexView.SizeInBytes = sizeof(std::uint16_t) * 36;
-
-		INIT_TRACE("End init of geometry views.");
-	}*/
 
 	void D3DWrapper::InitShaders() {
 		INIT_TRACE("Begin shader init.");
@@ -686,12 +670,16 @@ namespace MC {
 		_pCommandList->SetGraphicsRootSignature(_pBoxRootSignature.Get());
 
 		_pCommandList->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		_pCommandList->IASetVertexBuffers(0, 1, _pBoxMesh->VertexBufferView());
-		_pCommandList->IASetIndexBuffer(_pBoxMesh->IndexBufferView());
+		//_pCommandList->IASetVertexBuffers(0, 1, _pBoxMesh->VertexBufferView());
+		//_pCommandList->IASetIndexBuffer(_pBoxMesh->IndexBufferView());
+
+		_pBoxMesh->SetIABuffers(_pCommandList.Get());
 
 		_pCommandList->SetGraphicsRootDescriptorTable(0, _pCBVDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
-		_pCommandList->DrawIndexedInstanced(36, 1, 0, 0, 0);
+		//_pCommandList->DrawIndexedInstanced(36, 1, 0, 0, 0);
+
+		_pBoxMesh->DrawSubMesh("Box", _pCommandList.Get());
 
 		_pCommandList->ResourceBarrier(
 			1,
