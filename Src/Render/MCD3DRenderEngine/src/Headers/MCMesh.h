@@ -4,6 +4,8 @@
 #include "MCD3D12RenderUtilities.h"
 #include <unordered_map>
 
+#include "MCUploadBuffer.h"
+
 using Microsoft::WRL::ComPtr;
 
 namespace MC {
@@ -18,22 +20,41 @@ namespace MC {
 	};
 
 	template <typename TVERTEX_TYPE>
-	class MCStaticMeshUploaderDisposer {
+	class MCStaticMesh16UploaderDisposer {
 	public:
-		MCStaticMeshUploaderDisposer(MCStaticMesh16<TVERTEX_TYPE> *pMesh)
+		MCStaticMesh16UploaderDisposer(MCStaticMesh16<TVERTEX_TYPE> *pMesh)
 			: _pMesh(pMesh) {}
-		MCStaticMeshUploaderDisposer(MCStaticMeshUploaderDisposer&)            = delete;
-		MCStaticMeshUploaderDisposer& operator=(MCStaticMeshUploaderDisposer&) = delete;
-		MCStaticMeshUploaderDisposer(MCStaticMeshUploaderDisposer&& o) {
+		MCStaticMesh16UploaderDisposer(MCStaticMeshUploaderDisposer&)            = delete;
+		MCStaticMesh16UploaderDisposer& operator=(MCStaticMeshUploaderDisposer&) = delete;
+		MCStaticMesh16UploaderDisposer(MCStaticMeshUploaderDisposer&& o) {
 			this->_pMesh = o._pMesh;
 			o._pMesh = nullptr;
 		}
-		~MCStaticMeshUploaderDisposer() {
+		~MCStaticMesh16UploaderDisposer() {
 			if (_pMesh)
 				_pMesh->DisposeUploaders();
 		}
 	private:
 		MCStaticMesh16<TVERTEX_TYPE> *_pMesh;
+	};
+
+	template <typemane TVERTEX_TYPE>
+	class MCDynamicMesh16UploaderDisposer {
+	public:
+		MCDynamicMesh16UploaderDisposer(MCDynamicMesh16<TVERTEX_TYPE> *pMesh)
+			: _pMesh(pMesh) {}
+		MCDynamicMesh16UploaderDisposer(MCDynamicMesh16UploaderDisposer&) = delete;
+		MCDynamicMesh16UploaderDisposer& operator=(MCDynamicMesh16UploaderDisposer&) = delte;
+		MCDynamicMesh16UploaderDisposer(MCDynamicMesh16UploaderDisposer&& o) {
+			this->_pMesh = o._pMesh;
+			o._pMesh = nullptr;
+		}
+		~MCDynamicMesh16UploaderDisposer() {
+			if (_pMesh)
+				_pMesh->DisposeUploaders();
+		}
+	private:
+		MCDynamicMesh16<TVERTEX_TYPE> *_pMesh;
 	};
 
 	/*
@@ -53,17 +74,18 @@ namespace MC {
 		MCStaticMesh16& operator=(MCStaticMesh16&) = delete;
 		~MCStaticMesh16() {}
 
-		MCStaticMeshUploaderDisposer<TVERTEX_TYPE> Upload(ID3D12Device *pDevice, ID3D12GraphicsCommandList *pCommandList, TVERTEX_TYPE *pVert, UINT vSize, unsigned short *pIndicies, UINT iSize) {
+		MCStaticMesh16UploaderDisposer<TVERTEX_TYPE> Upload(ID3D12Device *pDevice, ID3D12GraphicsCommandList *pCommandList, TVERTEX_TYPE *pVert, UINT vSize, unsigned short *pIndicies, UINT iSize) {
 			// For the time being, this Upload method does not attempt to check the current status of the mesh to see if
 			// data has already been loaded. Since this check is not being done, if Upload is called on a mesh that has already
 			// been loaded with data, the data that already exists at the time the method is called will not be properly destroyed.
 
 			// For this reason, we are not allowing Upload to be called more that once on a Mesh. We are going to ensure
-			// this by asserting that the _uploaderDisposed flag is still false.
-			assert(!_uploadersDisposed);
+			// this by asserting that the _pVertexBufferGPU and _pIndexBufferGPU are null. 
+			assert(_vertexBufferGPU == nullptr);
+			assert(_indexBufferGPU  == nullptr);
 
 			// Create the disposer that will be returned to the caller.
-			MCStaticMeshUploaderDisposer<TVERTEX_TYPE> disposer(this);
+			MCStaticMesh16UploaderDisposer<TVERTEX_TYPE> disposer(this);
 
 			// Store the meta information about this mesh.
 			_vertexByteStride     = sizeof(TVERTEX_TYPE);
@@ -82,8 +104,8 @@ namespace MC {
 			_indexBufferGPU       = MCD3D12RenderUtilities::CreateDefaultBuffer(pDevice, pCommandList, pIndicies, iSize, _indexUploadBuffer);
 
 			// Set the name of the GPU buffers.
-			_vertexBufferGPU->SetName(s2ws(_name + std::string(" gpu vertex buffer")).c_str());
-			_indexBufferGPU ->SetName(s2ws(_name + std::string(" gpu index buffer")).c_str());
+			_pVertexBufferGPU->SetName(s2ws(_name + std::string(" gpu vertex buffer")).c_str());
+			_pIndexBufferGPU ->SetName(s2ws(_name + std::string(" gpu index buffer")).c_str());
 
 			// Set the name of the Upload buffers (even though) they are temporary.
 			_vertexUploadBuffer->SetName(s2ws(_name + std::string(" vertex upload buffer")).c_str());
@@ -103,8 +125,8 @@ namespace MC {
 		const D3D12_INDEX_BUFFER_VIEW*  IndexBufferView()  const { assert(_uploadersDisposed); return &_indexBufferView; }
 
 		void DisposeUploaders() {
-			_vertexUploadBuffer = nullptr;
-			_indexUploadBuffer  = nullptr;
+			_pVertexUploadBuffer = nullptr;
+			_pIndexUploadBuffer  = nullptr;
 
 			_vertexBufferView.BufferLocation = _vertexBufferGPU->GetGPUVirtualAddress();
 			_vertexBufferView.StrideInBytes  = _vertexByteStride;
@@ -140,11 +162,11 @@ namespace MC {
 		}
 
 	private:
-		ComPtr<ID3D12Resource> _vertexBufferGPU = nullptr;
-		ComPtr<ID3D12Resource> _indexBufferGPU  = nullptr;
+		ComPtr<ID3D12Resource> _pVertexBufferGPU = nullptr;
+		ComPtr<ID3D12Resource> _pIndexBufferGPU  = nullptr;
 
-		ComPtr<ID3D12Resource> _vertexUploadBuffer = nullptr;
-		ComPtr<ID3D12Resource> _indexUploadBuffer  = nullptr;
+		ComPtr<ID3D12Resource> _pVertexUploadBuffer = nullptr;
+		ComPtr<ID3D12Resource> _pIndexUploadBuffer  = nullptr;
 	private:
 		std::string _name;
 		UINT        _vertexByteStride;
@@ -160,11 +182,32 @@ namespace MC {
 		std::unordered_map<std::string, MCSubMesh> _subMeshes;
 
 	private:
-		bool _uploadersDisposed = false;
+		bool _uploadersInUse = false;
 	};
 
-	class MCDynamicMesh {
+	template <typename TVERTEX_TYPE>
+	class MCDynamicMesh16 {
+	public:
+		MCDynamicMesh16(std::string &name) {
+			_name = name;
+		}
+		MCDynamicMesh16(const char* pName) {
+			_name = pName;
+		}
+		MCDynamicMesh16(MCDynamicMesh16&) = delete;
+		MCDynamicMesh16& operator=(MCDynamicMesh16&) = delete;
+		~MCDynamicMesh16() {}
 
+		void Upload(ID3D12Device *pDevice, ID3D12GraphicsCommandList *pCommandList, TVERTEX_TYPE *pVert, UINT vSize, unsigned short *pIndicies, UINT iSize) {
+			_pVertexBuffer = std::make_unique<MCUploadBuffer<TVERTEX_TYPE>>(pDevice, vSize / sizeof(TVERTEX_TYPE), false);
+			_pIndexBuffer = std::make_unique<MCUploadBuffer<unsigned short>>(pDevice, iSize / sizeof(unsigned short), false);
+		}
+	private:
+		std::string _name;
+
+	private:
+		std::unique_ptr<MCUploadBuffer<TVERTEX_TYPE>>   _pVertexBuffer;
+		std::unique_ptr<MCUploadBuffer<unsigned short>> _pIndexBuffer;
 	};
 
 }

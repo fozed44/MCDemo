@@ -54,6 +54,17 @@ namespace MCTest {
 		pIndicies[33] = 4; pIndicies[34] = 3; pIndicies[35] = 7;
 	}
 
+	int GetIndexByPosition(const std::vector<MC::MCVertex1Color> *pVerts, const DirectX::XMFLOAT3 *pLocation) {
+		for (int x = 0; x < pVerts->size(); ++x) {
+			auto currentPosition = (*pVerts)[x].Position;
+			if(MC::MCMath::Abs(pLocation->x - currentPosition.x) < 0.001
+			&& MC::MCMath::Abs(pLocation->y - currentPosition.y) < 0.001
+			&& MC::MCMath::Abs(pLocation->z - currentPosition.z) < 0.001)
+				return x;
+		}
+		return -1;
+	}
+
 	void Subdivide(std::vector<MC::MCVertex1Color> *pVerts, std::vector<uint16_t> *pIndicies)
 	{
 		std::vector<MC::MCVertex1Color> tempVerts;
@@ -70,11 +81,11 @@ namespace MCTest {
 
 		//       v1
 		//       *
-		//      / \
-		//     /   \
+		//      /  \
+		//     /     \
 		//  m0*-----*m1
-		//   / \   / \
-		//  /   \ /   \
+		//   / \       / \
+		//  /    \    /    \
 		// *-----*-----*
 		// v0    m2     v2
 
@@ -129,29 +140,78 @@ namespace MCTest {
 			//
 			// Add new geometry.
 			//
+			int i0, i1, i2, i3, i4, i5, index;
+			
+			index = GetIndexByPosition(pVerts, &(v0.Position));
+			if (index == -1) {
+				i0 = pVerts->size();
+				pVerts->push_back(v0);
+			}
+			else {
+				i0 = index;
+			}
 
-			pVerts->push_back(v0); // 0
-			pVerts->push_back(v1); // 1
-			pVerts->push_back(v2); // 2
-			pVerts->push_back(m0); // 3
-			pVerts->push_back(m1); // 4
-			pVerts->push_back(m2); // 5
+			index = GetIndexByPosition(pVerts, &(v1.Position));
+			if (index == -1) {
+				i1 = pVerts->size();
+				pVerts->push_back(v1);
+			}
+			else {
+				i1 = index;
+			}
 
-			pIndicies->push_back(i * 6 + 0);
-			pIndicies->push_back(i * 6 + 3);
-			pIndicies->push_back(i * 6 + 5);
+			index = GetIndexByPosition(pVerts, &(v2.Position));
+			if (index == -1) {
+				i2 = pVerts->size();
+				pVerts->push_back(v2);
+			}
+			else {
+				i2 = index;
+			}
 
-			pIndicies->push_back(i * 6 + 3);
-			pIndicies->push_back(i * 6 + 4);
-			pIndicies->push_back(i * 6 + 5);
+			index = GetIndexByPosition(pVerts, &(m0.Position));
+			if (index == -1) {
+				i3 = pVerts->size();
+				pVerts->push_back(m0);
+			}
+			else {
+				i3 = index;
+			}
 
-			pIndicies->push_back(i * 6 + 5);
-			pIndicies->push_back(i * 6 + 4);
-			pIndicies->push_back(i * 6 + 2);
+			index = GetIndexByPosition(pVerts, &(m1.Position));
+			if (index == -1) {
+				i4 = pVerts->size();
+				pVerts->push_back(m1);
+			}
+			else {
+				i4 = index;
+			}
 
-			pIndicies->push_back(i * 6 + 3);
-			pIndicies->push_back(i * 6 + 1);
-			pIndicies->push_back(i * 6 + 4);
+			index = GetIndexByPosition(pVerts, &(m2.Position));
+			if (index == -1) {
+				i5 = pVerts->size();
+				pVerts->push_back(m2);
+			}
+			else {
+				i5 = index;
+			}
+
+
+			pIndicies->push_back(i0);
+			pIndicies->push_back(i3);
+			pIndicies->push_back(i5);
+
+			pIndicies->push_back(i3);
+			pIndicies->push_back(i4);
+			pIndicies->push_back(i5);
+
+			pIndicies->push_back(i5);
+			pIndicies->push_back(i4);
+			pIndicies->push_back(i2);
+
+			pIndicies->push_back(i3);
+			pIndicies->push_back(i1);
+			pIndicies->push_back(i4);
 		}
 	}
 
