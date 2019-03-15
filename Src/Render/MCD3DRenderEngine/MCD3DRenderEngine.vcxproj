@@ -94,6 +94,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
+      <PreprocessorDefinitions>__EXTRA_ERROR_CHECKING__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <FxCompile>
       <AssemblerOutput>AssemblyCodeAndHex</AssemblerOutput>
@@ -109,6 +110,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
+      <PreprocessorDefinitions>__EXTRA_ERROR_CHECKING__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <FxCompile>
       <AssemblerOutput>AssemblyCodeAndHex</AssemblerOutput>

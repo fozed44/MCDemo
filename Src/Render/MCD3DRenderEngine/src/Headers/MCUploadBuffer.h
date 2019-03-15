@@ -52,8 +52,25 @@ public:
 		return _elementByteSize;
 	}
 
+	/*
+		Copy a single element.
+	*/
 	void CopyData(int elementIndex, const T& data) {
 		memcpy(&_mappedData[elementIndex*_elementByteSize], &data, sizeof(T));
+	}
+
+	/*
+		Copy 'elementCount' elements starting the copy at 'elementIndex'.
+	*/
+	void CopyData(int elementIndex, const T* pData, UINT elementCount) {
+		size_t startByte = elementIndex * _elementByteSize;
+		size_t byteCount = elementCount * _elementByteSize;
+#ifdef __EXTRA_ERROR_CHECKING__
+		auto endByte    = startByte + byteCount;
+		auto bufferSize = _buffer->GetDesc().Width;
+		assert(endByte <= bufferSize);
+#endif __EXTRA_ERROR_CHECKING__
+		memcpy(&_mappedData[startByte], pData, byteCount);
 	}
 
 private:

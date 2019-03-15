@@ -17,8 +17,9 @@ struct VertexOut {
 VertexOut main(VertexIn vIn) {
 	VertexOut vOut;
 
-	//vIn.Pos.x += 0.015f*sin(vIn.Pos.z*3.0f*time);
-	//vIn.Pos.y += 0.015f*sin(vIn.Pos.z*3.5f*time);
+	vIn.Pos.x += 0.00615f*sin(vIn.Pos.y*1.0f*time);
+	vIn.Pos.y += 0.0062f*sin(vIn.Pos.z*1.5f*time);
+	vIn.Pos.z += 0.00615f*sin(vIn.Pos.x*1.25f*time);
 
 	vOut.PosH = mul(float4(vIn.Pos, 1.0f), gWorldViewProj);
 

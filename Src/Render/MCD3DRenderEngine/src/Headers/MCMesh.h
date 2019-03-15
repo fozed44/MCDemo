@@ -24,9 +24,9 @@ namespace MC {
 	public:
 		MCStaticMesh16UploaderDisposer(MCStaticMesh16<TVERTEX_TYPE> *pMesh)
 			: _pMesh(pMesh) {}
-		MCStaticMesh16UploaderDisposer(MCStaticMeshUploaderDisposer&)            = delete;
-		MCStaticMesh16UploaderDisposer& operator=(MCStaticMeshUploaderDisposer&) = delete;
-		MCStaticMesh16UploaderDisposer(MCStaticMeshUploaderDisposer&& o) {
+		MCStaticMesh16UploaderDisposer(MCStaticMesh16UploaderDisposer&)            = delete;
+		MCStaticMesh16UploaderDisposer& operator=(MCStaticMesh16UploaderDisposer&) = delete;
+		MCStaticMesh16UploaderDisposer(MCStaticMesh16UploaderDisposer&& o) {
 			this->_pMesh = o._pMesh;
 			o._pMesh = nullptr;
 		}
@@ -38,7 +38,7 @@ namespace MC {
 		MCStaticMesh16<TVERTEX_TYPE> *_pMesh;
 	};
 
-	template <typemane TVERTEX_TYPE>
+	/*template <typemane TVERTEX_TYPE>
 	class MCDynamicMesh16UploaderDisposer {
 	public:
 		MCDynamicMesh16UploaderDisposer(MCDynamicMesh16<TVERTEX_TYPE> *pMesh)
@@ -55,7 +55,7 @@ namespace MC {
 		}
 	private:
 		MCDynamicMesh16<TVERTEX_TYPE> *_pMesh;
-	};
+	};*/
 
 	/*
 		MCStaticMesh16 is a static mesh, (D3D12_HEAP_TYPE_DEFAULT) with a vertex type of VERTEX_TYPE and an
@@ -81,8 +81,8 @@ namespace MC {
 
 			// For this reason, we are not allowing Upload to be called more that once on a Mesh. We are going to ensure
 			// this by asserting that the _pVertexBufferGPU and _pIndexBufferGPU are null. 
-			assert(_vertexBufferGPU == nullptr);
-			assert(_indexBufferGPU  == nullptr);
+			assert(_pVertexBufferGPU == nullptr);
+			assert(_pIndexBufferGPU  == nullptr);
 
 			// Create the disposer that will be returned to the caller.
 			MCStaticMesh16UploaderDisposer<TVERTEX_TYPE> disposer(this);
@@ -100,16 +100,16 @@ namespace MC {
 			//  the vertex data must be copied to these buffers via the upload buffers (the output parameters passed to this method)
 			//  and these upload buffers must be kept alive until the command list has executed the copy (enter the disposer returned
 			//  by this method).
-			_vertexBufferGPU      = MCD3D12RenderUtilities::CreateDefaultBuffer(pDevice, pCommandList, pVert,     vSize, _vertexUploadBuffer);
-			_indexBufferGPU       = MCD3D12RenderUtilities::CreateDefaultBuffer(pDevice, pCommandList, pIndicies, iSize, _indexUploadBuffer);
+			_pVertexBufferGPU      = MCD3D12RenderUtilities::CreateDefaultBuffer(pDevice, pCommandList, pVert,     vSize, _pVertexUploadBuffer);
+			_pIndexBufferGPU       = MCD3D12RenderUtilities::CreateDefaultBuffer(pDevice, pCommandList, pIndicies, iSize, _pIndexUploadBuffer);
 
 			// Set the name of the GPU buffers.
 			_pVertexBufferGPU->SetName(s2ws(_name + std::string(" gpu vertex buffer")).c_str());
 			_pIndexBufferGPU ->SetName(s2ws(_name + std::string(" gpu index buffer")).c_str());
 
 			// Set the name of the Upload buffers (even though) they are temporary.
-			_vertexUploadBuffer->SetName(s2ws(_name + std::string(" vertex upload buffer")).c_str());
-			_indexUploadBuffer ->SetName(s2ws(_name + std::string(" index upload buffer")).c_str());
+			_pVertexUploadBuffer->SetName(s2ws(_name + std::string(" vertex upload buffer")).c_str());
+			_pIndexUploadBuffer ->SetName(s2ws(_name + std::string(" index upload buffer")).c_str());
 
 			// Next we add the entire mesh as a subMesh, allowing the client to call DrawSubMesh using the name of this mesh
 			// to draw the whole mesh.
@@ -128,15 +128,13 @@ namespace MC {
 			_pVertexUploadBuffer = nullptr;
 			_pIndexUploadBuffer  = nullptr;
 
-			_vertexBufferView.BufferLocation = _vertexBufferGPU->GetGPUVirtualAddress();
+			_vertexBufferView.BufferLocation = _pVertexBufferGPU->GetGPUVirtualAddress();
 			_vertexBufferView.StrideInBytes  = _vertexByteStride;
 			_vertexBufferView.SizeInBytes    = _vertexBufferByteSize;
 
-			_indexBufferView.BufferLocation = _indexBufferGPU->GetGPUVirtualAddress();
+			_indexBufferView.BufferLocation = _pIndexBufferGPU->GetGPUVirtualAddress();
 			_indexBufferView.Format         = _indexFormat;
 			_indexBufferView.SizeInBytes    = _indexBufferByteSize;
-
-			_uploadersDisposed = true;
 		}
 
 	public:
@@ -180,9 +178,6 @@ namespace MC {
 
 	private:
 		std::unordered_map<std::string, MCSubMesh> _subMeshes;
-
-	private:
-		bool _uploadersInUse = false;
 	};
 
 	template <typename TVERTEX_TYPE>
@@ -199,15 +194,60 @@ namespace MC {
 		~MCDynamicMesh16() {}
 
 		void Upload(ID3D12Device *pDevice, ID3D12GraphicsCommandList *pCommandList, TVERTEX_TYPE *pVert, UINT vSize, unsigned short *pIndicies, UINT iSize) {
+			assert(_pVertexBuffer == nullptr);
+			assert(_pIndexBuffer  == nullptr);
+
 			_pVertexBuffer = std::make_unique<MCUploadBuffer<TVERTEX_TYPE>>(pDevice, vSize / sizeof(TVERTEX_TYPE), false);
-			_pIndexBuffer = std::make_unique<MCUploadBuffer<unsigned short>>(pDevice, iSize / sizeof(unsigned short), false);
+			_pIndexBuffer  = std::make_unique<MCUploadBuffer<unsigned short>>(pDevice, iSize / sizeof(unsigned short), false);
+
+			_pVertexBuffer->CopyData(0, pVert, vSize / sizeof(TVERTEX_TYPE));
+			_pIndexBuffer->CopyData(0, pIndicies, iSize / sizeof(unsigned short));
+
+			_vertexBufferView.BufferLocation = _pVertexBuffer->Resource()->GetGPUVirtualAddress();
+			_vertexBufferView.StrideInBytes  = sizeof(TVERTEX_TYPE);
+			_vertexBufferView.SizeInBytes    = vSize;
+
+			_indexBufferView.BufferLocation = _pIndexBuffer->Resource()->GetGPUVirtualAddress();
+			_indexBufferView.Format         = DXGI_FORMAT_R16_UINT;
+			_indexBufferView.SizeInBytes    = iSize;
+
+			AddSubMesh(_name.c_str(), iSize / sizeof(unsigned short), 0, 0);
 		}
+
+	public:
+
+		void SetIABuffers(ID3D12GraphicsCommandList *pCommandList) const {
+			pCommandList->IASetVertexBuffers(0, 1, &_vertexBufferView);
+			pCommandList->IASetIndexBuffer(&_indexBufferView);
+		}
+
+		void DrawSubMesh(const char *pMeshName, ID3D12GraphicsCommandList *pCommandList) {
+			auto subMesh = _subMeshes[pMeshName];
+			pCommandList->DrawIndexedInstanced(subMesh.IndexCount, 1, subMesh.StartIndexLocation, subMesh.BaseVertexLocation, 0);
+		}
+
+	public:
+
+		void AddSubMesh(const char *pMeshName, UINT indexCount, UINT startIndexLocation, UINT baseVertexLocation) {
+			MCSubMesh subMesh;
+			subMesh.IndexCount = indexCount;
+			subMesh.StartIndexLocation = startIndexLocation;
+			subMesh.BaseVertexLocation = baseVertexLocation;
+			_subMeshes[pMeshName] = subMesh;
+		}
+
 	private:
 		std::string _name;
 
 	private:
-		std::unique_ptr<MCUploadBuffer<TVERTEX_TYPE>>   _pVertexBuffer;
-		std::unique_ptr<MCUploadBuffer<unsigned short>> _pIndexBuffer;
+		std::unordered_map<std::string, MCSubMesh> _subMeshes;
+	private:
+		std::unique_ptr<MCUploadBuffer<TVERTEX_TYPE>>   _pVertexBuffer = nullptr;
+		std::unique_ptr<MCUploadBuffer<unsigned short>> _pIndexBuffer  = nullptr;
+
+	private:
+		D3D12_VERTEX_BUFFER_VIEW _vertexBufferView;
+		D3D12_INDEX_BUFFER_VIEW  _indexBufferView;
 	};
 
 }

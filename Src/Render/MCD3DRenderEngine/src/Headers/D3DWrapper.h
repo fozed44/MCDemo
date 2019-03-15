@@ -122,13 +122,8 @@ namespace MC {
 		// execute GPU commands synchronously
 		void ExecSync(void (*func)());
 
-		/*ComPtr<ID3D12Resource>      _pBoxVerts;
-		ComPtr<ID3D12Resource>      _pBoxIndicies;
-
-		D3D12_VERTEX_BUFFER_VIEW    _boxVertView;
-		D3D12_INDEX_BUFFER_VIEW     _boxIndexView;*/
-
-		std::unique_ptr<MCStaticMesh16<MCVertex1Color>> _pBoxMesh;
+		std::unique_ptr<MCStaticMesh16<MCVertex1Color>> _pSphereMesh;
+		std::unique_ptr<MCDynamicMesh16<MC::MCVertex1Color>> _pCubeMesh;
 
 		ComPtr<ID3D12RootSignature> _pBoxRootSignature;
 		D3D12_INPUT_ELEMENT_DESC    _pElementLayoutDescriptions[2];

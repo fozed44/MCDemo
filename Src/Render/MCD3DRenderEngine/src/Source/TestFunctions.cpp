@@ -140,11 +140,12 @@ namespace MCTest {
 			//
 			// Add new geometry.
 			//
-			int i0, i1, i2, i3, i4, i5, index;
+			uint16_t i0, i1, i2, i3, i4, i5;
+			int index;
 			
 			index = GetIndexByPosition(pVerts, &(v0.Position));
 			if (index == -1) {
-				i0 = pVerts->size();
+				i0 = (uint16_t)pVerts->size();
 				pVerts->push_back(v0);
 			}
 			else {
@@ -153,7 +154,7 @@ namespace MCTest {
 
 			index = GetIndexByPosition(pVerts, &(v1.Position));
 			if (index == -1) {
-				i1 = pVerts->size();
+				i1 = (uint16_t)pVerts->size();
 				pVerts->push_back(v1);
 			}
 			else {
@@ -162,7 +163,7 @@ namespace MCTest {
 
 			index = GetIndexByPosition(pVerts, &(v2.Position));
 			if (index == -1) {
-				i2 = pVerts->size();
+				i2 = (uint16_t)pVerts->size();
 				pVerts->push_back(v2);
 			}
 			else {
@@ -171,7 +172,7 @@ namespace MCTest {
 
 			index = GetIndexByPosition(pVerts, &(m0.Position));
 			if (index == -1) {
-				i3 = pVerts->size();
+				i3 = (uint16_t)pVerts->size();
 				pVerts->push_back(m0);
 			}
 			else {
@@ -180,7 +181,7 @@ namespace MCTest {
 
 			index = GetIndexByPosition(pVerts, &(m1.Position));
 			if (index == -1) {
-				i4 = pVerts->size();
+				i4 = (uint16_t)pVerts->size();
 				pVerts->push_back(m1);
 			}
 			else {
@@ -189,7 +190,7 @@ namespace MCTest {
 
 			index = GetIndexByPosition(pVerts, &(m2.Position));
 			if (index == -1) {
-				i5 = pVerts->size();
+				i5 = (uint16_t)pVerts->size();
 				pVerts->push_back(m2);
 			}
 			else {
@@ -252,7 +253,7 @@ namespace MCTest {
 
 		
 
-		for (int i = 0; i < numSubdivisions; ++i) {
+		for (unsigned int i = 0; i < numSubdivisions; ++i) {
 			Subdivide(pVertDest, pIndDest);
 			if (i < 3) {
 				for (int x = 0; x < pVertDest->size(); ++x) {

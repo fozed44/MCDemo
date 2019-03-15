@@ -412,7 +412,7 @@ namespace MC {
 		the vertexes and indexes into the buffer.
 	*/
 	void D3DWrapper::InitBoxGeometry() {
-		INIT_TRACE("Begin box geometry initialization.");
+		INIT_TRACE("Begin test geometry initialization.");
 
 		//MCVertex1Color pVerts[8]     = {};
 		//std::uint16_t  pIndicies[36] = {};
@@ -433,8 +433,13 @@ namespace MC {
 			1.0f, 0.0f, 0.0f,
 			&verts,
 			&indicies,
-			5
+			4
 		);
+
+		MCVertex1Color cubeVerts[8];
+		uint16_t cubeIndicies[36];
+
+		MCTest::GenerateTestCube(0.0f, 0.0f, 0.0f, 1, 1, 1, cubeVerts, sizeof(cubeVerts), cubeIndicies, sizeof(cubeIndicies));
 
 		/////////////////////////////////////////////////////////////////////////
 		// COPY The vertexes into the _pBoxVerts upload buffer.
@@ -447,13 +452,24 @@ namespace MC {
 
 		INIT_TRACE("--Creating cube mesh resource.");
 
-		_pBoxMesh = std::make_unique<MCStaticMesh16<MCVertex1Color>>("Box");
-		//auto disposer = _pBoxMesh->Upload(_pDevice, _pCommandList.Get(), pVerts, sizeof(pVerts), pIndicies, sizeof(pIndicies));
-		auto disposer = _pBoxMesh->Upload(
+		_pSphereMesh = std::make_unique<MCStaticMesh16<MCVertex1Color>>("Sphere");
+
+		_pCubeMesh = std::make_unique<MCDynamicMesh16<MCVertex1Color>>("Cube");
+
+		auto disposer = _pSphereMesh->Upload(
 			_pDevice,
 			_pCommandList.Get(),
 			&verts[0], sizeof(MCVertex1Color) * verts.size(),
-			&indicies[0], sizeof(uint16_t) * indicies.size()
+			&indicies[0], (std::uint16_t)(sizeof(uint16_t) * indicies.size())
+		);
+
+		_pCubeMesh->Upload(
+			_pDevice,
+			_pCommandList.Get(),
+			cubeVerts,
+			sizeof(cubeVerts),
+			cubeIndicies,
+			sizeof(cubeIndicies)
 		);
 
 		INIT_TRACE("--Close command list.");
@@ -677,10 +693,11 @@ namespace MC {
 
 		_pCommandList->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		_pBoxMesh->SetIABuffers(_pCommandList.Get());
+		_pSphereMesh->SetIABuffers(_pCommandList.Get());
+		_pSphereMesh->DrawSubMesh("Sphere", _pCommandList.Get());
 
-
-		_pBoxMesh->DrawSubMesh("Box", _pCommandList.Get());
+		_pCubeMesh->SetIABuffers(_pCommandList.Get());
+		_pCubeMesh->DrawSubMesh("Cube", _pCommandList.Get());
 
 		_pCommandList->ResourceBarrier(
 			1,
