@@ -137,7 +137,9 @@
     <ClInclude Include="src\Headers\Utility.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Headers\MCCriticalSection.h" />
     <ClCompile Include="src\Source\MasterTimer.cpp" />
+    <ClCompile Include="src\Source\MCCriticalSection.cpp" />
     <ClCompile Include="src\Source\Paths.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

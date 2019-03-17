@@ -8,9 +8,10 @@
 #include "../../../Render/MCD3DRenderEngine//src/Headers/MCRenderWindow.h"
 #include "../../../Common/MCCommon/src/Headers/MasterTimer.h"
 #include "../../../Common/MCCommon/src/Headers/MCFrame.h"
-
+#include "../../../Common/MCCommon/src/Headers/MCCriticalSection.h"
 #include <iostream>
-
+#include <thread>
+#include <atomic>
 #pragma comment (lib, "d3dcompiler.lib")
 #pragma comment (lib, "d3d12.lib")
 #pragma comment (lib, "dxgi.lib")
@@ -101,9 +102,55 @@ int Sandbox() {
 	return 0;
 }
 
+std::atomic_int t2(0);
+
+void foo() {
+
+	int t = 0;
+	t++;
+}
+
+void sum(__int64 *pInt, int numSums, std::atomic_int *pAtomicInt){
+	for (int c = 0; c < numSums; ++c) {
+		ENTER_CRITICAL_SECTION(CS, pAtomicInt);
+		*pInt = *pInt + 1;
+		ENTER_CRITICAL_SECTION(bad, &t2);
+		EXIT_CRITICAL_SECTION
+		EXIT_CRITICAL_SECTION
+	}
+}
+
+const int NUM_SUMS = 5;
+const int THREADS_PER_SUM = 5;
+void CriticalSectionTest() {
+	__int64 sums[NUM_SUMS] = {};
+	MC::MCCriticalSectionLock locks[NUM_SUMS];
+	std::thread *threads[NUM_SUMS][THREADS_PER_SUM];
+
+	for (int x = 0; x < NUM_SUMS; ++x) {
+		MC::MCCriticalSection::InitializeLock(&locks[x]);
+		for (int y = 0; y < THREADS_PER_SUM; ++y) {
+			threads[x][y] = new std::thread(sum, &sums[x], 100000, &locks[x]);
+		}
+	}
+
+	for (int x = 0; x < NUM_SUMS; ++x) {
+		for (int y = 0; y < THREADS_PER_SUM; ++y) {
+			threads[x][y]->join();
+		}
+	}
+
+	for (int x = 0; x < NUM_SUMS; ++x)
+		std::cout << "sum #" << x << " = " << sums[x] << std::endl;
+}
+
 int main(int argc, char ** argv) {
 	try {
-		return Sandbox();
+		//return Sandbox();
+		for (int x = 0; x < 100; ++x)
+			CriticalSectionTest();
+		char t;
+		std::cin >> t;
 	}
 	catch (MCException *ex) {
 		MessageBox(nullptr, ex->what().c_str(), "MCException", MB_OK);

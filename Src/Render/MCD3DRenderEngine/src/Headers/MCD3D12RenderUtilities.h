@@ -10,7 +10,7 @@ namespace MCD3D12RenderUtilities {
 
 	/*
 		CreateDefaultBuffer creates a D3D12_HEAP_TYPE_DEFAULT ID3D12Resource using CreateComittedResource. These
-		types of resources are read only from the CPU. Since D3D12_HEAP_TYPE_DEFAULT can't be written to by the CPU,
+		types of resources are r inaccessible to the CPU. Since D3D12_HEAP_TYPE_DEFAULT can't be written to by the CPU,
 		CreateDefaultBuffer first creates an UploadBuffer D3D12_HEAP_TYPE_UPLOAD, copies initData into the upload buffer,
 		and then copies the upload buffer into the default buffer on the GPU side.
 
