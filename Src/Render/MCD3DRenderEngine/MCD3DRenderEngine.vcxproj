@@ -152,34 +152,51 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Headers\MCD3D12RenderUtilities.h" />
-    <ClInclude Include="src\Headers\D3DWrapper.h" />
-    <ClInclude Include="src\Headers\d3dx12.h" />
-    <ClInclude Include="src\Headers\DXGIWrapper.h" />
-    <ClInclude Include="src\Headers\MCD3D12Core.h" />
-    <ClInclude Include="src\Headers\MCMath.h" />
-    <ClInclude Include="src\Headers\MCMesh.h" />
-    <ClInclude Include="src\Headers\MCUploadBuffer.h" />
-    <ClInclude Include="src\Headers\RenderConfig.h" />
-    <ClInclude Include="src\Headers\TestFunctions.h" />
-    <ClInclude Include="src\Headers\MCRenderWindow.h" />
+    <ClInclude Include="src\Core\MCD3D12RenderUtilities.h" />
+    <ClInclude Include="src\Core\D3DWrapper.h" />
+    <ClInclude Include="src\Core\d3dx12.h" />
+    <ClInclude Include="src\Core\DXGIWrapper.h" />
+    <ClInclude Include="src\Core\MCD3D12Core.h" />
+    <ClInclude Include="src\Font\MCFont.h" />
+    <ClInclude Include="src\Font\MCFontLoader.h" />
+    <ClInclude Include="src\Font\MCFontRenderer.h" />
+    <ClInclude Include="src\Core\MCMath.h" />
+    <ClInclude Include="src\Core\MCMesh.h" />
+    <ClInclude Include="src\Core\MCUploadBuffer.h" />
+    <ClInclude Include="src\Core\RenderConfig.h" />
+    <ClInclude Include="src\Core\TestFunctions.h" />
+    <ClInclude Include="src\Core\MCRenderWindow.h" />
+    <ClInclude Include="src\Shader\MCShaderManager.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Source\D3DWrapper.cpp" />
-    <ClCompile Include="src\Source\DXGIWrapper.cpp" />
-    <ClCompile Include="src\Source\MCD3D12RenderUtilities.cpp" />
-    <ClCompile Include="src\Source\RenderConfig.cpp" />
-    <ClCompile Include="src\Source\TestFunctions.cpp" />
-    <ClCompile Include="src\Source\MCRenderWindow.cpp" />
+    <ClCompile Include="src\Shader\MCShaderManager.cpp" />
+    <ClCompile Include="src\Core\D3DWrapper.cpp" />
+    <ClCompile Include="src\Core\DXGIWrapper.cpp" />
+    <ClCompile Include="src\Font\MCFontRenderer.cpp" />
+    <ClCompile Include="src\Core\MCD3D12RenderUtilities.cpp" />
+    <ClCompile Include="src\Font\MCFontLoader.cpp" />
+    <ClCompile Include="src\Core\RenderConfig.cpp" />
+    <ClCompile Include="src\Core\TestFunctions.cpp" />
+    <ClCompile Include="src\Core\MCRenderWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="src\Source\StandardPixel.hlsl">
+    <FxCompile Include="src\Shaders\FontPixel.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\FontVertex.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\StandardPixel.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="src\Source\StandardVertex.hlsl">
+    <FxCompile Include="src\Shaders\StandardVertex.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>

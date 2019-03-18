@@ -1,4 +1,4 @@
-#include "../Headers/TestFunctions.h"
+#include "TestFunctions.h"
 
 namespace MCTest {
 	

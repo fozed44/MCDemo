@@ -1,18 +1,18 @@
 #include "../../../../Common/MCCommon/src/Headers/GlobalSwitches.h"
 
-#include "../Headers/d3dx12.h"
+#include "d3dx12.h"
 
-#include "../Headers/D3DWrapper.h"
-#include "../Headers/RenderConfig.h"
+#include "D3DWrapper.h"
+#include "RenderConfig.h"
 #include "../../../../Common/MCLog/src/Headers/MCLog.h"
 #include "../../../../Common/MCCommon/src/Headers/Utility.h"
 #include "../../../../Common/MCCommon/src/Headers/Paths.h"
 
-#include "../Headers/TestFunctions.h"
+#include "TestFunctions.h"
 #include <fstream>
-#include "d3dcompiler.h"
 
-#include "../Headers/MCD3D12RenderUtilities.h"
+
+#include "MCD3D12RenderUtilities.h"
 
 #define MC_DEPTH_STENCIL_FORMAT DXGI_FORMAT_D32_FLOAT
 
@@ -492,10 +492,10 @@ namespace MC {
 		INIT_TRACE("Begin shader init.");
 
 		INIT_TRACE("--Load standard vertex shader.");
-		_pBoxVertexShader = LoadShader("StandardVertex.cso");
+		_hVertexShader = MCShaderManager::Instance()->Load("StandardVertex.cso");
 
 		INIT_TRACE("-- Load standard pixel shader.");
-		_pBoxPixelShader = LoadShader("StandardPixel.cso");
+		_hPixelShader = MCShaderManager::Instance()->Load("StandardPixel.cso");
 
 		INIT_TRACE("End shader init.");
 	}
@@ -561,8 +561,8 @@ namespace MC {
 
 		psoDesc.InputLayout = { _pElementLayoutDescriptions, _countof(_pElementLayoutDescriptions) };
 		psoDesc.pRootSignature = _pBoxRootSignature.Get();
-		psoDesc.VS = { reinterpret_cast<BYTE*>(_pBoxVertexShader->GetBufferPointer()), _pBoxVertexShader->GetBufferSize() };
-		psoDesc.PS = { reinterpret_cast<BYTE*>(_pBoxPixelShader->GetBufferPointer()),  _pBoxPixelShader->GetBufferSize()  };
+		psoDesc.VS = MCShaderManager::Instance()->GetByteCode(_hVertexShader);
+		psoDesc.PS = MCShaderManager::Instance()->GetByteCode(_hPixelShader);
 		psoDesc.RasterizerState = rasterizerState;
 		psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 		psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
@@ -757,30 +757,7 @@ namespace MC {
 		}
 	}
 
-	ComPtr<ID3DBlob> D3DWrapper::LoadShader(const std::string& filename) const {
-
-		// TODO:
-		//	This method has zero error checking.
-
-		auto fullFilename = std::string(Paths::ShaderDirectory()) + filename;
-
-		std::ifstream fin(fullFilename.c_str(), std::ios::binary);
-
-		fin.seekg(0, std::ios_base::end);
-		std::ifstream::pos_type size = (int)fin.tellg();
-		fin.seekg(0, std::ios_base::beg);
-
-		if (!fin.good())
-			MCTHROW(std::string("Error opening file ") + filename);
-
-		ComPtr<ID3DBlob> blob;
-		MCThrowIfFailed(D3DCreateBlob(size, &blob));
-
-		fin.read((char*)blob->GetBufferPointer(), size);
-		fin.close();
-
-		return blob;
-	}
+	
 
 	void D3DWrapper::Resize() {
 

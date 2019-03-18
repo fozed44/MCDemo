@@ -10,6 +10,8 @@
 
 #include "MCMesh.h"
 
+#include "../Shader/MCShaderManager.h"
+
 using Microsoft::WRL::ComPtr;
 
 namespace MC {
@@ -129,12 +131,13 @@ namespace MC {
 		D3D12_INPUT_ELEMENT_DESC    _pElementLayoutDescriptions[2];
 		ComPtr<ID3D12PipelineState> _pBoxPSO;
 
-		ComPtr<ID3DBlob>            _pBoxVertexShader;
-		ComPtr<ID3DBlob>            _pBoxPixelShader;
+		//ComPtr<ID3DBlob>            _pBoxVertexShader;
+		//ComPtr<ID3DBlob>            _pBoxPixelShader;
+
+		MCShaderHandle	_hVertexShader;
+		MCShaderHandle  _hPixelShader;
 
 	private:
-
-		ComPtr<ID3DBlob> LoadShader(const std::string& filename) const;
 
 		/*
 			Call to resize the swap chain buffers. Will release and restore resources.

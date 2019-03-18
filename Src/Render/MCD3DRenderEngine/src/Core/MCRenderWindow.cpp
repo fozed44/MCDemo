@@ -1,4 +1,4 @@
-#include "../Headers/MCRenderWindow.h"
+#include "../Core/MCRenderWindow.h"
 #include "../../../../Common/MCLog/src/Headers/MCLog.h"
 #include "../../../../Common/MCCommon/src/Headers/Utility.h"
 

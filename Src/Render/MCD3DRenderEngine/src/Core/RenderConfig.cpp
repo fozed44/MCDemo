@@ -1,6 +1,6 @@
 #include "../../../../Common/MCCommon/src/Headers/GlobalSwitches.h"
 
-#include "../Headers/RenderConfig.h"
+#include "RenderConfig.h"
 #include "../../../../Common/MCXML/src/Headers/MCXML.h"
 #include "../../../../Common/MCLog/src/Headers/MCLog.h"
 #include "../../../../Common/MCCommon/src/Headers/Paths.h"

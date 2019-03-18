@@ -1,4 +1,4 @@
-#include "../Headers/MCD3D12RenderUtilities.h"
+#include "MCD3D12RenderUtilities.h"
 #include "../../../../Common/MCCommon/src/Headers/Utility.h"
 
 using Microsoft::WRL::ComPtr;

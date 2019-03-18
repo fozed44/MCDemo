@@ -15,62 +15,85 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Headers\DXGIWrapper.h">
+    <ClInclude Include="src\Shader\MCShaderManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Headers\D3DWrapper.h">
+    <ClInclude Include="src\Core\MCD3D12Core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Headers\RenderConfig.h">
+    <ClInclude Include="src\Core\D3DWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Headers\d3dx12.h">
+    <ClInclude Include="src\Core\DXGIWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Headers\MCUploadBuffer.h">
+    <ClInclude Include="src\Core\d3dx12.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Headers\MCD3D12Core.h">
+    <ClInclude Include="src\Core\TestFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Headers\MCMath.h">
+    <ClInclude Include="src\Core\MCMath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Headers\TestFunctions.h">
+    <ClInclude Include="src\Core\MCMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Headers\MCRenderWindow.h">
+    <ClInclude Include="src\Core\MCRenderWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Headers\MCMesh.h">
+    <ClInclude Include="src\Core\MCUploadBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Headers\MCD3D12RenderUtilities.h">
+    <ClInclude Include="src\Core\RenderConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Font\MCFont.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Font\MCFontLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Font\MCFontRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\MCD3D12RenderUtilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Source\DXGIWrapper.cpp">
+    <ClCompile Include="src\Shader\MCShaderManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Source\D3DWrapper.cpp">
+    <ClCompile Include="src\Core\D3DWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Source\RenderConfig.cpp">
+    <ClCompile Include="src\Core\DXGIWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Source\TestFunctions.cpp">
+    <ClCompile Include="src\Core\MCD3D12RenderUtilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Source\MCRenderWindow.cpp">
+    <ClCompile Include="src\Core\TestFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Source\MCD3D12RenderUtilities.cpp">
+    <ClCompile Include="src\Core\MCRenderWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\RenderConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Font\MCFontLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Font\MCFontRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="src\Source\StandardVertex.hlsl" />
-    <FxCompile Include="src\Source\StandardPixel.hlsl" />
+    <FxCompile Include="src\Shaders\StandardPixel.hlsl" />
+    <FxCompile Include="src\Shaders\StandardVertex.hlsl" />
+    <FxCompile Include="src\Shaders\FontVertex.hlsl" />
+    <FxCompile Include="src\Shaders\FontPixel.hlsl" />
   </ItemGroup>
 </Project>

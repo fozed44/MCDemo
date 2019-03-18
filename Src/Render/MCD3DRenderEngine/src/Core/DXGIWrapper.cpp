@@ -1,9 +1,9 @@
 #include "../../../../Common/MCCommon/src/Headers/GlobalSwitches.h"
 
-#include "../Headers/DXGIWrapper.h"
+#include "DXGIWrapper.h"
+#include "MCMath.h"
 #include "../../../../Common/MCLog/src/Headers/MCLog.h"
 #include "../../../../Common/MCCommon/src/Headers/Utility.h"
-#include "../Headers/MCMath.h"
 
 namespace MC {
 

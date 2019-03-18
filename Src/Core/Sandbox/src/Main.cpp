@@ -2,10 +2,10 @@
 
 #include "../../../Common/MCLog/src/Headers/MCLog.h"
 #include "../../../Common/MCXML/src/Headers/MCXML.h"
-#include "../../../Render/MCD3DRenderEngine/src/Headers/DXGIWrapper.h"
-#include "../../../Render/MCD3DRenderEngine/src/Headers/D3DWrapper.h"
+#include "../../../Render/MCD3DRenderEngine/Src/Core/DXGIWrapper.h"
+#include "../../../Render/MCD3DRenderEngine/Src/Core/D3DWrapper.h"
 #include "../../../Common/MCCommon/src/Headers/Utility.h"
-#include "../../../Render/MCD3DRenderEngine//src/Headers/MCRenderWindow.h"
+#include "../../../Render/MCD3DRenderEngine/Src/Core/MCRenderWindow.h"
 #include "../../../Common/MCCommon/src/Headers/MasterTimer.h"
 #include "../../../Common/MCCommon/src/Headers/MCFrame.h"
 #include "../../../Common/MCCommon/src/Headers/MCCriticalSection.h"
@@ -146,11 +146,11 @@ void CriticalSectionTest() {
 
 int main(int argc, char ** argv) {
 	try {
-		//return Sandbox();
-		for (int x = 0; x < 100; ++x)
+		return Sandbox();
+		/*for (int x = 0; x < 100; ++x)
 			CriticalSectionTest();
 		char t;
-		std::cin >> t;
+		std::cin >> t;*/
 	}
 	catch (MCException *ex) {
 		MessageBox(nullptr, ex->what().c_str(), "MCException", MB_OK);
