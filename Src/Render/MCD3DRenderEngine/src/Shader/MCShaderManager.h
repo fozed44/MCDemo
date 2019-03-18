@@ -4,6 +4,8 @@
 #include <map>
 #include "../../../../Common/MCCommon/Src/Headers/MCCriticalSection.h"
 
+#include "../../../../Common/MCCommon/src/Headers/MCManagedHandle.h"
+
 using Microsoft::WRL::ComPtr;
 
 namespace MC {
@@ -52,6 +54,8 @@ namespace MC {
 		friend MCShaderManager;
 	};
 
+	typedef MCManagedHandle<ComPtr<ID3DBlob>*, MCShaderManager> MCShaderManagedHandle;
+
 	class MCShaderManager {
 	public:
 		MCShaderManager(MCShaderManager&)             = delete;
@@ -83,9 +87,10 @@ namespace MC {
 			UINT _refCount;
 		};
 		std::map<UINT, MCShaderContext> _shaders;
+		std::map<ComPtr<ID3DBlob>*, MCShaderContext> _
 		MCCriticalSectionLock _lock;
 	private:
-		friend MCShaderHandle;
+		friend MCShaderHandle;		
 	};
 
 }

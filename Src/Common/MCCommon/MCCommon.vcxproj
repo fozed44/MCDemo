@@ -91,6 +91,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <ObjectFileName>$(IntDir)$(ProjectName)\</ObjectFileName>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -99,6 +100,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <ObjectFileName>$(IntDir)$(ProjectName)\</ObjectFileName>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -109,6 +111,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <ObjectFileName>$(IntDir)$(ProjectName)\</ObjectFileName>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -123,6 +126,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <ObjectFileName>$(IntDir)$(ProjectName)\</ObjectFileName>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -132,12 +136,13 @@
   <ItemGroup>
     <ClInclude Include="src\Headers\GlobalSwitches.h" />
     <ClInclude Include="src\Headers\MasterTimer.h" />
+    <ClInclude Include="src\Headers\MCCriticalSection.h" />
     <ClInclude Include="src\Headers\MCFrame.h" />
+    <ClInclude Include="src\Headers\MCManagedHandle.h" />
     <ClInclude Include="src\Headers\Paths.h" />
     <ClInclude Include="src\Headers\Utility.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Headers\MCCriticalSection.h" />
     <ClCompile Include="src\Source\MasterTimer.cpp" />
     <ClCompile Include="src\Source\MCCriticalSection.cpp" />
     <ClCompile Include="src\Source\Paths.cpp" />
