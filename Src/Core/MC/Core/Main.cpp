@@ -2,8 +2,8 @@
 
 #include "../../../Common/MCLog/src/Headers/MCLog.h"
 #include "../../../Common/MCXML/src/Headers/MCXML.h"
-#include "../../../Render/MCD3DRenderEngine/src/Headers/DXGIWrapper.h"
-#include "../../../Render/MCD3DRenderEngine/src/Headers/D3DWrapper.h"
+#include "../../../Render/MCD3DRenderEngine/src/Core/DXGIWrapper.h"
+#include "../../../Render/MCD3DRenderEngine/src/Core/D3DWrapper.h"
 
 #include <iostream>
 
