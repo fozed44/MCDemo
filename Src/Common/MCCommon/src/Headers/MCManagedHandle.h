@@ -2,11 +2,14 @@
 
 namespace MC {
 
-	template <typename pManagedType, typename ManagedContextItemType, typename ManagerType>
+	template <typename pManagedType, typename ManagerType>
 	class MCManagedHandle {
 	public:
 		MCManagedHandle() {
 			_ptr = nullptr;
+		}
+		MCManagedHandle(pManagedType t) {
+			_ptr = t;
 		}
 		MCManagedHandle(MCManagedHandle&) = delete;
 		MCManagedHandle& operator= (MCManagedHandle&) = delete;
@@ -31,8 +34,8 @@ namespace MC {
 				ManagerType::Instance()->RemoveRef(*this);
 		}
 
-	private:
 		inline const pManagedType Ptr() const { return _ptr; }
+
 		inline void Initialize(pManagedType ptr) {
 			assert(_ptr == nullptr);
 			_ptr = ptr;
@@ -40,7 +43,6 @@ namespace MC {
 
 	private:
 		pManagedType _ptr;
-		friend MCManagedHandleManager<pManagedType, ManagedContextItemType, ManagerType>;
 	};
 
 	template <typename pManagedType,typename ManagedContextItemType, typename DerivedType>
@@ -50,30 +52,26 @@ namespace MC {
 		virtual ~MCManagedHandleManager() {}
 
 	protected:
-		MCManagedHandle<pManagedType, ManagedContextItemType, DerivedType> CreateRef(pManagedType pKey, ManagedContextItemType &contextItem) {
-			ManagedContextType managedContext;
-			managedContext.RefCount    = 1;
-			managedContext.ManagedItem = contextItem;
+		MCManagedHandle<pManagedType, DerivedType> CreateRef(pManagedType pKey, ManagedContextItemType &contextItem) {
 			ENTER_CRITICAL_SECTION(MCManagedHandleManager_CreateRef, &_lock);
-			_itemMap.emplace(pKey, managedContext);
+			auto itemIterator = _itemMap.find(pKey);
+			if (itemIterator == _itemMap.end())
+				_itemMap.emplace(pKey, ManagedContextType{ contextItem, 1 });
+			else
+				itemIterator->second.RefCount++;
 			EXIT_CRITICAL_SECTION;
+			return MCManagedHandle<pManagedType, DerivedType>(pKey);
 		}
 
-		void AddRef(const MCManagedHandle<pManagedType, ManagedContextItemType, DerivedType>& handle) {
-			ENTER_CRITICAL_SECTION(MCManagedHandleManager_AddRef, &_lock);
-			ManagedContextType managedContext = _itemMap.find(handle.Ptr());
-			managedContext.RefCount++
-			EXIT_CRITICAL_SECTION; 
-		}
-
-		void RemoveRef(const MCManagedHandle<pManagedType, ManagedContextItemType, DerivedType>& handle) {
+		void RemoveRef(const MCManagedHandle<pManagedType, DerivedType>& handle) {
 			ENTER_CRITICAL_SECTION(MCManagedHandleManager_RemoveRef, &_lock);
-			ManagedContextType managedContext = _itemMap.find(handle.Ptr());			
-			_itemMap.erase(handle.Ptr());
-			managedContext.RefCount--;
-
-			if(managedContext.RefCount == 0)
-				ReferenceCountToZero(&managedContext);
+			auto itemIterator = _itemMap.find(handle.Ptr());
+			assert(itemIterator->second.RefCount);
+			itemIterator->second.RefCount--;
+			if (itemIterator->second.RefCount == 0) {
+				OnDestroyingManagedItem(&itemIterator->second.ManagedItem);
+				_itemMap.erase(itemIterator);
+			}
 			EXIT_CRITICAL_SECTION;
 		}
 
@@ -88,7 +86,9 @@ namespace MC {
 		MCCriticalSectionLock _lock;
 
 	protected:
-		virtual void ReferenceCountToZero(ManagedContextType *pContext) = 0;
+		virtual void OnDestroyingManagedItem(ManagedContextItemType *pManagedItem) {};
+		template<typename t, typename u>
+		friend class MCManagedHandle;
 	};
 
 }
