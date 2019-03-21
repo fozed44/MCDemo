@@ -1,71 +1,75 @@
 #pragma once
 
+#include "MCCriticalSection.h"
+#include <assert.h>
+#include <map>
+
 namespace MC {
 
-	template <typename pManagedType, typename ManagerType>
+	template <typename tManagedHandle, typename tDerivedManager>
 	class MCManagedHandle {
 	public:
 		MCManagedHandle() {
-			_ptr = nullptr;
+			_handle = {};
 		}
-		MCManagedHandle(pManagedType t) {
-			_ptr = t;
+		MCManagedHandle(tManagedHandle t) {
+			_handle = t;
 		}
-		MCManagedHandle(MCManagedHandle&) = delete;
+		MCManagedHandle(MCManagedHandle&)             = delete;
 		MCManagedHandle& operator= (MCManagedHandle&) = delete;
 		MCManagedHandle(MCManagedHandle&& o) {
-			this->_ptr = o._ptr;
-			o._ptr = nullptr;
+			this->_handle = o._handle;
+			o._handle = {};
 		}
 		MCManagedHandle& operator= (MCManagedHandle&& o) {
 			if (this == &o)
 				return *this;
 
-			if (this->_ptr != nullptr)
-				ManagerType::Instance()->RemoveRef(*this);
+			if (this->_handle)
+				tDerivedManager::Instance()->RemoveRef(*this);
 
-			this->_ptr = o._ptr;
-			o._ptr = nullptr;
+			this->_handle = o._handle;
+			o._handle = {};
 
 			return *this;
 		}
 		~MCManagedHandle() {
-			if(_ptr != nullptr)
-				ManagerType::Instance()->RemoveRef(*this);
+			if (_handle)
+				tDerivedManager::Instance()->RemoveRef(*this);
 		}
 
-		inline const pManagedType Ptr() const { return _ptr; }
+		inline const tManagedHandle Handle() const { return _handle; }
 
-		inline void Initialize(pManagedType ptr) {
-			assert(_ptr == nullptr);
-			_ptr = ptr;
+		inline void Initialize(tManagedHandle handle) {
+			assert(_handle);
+			_handle = handle;
 		}
 
 	private:
-		pManagedType _ptr;
+		tManagedHandle _handle;
 	};
 
-	template <typename pManagedType,typename ManagedContextItemType, typename DerivedType>
+	template <typename tManagedHandle,typename tManagedItem, typename tDerived>
 	class MCManagedHandleManager {
 	public:
 		MCManagedHandleManager() { MCCriticalSection::InitializeLock(&_lock); }
 		virtual ~MCManagedHandleManager() {}
 
 	protected:
-		MCManagedHandle<pManagedType, DerivedType> CreateRef(pManagedType pKey, ManagedContextItemType &contextItem) {
+		MCManagedHandle<tManagedHandle, tDerived> CreateRef(tManagedHandle pKey, tManagedItem &contextItem) {
 			ENTER_CRITICAL_SECTION(MCManagedHandleManager_CreateRef, &_lock);
 			auto itemIterator = _itemMap.find(pKey);
 			if (itemIterator == _itemMap.end())
-				_itemMap.emplace(pKey, ManagedContextType{ contextItem, 1 });
+				_itemMap.emplace(pKey, ManagedContext{ contextItem, 1 });
 			else
 				itemIterator->second.RefCount++;
+			return MCManagedHandle<tManagedHandle, tDerived>(pKey);
 			EXIT_CRITICAL_SECTION;
-			return MCManagedHandle<pManagedType, DerivedType>(pKey);
 		}
 
-		void RemoveRef(const MCManagedHandle<pManagedType, DerivedType>& handle) {
+		void RemoveRef(const MCManagedHandle<tManagedHandle, tDerived>& handle) {
 			ENTER_CRITICAL_SECTION(MCManagedHandleManager_RemoveRef, &_lock);
-			auto itemIterator = _itemMap.find(handle.Ptr());
+			auto itemIterator = _itemMap.find(handle.Handle());
 			assert(itemIterator->second.RefCount);
 			itemIterator->second.RefCount--;
 			if (itemIterator->second.RefCount == 0) {
@@ -77,18 +81,27 @@ namespace MC {
 
 
 	protected:
-		struct ManagedContextType {
-			ManagedContextItemType ManagedItem;
-			UINT                   RefCount;
+		struct ManagedContext {
+			tManagedItem ManagedItem;
+			int          RefCount;
 		};
 	private:
-		std::map<pManagedType, ManagedContextType> _itemMap;
+		std::map<tManagedHandle, ManagedContext> _itemMap;
 		MCCriticalSectionLock _lock;
 
 	protected:
-		virtual void OnDestroyingManagedItem(ManagedContextItemType *pManagedItem) {};
+		virtual void OnDestroyingManagedItem(tManagedItem *pManagedItem) {};
 		template<typename t, typename u>
 		friend class MCManagedHandle;
+
+#ifdef MCMANAGEDHANDLE_UNIT_TEST_HELPERS
+	public:
+		int GetRefCount(const tManagedHandle& handle) {
+			ENTER_CRITICAL_SECTION(MCManagedHandleManager_GetRefCount, &_lock);
+			return _itemMap[handle].RefCount;
+			EXIT_CRITICAL_SECTION;
+		}
+#endif MCMANAGEDHANDLE_UNIT_TEST_HELPERS
 	};
 
 }

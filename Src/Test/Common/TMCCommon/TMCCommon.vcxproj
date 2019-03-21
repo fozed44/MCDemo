@@ -20,9 +20,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{9E600A41-1C3D-4213-BB9B-EBFFA8AEDCB0}</ProjectGuid>
+    <ProjectGuid>{D6280A10-8CFC-445A-BB5D-3EFF0DB7196A}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>TMCXML</RootNamespace>
+    <RootNamespace>TMCCommon</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
     <ProjectSubType>NativeUnitTestProject</ProjectSubType>
   </PropertyGroup>
@@ -162,14 +162,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="tCoreXMLFunctionality.cpp" />
+    <ClCompile Include="tMCManagedHandle.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Common\MCLog\MCLog.vcxproj">
-      <Project>{0d33c258-4069-4642-b520-b66f3f30fc56}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Common\MCXML\MCXML.vcxproj">
-      <Project>{8542da21-4af1-45fd-87d4-67cf08b0e012}</Project>
+    <ProjectReference Include="..\..\..\Common\MCCommon\MCCommon.vcxproj">
+      <Project>{77a101a5-7b87-4f62-aac9-df5a6a27cd40}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
