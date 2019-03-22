@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Memory\MCResourceManager.h" />
     <ClInclude Include="src\Core\MCD3D12RenderUtilities.h" />
     <ClInclude Include="src\Core\D3DWrapper.h" />
     <ClInclude Include="src\Core\d3dx12.h" />
@@ -169,6 +170,7 @@
     <ClInclude Include="src\Shader\MCShaderManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Memory\MCResourceManager.cpp" />
     <ClCompile Include="src\Shader\MCShaderManager.cpp" />
     <ClCompile Include="src\Core\D3DWrapper.cpp" />
     <ClCompile Include="src\Core\DXGIWrapper.cpp" />
