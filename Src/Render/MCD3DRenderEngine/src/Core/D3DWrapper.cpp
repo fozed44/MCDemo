@@ -31,15 +31,12 @@ namespace MC {
 
 #pragma region Initialization
 
-	void D3DWrapper::Init(std::shared_ptr<MCDXGI>& pMCDXGI) {
+	void D3DWrapper::Init() {
 		MC_INFO("Begin render initialization.");
 
-		assert(pMCDXGI->Initialized());
+		assert(MCDXGI::Instance()->Initialized());
 
 		EnsureValidWindowConfig();
-
-		// Store a pointer to the dxgi wrapper.
-		_pMCDXGI = pMCDXGI;
 
 		// initialize the current fence value
 		_currentFence = 0;
@@ -132,7 +129,7 @@ namespace MC {
 	void D3DWrapper::InitSwapChain() {
 		INIT_TRACE("Begin swapchain init.");
 
-		_pMCDXGI->CreateConfiguredOrDefaltSwapchain(_pCommandQueue.Get());
+		MCDXGI::Instance()->CreateConfiguredOrDefaltSwapchain(_pCommandQueue.Get());
 
 		INIT_TRACE("End swapchain init.");
 	}
@@ -140,7 +137,7 @@ namespace MC {
 	void D3DWrapper::Init3DDevice() {
 		INIT_TRACE("Begin 3d device init.");
 
-		_pDevice = _pMCDXGI->CreateConfiguredOrDefault3DDevice();
+		_pDevice = MCDXGI::Instance()->CreateConfiguredOrDefault3DDevice();
 
 		INIT_TRACE("End 3d device init.");
 	}
@@ -188,7 +185,7 @@ namespace MC {
 
 		// Create a render target view for each swap chain buffer
 		for (int n = 0; n < FRAME_BUFFER_COUNT; n++) {
-			_pMCDXGI->GetFrameBuffer(n, __uuidof(_ppRenderTargets[n]), &_ppRenderTargets[n]);
+			MCDXGI::Instance()->GetFrameBuffer(n, __uuidof(_ppRenderTargets[n]), &_ppRenderTargets[n]);
 		}
 
 		INIT_TRACE("End init render targets.");
@@ -212,7 +209,7 @@ namespace MC {
 
 		int width, height;
 
-		_pMCDXGI->GetFrameBufferSize(&width, &height);
+		MCDXGI::Instance()->GetFrameBufferSize(&width, &height);
 
 		D3D12_RESOURCE_DESC depthStencilBufferDesc = {};
 		depthStencilBufferDesc.Dimension        = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -613,7 +610,7 @@ namespace MC {
 
 		// TODO::
 		// Aspect ratio needs to be tracked
-		float aspectRatio = _pMCDXGI->GetAspectRatio();
+		float aspectRatio = MCDXGI::Instance()->GetAspectRatio();
 		DirectX::XMMATRIX proj = DirectX::XMMatrixPerspectiveFovLH(0.25f*3.14159f, aspectRatio, 1.0f, 1000.0f);
 		DirectX::XMStoreFloat4x4(&_projectionMatrix, proj);
 
@@ -634,7 +631,7 @@ namespace MC {
 
 	void D3DWrapper::QuickDraw() {
 
-		if (_pMCDXGI->IsResizeQueued())
+		if (MCDXGI::Instance()->IsResizeQueued())
 			Resize();
 
 		MCThrowIfFailed(_pCommandAllocator->Reset());
@@ -644,7 +641,7 @@ namespace MC {
 		_pCommandList->RSSetViewports(1, &_viewPort);
 		_pCommandList->RSSetScissorRects(1, &_scissorRect);
 
-		UINT currentBackBufferIndex = _pMCDXGI->GetCurrentBackBufferIndex();
+		UINT currentBackBufferIndex = MCDXGI::Instance()->GetCurrentBackBufferIndex();
 
 		_pCommandList->ResourceBarrier(
 			1,
@@ -713,7 +710,7 @@ namespace MC {
 		ID3D12CommandList* cmdsLists[] = { _pCommandList.Get() };
 		_pCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
-		MCThrowIfFailed(_pMCDXGI->Swap());
+		MCThrowIfFailed(MCDXGI::Instance()->Present());
 
 		FlushCommandQueue();
 
@@ -780,7 +777,7 @@ namespace MC {
 		
 
 		assert(_pDevice);
-		assert(_pMCDXGI);
+		assert(MCDXGI::Instance()->Initialized());
 		assert(_pCommandAllocator);
 
 		// Make sure the command queue is flushed.
@@ -794,7 +791,7 @@ namespace MC {
 
 		_pDepthStencil.Reset();
 
-		_pMCDXGI->ForceResize();
+		MCDXGI::Instance()->ForceResize();
 
 		InitRenderTargets();
 		InitRenderTargetViews();
@@ -818,7 +815,7 @@ namespace MC {
 		FlushCommandQueue();
 
 		int newWidth, newHeight;
-		_pMCDXGI->GetFrameBufferSize(&newWidth, &newHeight);
+		MCDXGI::Instance()->GetFrameBufferSize(&newWidth, &newHeight);
 
 		_viewPort = {};
 		_viewPort.TopLeftX = 0.0f;

@@ -12,24 +12,80 @@ namespace MC {
 
 	class MCDXGI {
 	public:
-		MCDXGI();
+		/*
+			MCDXGI is a singleton class. All copy constructors and assignment operators are deleted.
+		*/
+		MCDXGI(MCDXGI&)              = delete;
+		MCDXGI(MCDXGI&&)             = delete;
+		MCDXGI& operator= (MCDXGI&)  = delete;
+		MCDXGI& operator= (MCDXGI&&) = delete;
+		/*
+			Simple destructor - MCDXGI owns no heap memory.
+		*/
 		~MCDXGI();
 
+		/*
+			Retrieve the singleton instance.
+		*/
+		static inline MCDXGI* Instance() {
+			static MCDXGI instance;
+			return &instance;
+		}
+
+	private:
+		/*
+			MCDXGI is a singleton. The constructor is private.
+		*/
+		MCDXGI();
+
 	public:
-		void Init(const RENDER_CONFIG* pConfig, std::shared_ptr<MCRenderWindow>& renderWindow);
+		/*
+			Initialize must be called on the MCDXGI instance prior to any other methods. Initialize attaches a target
+			render window and a RENDER_CONFIG object to the MCDXGI instance.
+		*/
+		void Initialize(const RENDER_CONFIG* pConfig, std::shared_ptr<MCRenderWindow>& renderWindow);
 		
+		/*
+			Return true if the instance has been initialized (Initialize has been called). Otherwise, return false.
+		*/
 		inline bool Initialized() { return _initialized; }
 		
+		/*
+			Creates a new device based on the configuration and the render window supplied to the Initialize method.
+
+			NOTE:
+				CreateConfiguredOrDefault3DDevice must be called in order to create the internal ID3D12Device. Other
+				methods will fail if this method has not been called.
+				
+				Further, CreateConfiguredOrDefault3DDeviceonly must be called once and only once.
+		*/
 		ID3D12Device *CreateConfiguredOrDefault3DDevice();
+
+		/*
+			Creates a swap chain for the given ID3D12CommandQueue.
+		*/
+		IDXGISwapChain3 *CreateConfiguredOrDefaltSwapchain(ID3D12CommandQueue *pCommandQueue);
+
+		/*
+			Access the ID3DDevice previously created by the call to CreateConfiguredOrDefault3DDevice.
+		*/
 		ID3D12Device *Get3DDevice();
 		
-		IDXGISwapChain3 *CreateConfiguredOrDefaltSwapchain(ID3D12CommandQueue *pCommandQueue);
-		IDXGISwapChain3 *GetSwapChain();
-		HRESULT Swap();
 
-		IDXGIAdapter *CreateConfiguredOrDefaultAdapter();
+		/*
+			Internally calls present on the swap-chain.
+
+			Note:
+				After calling Present. The frame at the index previously returned from GetCurrentBackBufferIndex
+				will now be drawn to the screen and GetCurrentBackBufferIndex will return a new index.
+		*/
+		HRESULT Present();
+
 		
 
+		/*
+			Query the memory info the adapter associated with the current ID3D12Device.
+		*/
 		void QueryLocalMemoryInfo(DXGI_QUERY_VIDEO_MEMORY_INFO *pMemoryInfo) const;
 		void QueryNonLocalMemoryInfo(DXGI_QUERY_VIDEO_MEMORY_INFO *pMemoryInfo) const;
 
@@ -65,8 +121,7 @@ namespace MC {
 		void GetFrameBufferSize(int *pWidth, int *pHeight);
 
 	private:
-		MCDXGI(MCDXGI&)  = delete;
-		MCDXGI(MCDXGI&&) = delete;
+		IDXGIAdapter *CreateConfiguredOrDefaultAdapter();
 
 		void LogAdapters();
 		void LogAdapterOutputs(IDXGIAdapter *pAdapter);

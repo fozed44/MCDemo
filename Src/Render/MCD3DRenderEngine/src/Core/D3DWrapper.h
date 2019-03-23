@@ -32,14 +32,13 @@ namespace MC {
 		~D3DWrapper();
 
 	public:
-		void Init(std::shared_ptr<MCDXGI>& pMCDXGI);
+		void Init();
 
 		void RenderFrame(const MCFrame *pFrame);
 
 		void QuickDraw();
 		void FlushCommandQueue();
 
-		const MCDXGI* GetMCDXGI() const { return _pMCDXGI.get(); }
 	private:
 
 		ComPtr<ID3D12Fence>               _pFence;
@@ -146,8 +145,6 @@ namespace MC {
 
 	private:
 		const RENDER_CONFIG _initialConfiguration;
-
-		std::shared_ptr<MCDXGI> _pMCDXGI;
 
 		// The device is actually created and owned by the MCDXGI. Specifically
 		// calling GXGIWrapper.CreateConfiguredOrDefault3DDevice or if the MCDXGI

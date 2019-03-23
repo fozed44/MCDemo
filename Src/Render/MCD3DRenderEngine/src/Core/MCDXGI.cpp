@@ -16,7 +16,7 @@ namespace MC {
 
 	MCDXGI::~MCDXGI(){}
 
-	void MCDXGI::Init(const RENDER_CONFIG *pConfig, std::shared_ptr<MCRenderWindow>& renderWindow) {
+	void MCDXGI::Initialize(const RENDER_CONFIG *pConfig, std::shared_ptr<MCRenderWindow>& renderWindow) {
 
 		// save the pointer to the window wrapper for later. The first place we will use it is
 		// when we create the swap chain. ---- Remember that while CreateConfiguredOrDefaltSwapchain is
@@ -321,7 +321,7 @@ namespace MC {
 		MCThrowIfFailed(_pSwapChain->GetBuffer(pos, riid, ppSurface));
 	}
 
-	HRESULT MCDXGI::Swap() {
+	HRESULT MCDXGI::Present() {
 		return _pSwapChain->Present(0, 0);
 	}
 

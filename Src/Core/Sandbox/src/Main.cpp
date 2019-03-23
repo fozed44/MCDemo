@@ -46,17 +46,15 @@ int Sandbox() {
 
 	pRenderWindow->Init();
 
-	auto mcdxgi = std::make_shared<MC::MCDXGI>();
-
-	mcdxgi->Init(&renderConfig, pRenderWindow);
+	MC::MCDXGI::Instance()->Initialize(&renderConfig, pRenderWindow);
 
 	auto d3dWrapper = std::make_unique<MC::D3DWrapper>(renderConfig);
 
-	d3dWrapper->Init(mcdxgi);
+	d3dWrapper->Init();
 
 	pRenderWindow->RegisterResizeCallback(
-		[mcdxgi]() {
-			mcdxgi->QueueResize();
+		[]() {
+			MC::MCDXGI::Instance()->QueueResize();
 		}
 	);
 
