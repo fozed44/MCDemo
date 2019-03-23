@@ -10,10 +10,10 @@ using Microsoft::WRL::ComPtr;
 
 namespace MC {
 
-	class DXGIWrapper {
+	class MCDXGI {
 	public:
-		DXGIWrapper();
-		~DXGIWrapper();
+		MCDXGI();
+		~MCDXGI();
 
 	public:
 		void Init(const RENDER_CONFIG* pConfig, std::shared_ptr<MCRenderWindow>& renderWindow);
@@ -65,8 +65,8 @@ namespace MC {
 		void GetFrameBufferSize(int *pWidth, int *pHeight);
 
 	private:
-		DXGIWrapper(DXGIWrapper&)  = delete;
-		DXGIWrapper(DXGIWrapper&&) = delete;
+		MCDXGI(MCDXGI&)  = delete;
+		MCDXGI(MCDXGI&&) = delete;
 
 		void LogAdapters();
 		void LogAdapterOutputs(IDXGIAdapter *pAdapter);

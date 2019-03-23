@@ -3,7 +3,7 @@
 #include "MCD3D12Core.h"
 
 #include "RenderConfig.h"
-#include "DXGIWrapper.h"
+#include "MCDXGI.h"
 #include "MCUploadBuffer.h"
 #include "MCMath.h"
 #include "../../../../Common/MCCommon/src/Headers/MCFrame.h"
@@ -32,14 +32,14 @@ namespace MC {
 		~D3DWrapper();
 
 	public:
-		void Init(std::shared_ptr<DXGIWrapper>& pDXGIWrapper);
+		void Init(std::shared_ptr<MCDXGI>& pMCDXGI);
 
 		void RenderFrame(const MCFrame *pFrame);
 
 		void QuickDraw();
 		void FlushCommandQueue();
 
-		const DXGIWrapper* GetDXGIWrapper() const { return _pDXGIWrapper.get(); }
+		const MCDXGI* GetMCDXGI() const { return _pMCDXGI.get(); }
 	private:
 
 		ComPtr<ID3D12Fence>               _pFence;
@@ -147,10 +147,10 @@ namespace MC {
 	private:
 		const RENDER_CONFIG _initialConfiguration;
 
-		std::shared_ptr<DXGIWrapper> _pDXGIWrapper;
+		std::shared_ptr<MCDXGI> _pMCDXGI;
 
-		// The device is actually created and owned by the DXGIWrapper. Specifically
-		// calling GXGIWrapper.CreateConfiguredOrDefault3DDevice or if the DXGIWrapper
+		// The device is actually created and owned by the MCDXGI. Specifically
+		// calling GXGIWrapper.CreateConfiguredOrDefault3DDevice or if the MCDXGI
 		// goes out of scope, this pointer will be destroyed.
 		ID3D12Device *_pDevice;
 	};

@@ -1,33 +1,33 @@
 #include "../../../../Common/MCCommon/src/Headers/GlobalSwitches.h"
 
-#include "DXGIWrapper.h"
+#include "MCDXGI.h"
 #include "MCMath.h"
 #include "../../../../Common/MCLog/src/Headers/MCLog.h"
 #include "../../../../Common/MCCommon/src/Headers/Utility.h"
 
 namespace MC {
 
-	DXGIWrapper::DXGIWrapper() 
+	MCDXGI::MCDXGI()
 		: _initialized(false),
 		  _initialConfiguration{},
 		  _pRenderWindow{ nullptr },
 		  _cachedAspectRatio{ 0 }
 	{}
 
-	DXGIWrapper::~DXGIWrapper(){}
+	MCDXGI::~MCDXGI(){}
 
-	void DXGIWrapper::Init(const RENDER_CONFIG *pConfig, std::shared_ptr<MCRenderWindow>& renderWindow) {
+	void MCDXGI::Init(const RENDER_CONFIG *pConfig, std::shared_ptr<MCRenderWindow>& renderWindow) {
 
 		// save the pointer to the window wrapper for later. The first place we will use it is
 		// when we create the swap chain. ---- Remember that while CreateConfiguredOrDefaltSwapchain is
-		// defined in the DXGIWrapper, CreateConfiguredOrDefaltSwapchain will actually be called by D3DWrapper
+		// defined in the MCDXGI class, CreateConfiguredOrDefaltSwapchain will actually be called by D3DWrapper
 		// during its initialization.
 		_pRenderWindow = renderWindow;
 
 		// Ensure that the render window has been initialized.
 		if (!_pRenderWindow->Initialized()) {
-			INIT_ERROR("Window wrapper must be initialized before calling DXGIWrapper.Init");
-			MCTHROW("Window wrapper must be initialized before calling DXGIWrapper.Init");
+			INIT_ERROR("Window wrapper must be initialized before calling MCDXGI.Init");
+			MCTHROW("Window wrapper must be initialized before calling MCDXGI.Init");
 		}
 
 		MC_INFO("Begin DXGI initialization.");
@@ -41,11 +41,11 @@ namespace MC {
 		MC_INFO("End DXGI initialization.");
 	}
 
-	void DXGIWrapper::InitConfiguration(const RENDER_CONFIG *pConfig) {
+	void MCDXGI::InitConfiguration(const RENDER_CONFIG *pConfig) {
 		const_cast<RENDER_CONFIG&>(_initialConfiguration) = *pConfig;
 	}
 
-	void DXGIWrapper::LogAdapters() {
+	void MCDXGI::LogAdapters() {
 		int i = 0;
 		IDXGIAdapter* pAdapter = nullptr;
 
@@ -66,7 +66,7 @@ namespace MC {
 		}
 	}
 	
-	void DXGIWrapper::LogAdapterOutputs(IDXGIAdapter* pAdapter) {
+	void MCDXGI::LogAdapterOutputs(IDXGIAdapter* pAdapter) {
 		UINT i = 0;
 		IDXGIOutput *pOutput = nullptr;
 
@@ -86,7 +86,7 @@ namespace MC {
 
 	}
 
-	void DXGIWrapper::LogOutputDisplayModes(IDXGIOutput* pOutput, DXGI_FORMAT format) {
+	void MCDXGI::LogOutputDisplayModes(IDXGIOutput* pOutput, DXGI_FORMAT format) {
 		UINT count = 0;
 		UINT flags = 0;
 
@@ -112,7 +112,7 @@ namespace MC {
 		}
 	}
 
-	void DXGIWrapper::InitDXGIFactory() {
+	void MCDXGI::InitDXGIFactory() {
 		UINT dxgiCreateFlags = 0;
 
 		// Note:
@@ -129,7 +129,7 @@ namespace MC {
 		INIT_TRACE("Success.");
 	}
 
-	IDXGIAdapter *DXGIWrapper::GetAdapterByDeviceID(UINT deviceId) {
+	IDXGIAdapter *MCDXGI::GetAdapterByDeviceID(UINT deviceId) {
 		int i = 0;
 		IDXGIAdapter* pAdapter = nullptr;
 
@@ -148,7 +148,7 @@ namespace MC {
 		return nullptr;
 	}
 
-	IDXGIAdapter *DXGIWrapper::GetDefaultAdapter() {
+	IDXGIAdapter *MCDXGI::GetDefaultAdapter() {
 		int i = 0;
 		IDXGIAdapter1* pAdapter = nullptr;
 
@@ -177,7 +177,7 @@ namespace MC {
 		return nullptr;
 	}
 
-	IDXGIAdapter *DXGIWrapper::CreateConfiguredOrDefaultAdapter() {
+	IDXGIAdapter *MCDXGI::CreateConfiguredOrDefaultAdapter() {
 		assert(_pAdapter == nullptr);
 		ComPtr<IDXGIAdapter> tempAdapter;
 		INIT_INFO("Attempting to get configured adapter: {0:d}", _initialConfiguration.DISPLAY_ADAPTER_DEVICE_ID);
@@ -208,7 +208,7 @@ namespace MC {
 		return defaultAdapter;
 	}
 
-	ID3D12Device *DXGIWrapper::CreateConfiguredOrDefault3DDevice() {
+	ID3D12Device *MCDXGI::CreateConfiguredOrDefault3DDevice() {
 
 		// If there is already a device in existence, release it.
 		MCSAFE_RELEASE(_p3DDevice);
@@ -243,12 +243,12 @@ namespace MC {
 		return _p3DDevice.Get();
 	}
 
-	ID3D12Device *DXGIWrapper::Get3DDevice() {
+	ID3D12Device *MCDXGI::Get3DDevice() {
 		assert(_p3DDevice);
 		return _p3DDevice.Get();
 	}
 
-	void DXGIWrapper::EnableDXDebugLayer() {
+	void MCDXGI::EnableDXDebugLayer() {
 		// Enable the debug layer (requires the Graphics Tools "optional feature").
 		// NOTE: Enabling the debug layer after device creation will invalidate the active device.
 		ComPtr<ID3D12Debug> debugController;
@@ -257,7 +257,7 @@ namespace MC {
 		}
 	}
 
-	IDXGISwapChain3 *DXGIWrapper::CreateConfiguredOrDefaltSwapchain(ID3D12CommandQueue *pCommandQueue) {		
+	IDXGISwapChain3 *MCDXGI::CreateConfiguredOrDefaltSwapchain(ID3D12CommandQueue *pCommandQueue) {
 
 		// Ensure that the window configuration is valid... We will be using the dimensions of the window
 		// as the dimensions of the back buffer.
@@ -298,7 +298,7 @@ namespace MC {
 	Examine the window width and height in _renderConfig. Throw an exception if the values do not
 	fall within an acceptable range.
 	*/
-	void DXGIWrapper::EnsureValidWindowConfig() {
+	void MCDXGI::EnsureValidWindowConfig() {
 		if (_initialConfiguration.DISPLAY_OUTPUT_WIDTH <= 0
 			|| _initialConfiguration.DISPLAY_OUTPUT_WIDTH > MAX_VALID_WINDOW_WIDTH) {
 			INIT_ERROR("Detected an invalid window width ({0:d}) in the config file.", _initialConfiguration.DISPLAY_OUTPUT_WIDTH);
@@ -312,20 +312,20 @@ namespace MC {
 		}
 	}
 
-	unsigned int DXGIWrapper::GetCurrentBackBufferIndex() {
+	unsigned int MCDXGI::GetCurrentBackBufferIndex() {
 		assert(_pSwapChain);
 		return _pSwapChain->GetCurrentBackBufferIndex();
 	}
 
-	void DXGIWrapper::GetFrameBuffer(UINT pos, const IID &riid, void **ppSurface) {
+	void MCDXGI::GetFrameBuffer(UINT pos, const IID &riid, void **ppSurface) {
 		MCThrowIfFailed(_pSwapChain->GetBuffer(pos, riid, ppSurface));
 	}
 
-	HRESULT DXGIWrapper::Swap() {
+	HRESULT MCDXGI::Swap() {
 		return _pSwapChain->Present(0, 0);
 	}
 
-	void DXGIWrapper::ForceResize() {
+	void MCDXGI::ForceResize() {
 		MCThrowIfFailed(_pSwapChain->ResizeBuffers(
 			FRAME_BUFFER_COUNT,
 			0,
@@ -344,7 +344,7 @@ namespace MC {
 		_resizeQueued = false;
 	}
 
-	void DXGIWrapper::GetFrameBufferSize(int *pWidth, int *pHeight) {
+	void MCDXGI::GetFrameBufferSize(int *pWidth, int *pHeight) {
 		assert(_pSwapChain);
 
 		DXGI_SWAP_CHAIN_DESC swapChainDesc;
@@ -354,12 +354,12 @@ namespace MC {
 		*pHeight = swapChainDesc.BufferDesc.Height;
 	}
 
-	void DXGIWrapper::QueryLocalMemoryInfo(DXGI_QUERY_VIDEO_MEMORY_INFO *pMemoryInfo) const {
+	void MCDXGI::QueryLocalMemoryInfo(DXGI_QUERY_VIDEO_MEMORY_INFO *pMemoryInfo) const {
 		assert(_pAdapter);
 		_pAdapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, pMemoryInfo);
 	}
 
-	void DXGIWrapper::QueryNonLocalMemoryInfo(DXGI_QUERY_VIDEO_MEMORY_INFO *pMemoryInfo) const {
+	void MCDXGI::QueryNonLocalMemoryInfo(DXGI_QUERY_VIDEO_MEMORY_INFO *pMemoryInfo) const {
 		assert(_pAdapter);
 		_pAdapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, pMemoryInfo);
 	}

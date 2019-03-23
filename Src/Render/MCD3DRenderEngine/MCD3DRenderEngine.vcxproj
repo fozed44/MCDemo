@@ -156,7 +156,7 @@
     <ClInclude Include="src\Core\MCD3D12RenderUtilities.h" />
     <ClInclude Include="src\Core\D3DWrapper.h" />
     <ClInclude Include="src\Core\d3dx12.h" />
-    <ClInclude Include="src\Core\DXGIWrapper.h" />
+    <ClInclude Include="src\Core\MCDXGI.h" />
     <ClInclude Include="src\Core\MCD3D12Core.h" />
     <ClInclude Include="src\Font\MCFont.h" />
     <ClInclude Include="src\Font\MCFontLoader.h" />
@@ -173,7 +173,7 @@
     <ClCompile Include="src\Memory\MCResourceManager.cpp" />
     <ClCompile Include="src\Shader\MCShaderManager.cpp" />
     <ClCompile Include="src\Core\D3DWrapper.cpp" />
-    <ClCompile Include="src\Core\DXGIWrapper.cpp" />
+    <ClCompile Include="src\Core\MCDXGI.cpp" />
     <ClCompile Include="src\Font\MCFontRenderer.cpp" />
     <ClCompile Include="src\Core\MCD3D12RenderUtilities.cpp" />
     <ClCompile Include="src\Font\MCFontLoader.cpp" />

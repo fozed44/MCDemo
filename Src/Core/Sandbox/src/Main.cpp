@@ -2,7 +2,7 @@
 
 #include "../../../Common/MCLog/src/Headers/MCLog.h"
 #include "../../../Common/MCXML/src/Headers/MCXML.h"
-#include "../../../Render/MCD3DRenderEngine/Src/Core/DXGIWrapper.h"
+#include "../../../Render/MCD3DRenderEngine/Src/Core/MCDXGI.h"
 #include "../../../Render/MCD3DRenderEngine/Src/Core/D3DWrapper.h"
 #include "../../../Common/MCCommon/src/Headers/Utility.h"
 #include "../../../Render/MCD3DRenderEngine/Src/Core/MCRenderWindow.h"
@@ -46,17 +46,17 @@ int Sandbox() {
 
 	pRenderWindow->Init();
 
-	auto dxgiWrapper = std::make_shared<MC::DXGIWrapper>();
+	auto mcdxgi = std::make_shared<MC::MCDXGI>();
 
-	dxgiWrapper->Init(&renderConfig, pRenderWindow);
+	mcdxgi->Init(&renderConfig, pRenderWindow);
 
 	auto d3dWrapper = std::make_unique<MC::D3DWrapper>(renderConfig);
 
-	d3dWrapper->Init(dxgiWrapper);
+	d3dWrapper->Init(mcdxgi);
 
 	pRenderWindow->RegisterResizeCallback(
-		[dxgiWrapper]() {
-			dxgiWrapper->QueueResize();
+		[mcdxgi]() {
+			mcdxgi->QueueResize();
 		}
 	);
 
