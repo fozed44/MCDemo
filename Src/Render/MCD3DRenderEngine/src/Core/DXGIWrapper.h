@@ -27,8 +27,11 @@ namespace MC {
 		IDXGISwapChain3 *GetSwapChain();
 		HRESULT Swap();
 
-		IDXGIAdapter *GetConfiguredOrDefaultAdapter();
-		IDXGIOutput  *GetConfiguredOrDefaultOutput();
+		IDXGIAdapter *CreateConfiguredOrDefaultAdapter();
+		
+
+		void QueryLocalMemoryInfo(DXGI_QUERY_VIDEO_MEMORY_INFO *pMemoryInfo) const;
+		void QueryNonLocalMemoryInfo(DXGI_QUERY_VIDEO_MEMORY_INFO *pMemoryInfo) const;
 
 		/*
 			Returns the index of the current back buffer that is being presented by the DXGI.
@@ -97,6 +100,7 @@ namespace MC {
 		ComPtr<IDXGIFactory4>   _pDXGIFactory;
 		ComPtr<ID3D12Device>    _p3DDevice;
 		ComPtr<IDXGISwapChain3> _pSwapChain;
+		ComPtr<IDXGIAdapter3>   _pAdapter;
 	};
 
 }

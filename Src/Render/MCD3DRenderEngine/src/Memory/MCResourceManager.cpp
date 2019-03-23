@@ -1,12 +1,12 @@
-#include "MCResourceAllocator.h"
-
-
-
-MCResourceAllocator::MCResourceAllocator()
-{
-}
-
-
-MCResourceAllocator::~MCResourceAllocator()
-{
-}
+//#include "MCResourceAllocator.h"
+//
+//
+//
+//MCResourceAllocator::MCResourceAllocator()
+//{
+//}
+//
+//
+//MCResourceAllocator::~MCResourceAllocator()
+//{
+//}

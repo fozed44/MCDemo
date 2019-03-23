@@ -39,7 +39,7 @@ namespace MC {
 		void QuickDraw();
 		void FlushCommandQueue();
 
-
+		const DXGIWrapper* GetDXGIWrapper() const { return _pDXGIWrapper.get(); }
 	private:
 
 		ComPtr<ID3D12Fence>               _pFence;

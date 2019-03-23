@@ -177,12 +177,16 @@ namespace MC {
 		return nullptr;
 	}
 
-	IDXGIAdapter *DXGIWrapper::GetConfiguredOrDefaultAdapter() {
+	IDXGIAdapter *DXGIWrapper::CreateConfiguredOrDefaultAdapter() {
+		assert(_pAdapter == nullptr);
+		ComPtr<IDXGIAdapter> tempAdapter;
 		INIT_INFO("Attempting to get configured adapter: {0:d}", _initialConfiguration.DISPLAY_ADAPTER_DEVICE_ID);
 		auto configuredAdapter = GetAdapterByDeviceID(_initialConfiguration.DISPLAY_ADAPTER_DEVICE_ID);
 
 		if (configuredAdapter != nullptr) {
-			INIT_INFO("Atapter found.");
+			INIT_INFO("Adapter found.");
+			tempAdapter.Attach(configuredAdapter);
+			MCThrowIfFailed(tempAdapter.As(&_pAdapter));
 			return configuredAdapter;
 		}
 
@@ -192,8 +196,12 @@ namespace MC {
 		auto defaultAdapter = GetDefaultAdapter();
 
 		if (defaultAdapter == nullptr) {
-			MCTHROW("Failed to load default dxgi adapter.");
+			MCTHROW("Failed to load default DXGI adapter.");
 		}
+
+		tempAdapter.Attach(defaultAdapter);
+		MCThrowIfFailed(tempAdapter.As(&_pAdapter));
+		tempAdapter.Detach();
 
 		INIT_INFO("Loaded default adapter");
 
@@ -217,7 +225,7 @@ namespace MC {
 		// TODO:
 		//	We don't really want to be messing with raw com pointers that need to be released.
 		//  FIND AND USE A BETTER SOLUTION.
-		auto pAdapter = GetConfiguredOrDefaultAdapter();
+		auto pAdapter = CreateConfiguredOrDefaultAdapter();
 
 		INIT_INFO("Creating 3D Device.");
 
@@ -344,5 +352,15 @@ namespace MC {
 
 		*pWidth  = swapChainDesc.BufferDesc.Width;
 		*pHeight = swapChainDesc.BufferDesc.Height;
+	}
+
+	void DXGIWrapper::QueryLocalMemoryInfo(DXGI_QUERY_VIDEO_MEMORY_INFO *pMemoryInfo) const {
+		assert(_pAdapter);
+		_pAdapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, pMemoryInfo);
+	}
+
+	void DXGIWrapper::QueryNonLocalMemoryInfo(DXGI_QUERY_VIDEO_MEMORY_INFO *pMemoryInfo) const {
+		assert(_pAdapter);
+		_pAdapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, pMemoryInfo);
 	}
 }
