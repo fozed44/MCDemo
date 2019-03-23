@@ -1,6 +1,6 @@
 #pragma once
 
-#include "D3DWrapper.h"
+#include "MCD3D.h"
 #include "DirectXColors.h"
 
 namespace MCTest {

@@ -20,7 +20,7 @@ namespace MC {
 
 		// save the pointer to the window wrapper for later. The first place we will use it is
 		// when we create the swap chain. ---- Remember that while CreateConfiguredOrDefaltSwapchain is
-		// defined in the MCDXGI class, CreateConfiguredOrDefaltSwapchain will actually be called by D3DWrapper
+		// defined in the MCDXGI class, CreateConfiguredOrDefaltSwapchain will actually be called by MCD3D
 		// during its initialization.
 		_pRenderWindow = renderWindow;
 

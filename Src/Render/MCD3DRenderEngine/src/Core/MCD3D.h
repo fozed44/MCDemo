@@ -26,10 +26,10 @@ namespace MC {
 		float  time                      = 1.0;
 	};
 
-	class D3DWrapper {
+	class MCD3D {
 	public:
-		D3DWrapper(const RENDER_CONFIG& renderConfig);
-		~D3DWrapper();
+		MCD3D(const RENDER_CONFIG& renderConfig);
+		~MCD3D();
 
 	public:
 		void Init();

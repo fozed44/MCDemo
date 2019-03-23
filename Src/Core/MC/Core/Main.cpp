@@ -3,7 +3,7 @@
 #include "../../../Common/MCLog/src/Headers/MCLog.h"
 #include "../../../Common/MCXML/src/Headers/MCXML.h"
 #include "../../../Render/MCD3DRenderEngine/src/Core/MCDXGI.h"
-#include "../../../Render/MCD3DRenderEngine/src/Core/D3DWrapper.h"
+#include "../../../Render/MCD3DRenderEngine/src/Core/MCD3D.h"
 
 #include <iostream>
 
@@ -39,9 +39,9 @@ int main(int argc, char ** argv) {
 
 	mxdxgi->Init(&renderConfig);
 
-	auto d3dWrapper = std::make_shared<MC::D3DWrapper>();
+	auto mcd3d = std::make_shared<MC::MCD3D>();
 
-	d3dWrapper->Init(&renderConfig, mcdxgi);*/
+	mcd3d->Init(&renderConfig, mcdxgi);*/
 
 	char t;
 	std::cin >> t;

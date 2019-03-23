@@ -21,9 +21,6 @@
     <ClInclude Include="src\Core\MCD3D12Core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\D3DWrapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Core\d3dx12.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -63,12 +60,12 @@
     <ClInclude Include="src\Core\MCDXGI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\MCD3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Shader\MCShaderManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\D3DWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\MCD3D12RenderUtilities.cpp">
@@ -93,6 +90,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\MCDXGI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\MCD3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

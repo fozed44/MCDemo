@@ -2,7 +2,7 @@
 
 #include "d3dx12.h"
 
-#include "D3DWrapper.h"
+#include "MCD3D.h"
 #include "RenderConfig.h"
 #include "../../../../Common/MCLog/src/Headers/MCLog.h"
 #include "../../../../Common/MCCommon/src/Headers/Utility.h"
@@ -20,18 +20,18 @@ namespace MC {
 
 #pragma region CtorDtor
 
-	D3DWrapper::D3DWrapper(const RENDER_CONFIG& renderConfig) 
+	MCD3D::MCD3D(const RENDER_CONFIG& renderConfig) 
 		: _initialConfiguration(renderConfig),
 		  _pObjectConstantBuffer(nullptr),
 		  _pElementLayoutDescriptions{} {}
 
-	D3DWrapper::~D3DWrapper() {}
+	MCD3D::~MCD3D() {}
 
 #pragma endregion 
 
 #pragma region Initialization
 
-	void D3DWrapper::Init() {
+	void MCD3D::Init() {
 		MC_INFO("Begin render initialization.");
 
 		assert(MCDXGI::Instance()->Initialized());
@@ -63,7 +63,7 @@ namespace MC {
 		MC_INFO("End render initialization.");
 	}
 
-	void D3DWrapper::InitFence() {
+	void MCD3D::InitFence() {
 		INIT_TRACE("Begin d3d12 fence init.");
 		MCThrowIfFailed(_pDevice->CreateFence(
 			0,
@@ -71,10 +71,10 @@ namespace MC {
 			__uuidof(_pFence),
 			&_pFence
 		));
-		_pFence->SetName(L"D3DWrapper fence.");
+		_pFence->SetName(L"MCD3D fence.");
 		INIT_TRACE("End d3d12 fence init.");
 	}
-	void D3DWrapper::InitCommandQueue() {
+	void MCD3D::InitCommandQueue() {
 		INIT_TRACE("Begin d3d12 command queue init.");
 
 		D3D12_COMMAND_QUEUE_DESC queueDesc = {};
@@ -91,7 +91,7 @@ namespace MC {
 
 		INIT_TRACE("End d3d12 command queue init.");
 	}
-	void D3DWrapper::InitCommandAllocator() {
+	void MCD3D::InitCommandAllocator() {
 		INIT_TRACE("Begin d3d12 command allocator queue init.");
 
 		MCThrowIfFailed(_pDevice->CreateCommandAllocator(
@@ -105,7 +105,7 @@ namespace MC {
 		INIT_TRACE("End d3d12 command allocator queue inti.");
 	}
 
-	void D3DWrapper::InitCommandList() {
+	void MCD3D::InitCommandList() {
 		INIT_TRACE("Begin d3d12 command list init.");
 
 		MCThrowIfFailed(_pDevice->CreateCommandList(
@@ -126,7 +126,7 @@ namespace MC {
 		INIT_TRACE("End d3d12 command list init.");
 	}
 
-	void D3DWrapper::InitSwapChain() {
+	void MCD3D::InitSwapChain() {
 		INIT_TRACE("Begin swapchain init.");
 
 		MCDXGI::Instance()->CreateConfiguredOrDefaltSwapchain(_pCommandQueue.Get());
@@ -134,7 +134,7 @@ namespace MC {
 		INIT_TRACE("End swapchain init.");
 	}
 
-	void D3DWrapper::Init3DDevice() {
+	void MCD3D::Init3DDevice() {
 		INIT_TRACE("Begin 3d device init.");
 
 		_pDevice = MCDXGI::Instance()->CreateConfiguredOrDefault3DDevice();
@@ -142,7 +142,7 @@ namespace MC {
 		INIT_TRACE("End 3d device init.");
 	}
 
-	void D3DWrapper::InitDescriptorHeaps() {
+	void MCD3D::InitDescriptorHeaps() {
 		INIT_TRACE("Begin descriptor heap init.");
 
 		// Render Target Descriptor Heap ****************************
@@ -180,7 +180,7 @@ namespace MC {
 		INIT_TRACE("End descriptor heap init.");
 	}
 
-	void D3DWrapper::InitRenderTargets() {
+	void MCD3D::InitRenderTargets() {
 		INIT_TRACE("Begin init render targets.");
 
 		// Create a render target view for each swap chain buffer
@@ -191,7 +191,7 @@ namespace MC {
 		INIT_TRACE("End init render targets.");
 	}
 
-	void D3DWrapper::InitRenderTargetViews() {
+	void MCD3D::InitRenderTargetViews() {
 		INIT_TRACE("Begin init RTV Heap.");
 
 		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHeapHandle(_pRTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
@@ -204,7 +204,7 @@ namespace MC {
 		INIT_TRACE("End init RTV Heap.");
 	}
 
-	void D3DWrapper::InitDepthStencilBuffer() {
+	void MCD3D::InitDepthStencilBuffer() {
 		INIT_TRACE("Init depth stencil buffer.");
 
 		int width, height;
@@ -245,7 +245,7 @@ namespace MC {
 		INIT_TRACE("End init depth stencil buffer.");
 	}
 
-	void D3DWrapper::InitDepthStencilBufferView() {
+	void MCD3D::InitDepthStencilBufferView() {
 		INIT_TRACE("Begin init depth stencil buffer view.");
 
 		CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHeapHandle(_pDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
@@ -261,7 +261,7 @@ namespace MC {
 		INIT_TRACE("End init depth stencil buffer view.");
 	}
 
-	void D3DWrapper::InitConstantBuffer() {
+	void MCD3D::InitConstantBuffer() {
 		INIT_TRACE("Init constant buffer.");
 
 		_pObjectConstantBuffer = std::make_unique<MCUploadBuffer<ObjectConstants>>(_pDevice, 1, true);
@@ -269,7 +269,7 @@ namespace MC {
 		INIT_TRACE("End init constant buffer.");
 	}
 
-	void D3DWrapper::InitConstantBufferView() {
+	void MCD3D::InitConstantBufferView() {
 		INIT_TRACE("Init constant buffer view");
 
 		D3D12_GPU_VIRTUAL_ADDRESS cbAddress = _pObjectConstantBuffer->Resource()->GetGPUVirtualAddress();
@@ -291,7 +291,7 @@ namespace MC {
 		INIT_TRACE("End init constant buffer view.");
 	}
 
-	void D3DWrapper::InitViewPort() {
+	void MCD3D::InitViewPort() {
 		INIT_TRACE("Begin init view port.");
 
 		_viewPort = {};
@@ -311,7 +311,7 @@ namespace MC {
 		INIT_TRACE("End view port.");
 	}
 
-	void D3DWrapper::InitFinalize() {
+	void MCD3D::InitFinalize() {
 		INIT_TRACE("Begin init finalize.");
 
 		INIT_TRACE("--Reset command allocator.");
@@ -342,7 +342,7 @@ namespace MC {
 		INIT_TRACE("End init finalize.");
 	}
 
-	void D3DWrapper::InitMatrices() {
+	void MCD3D::InitMatrices() {
 		INIT_TRACE("Init matrices.");
 
 		_worldMatrix      = MCMath::Identity4x4();
@@ -356,7 +356,7 @@ namespace MC {
 		Examine the window width and height in _initialConfiguration. Throw an exception if the values do not
 		fall within an acceptable range.
 	*/
-	void D3DWrapper::EnsureValidWindowConfig() {
+	void MCD3D::EnsureValidWindowConfig() {
 		if (_initialConfiguration.DISPLAY_OUTPUT_WIDTH <= 0
 			|| _initialConfiguration.DISPLAY_OUTPUT_WIDTH > MAX_VALID_WINDOW_WIDTH) {
 			INIT_ERROR("Detected an invalid window width ({0:d}) in the config file.", _initialConfiguration.DISPLAY_OUTPUT_WIDTH);
@@ -374,7 +374,7 @@ namespace MC {
 
 #pragma region Test
 
-	void D3DWrapper::InitTest() {
+	void MCD3D::InitTest() {
 		INIT_TRACE("Begin test initialization.");
 
 		InitBoxGeometry();
@@ -408,7 +408,7 @@ namespace MC {
 		Initialize the cube geometry, create an upload buffer for the vertex and index buffers, copy
 		the vertexes and indexes into the buffer.
 	*/
-	void D3DWrapper::InitBoxGeometry() {
+	void MCD3D::InitBoxGeometry() {
 		INIT_TRACE("Begin test geometry initialization.");
 
 		//MCVertex1Color pVerts[8]     = {};
@@ -485,7 +485,7 @@ namespace MC {
 		INIT_TRACE("End box geometry initialization.");
 	}
 
-	void D3DWrapper::InitShaders() {
+	void MCD3D::InitShaders() {
 		INIT_TRACE("Begin shader init.");
 
 		INIT_TRACE("--Load standard vertex shader.");
@@ -497,7 +497,7 @@ namespace MC {
 		INIT_TRACE("End shader init.");
 	}
 
-	void D3DWrapper::InitBoxRootSignature() {
+	void MCD3D::InitBoxRootSignature() {
 		INIT_TRACE("Begin box root signature initialize.");
 
 		CD3DX12_ROOT_PARAMETER pSlotRootParameter[1];
@@ -545,7 +545,7 @@ namespace MC {
 		INIT_TRACE("End box root signature initialize.");
 	}
 
-	void D3DWrapper::InitBoxPSO() {
+	void MCD3D::InitBoxPSO() {
 		INIT_TRACE("Begin box pipeline state object init.");
 
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
@@ -589,7 +589,7 @@ namespace MC {
 
 #pragma region QuickDraw
 
-	void D3DWrapper::TestUpdate(const MCFrame* pFrame) {
+	void MCD3D::TestUpdate(const MCFrame* pFrame) {
 
 		DirectX::XMVECTOR target = DirectX::XMVectorSet(
 										pFrame->LookAt.x,
@@ -629,7 +629,7 @@ namespace MC {
 		_pObjectConstantBuffer->CopyData(0, oc);
 	}
 
-	void D3DWrapper::QuickDraw() {
+	void MCD3D::QuickDraw() {
 
 		if (MCDXGI::Instance()->IsResizeQueued())
 			Resize();
@@ -721,7 +721,7 @@ namespace MC {
 
 #pragma region Render
 
-	void D3DWrapper::RenderFrame(const MCFrame* pFrame) {
+	void MCD3D::RenderFrame(const MCFrame* pFrame) {
 		TestUpdate(pFrame);
 		QuickDraw();
 	}
@@ -730,7 +730,7 @@ namespace MC {
 
 #pragma region Utilities	
 
-	void D3DWrapper::FlushCommandQueue()
+	void MCD3D::FlushCommandQueue()
 	{
 		// Advance the fence value to mark commands up to this fence point.
 		_currentFence++;
@@ -756,7 +756,7 @@ namespace MC {
 
 	
 
-	void D3DWrapper::Resize() {
+	void MCD3D::Resize() {
 
 		/*
 			The general steps to resize the swap chain buffers are as follows:
@@ -831,7 +831,7 @@ namespace MC {
 		_scissorRect.bottom = newHeight;
 	}
 
-	void D3DWrapper::ExecSync(void (*func)()) {
+	void MCD3D::ExecSync(void (*func)()) {
 
 		MCThrowIfFailed(_pCommandAllocator->Reset());
 

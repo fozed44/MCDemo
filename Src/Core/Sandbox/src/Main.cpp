@@ -3,7 +3,7 @@
 #include "../../../Common/MCLog/src/Headers/MCLog.h"
 #include "../../../Common/MCXML/src/Headers/MCXML.h"
 #include "../../../Render/MCD3DRenderEngine/Src/Core/MCDXGI.h"
-#include "../../../Render/MCD3DRenderEngine/Src/Core/D3DWrapper.h"
+#include "../../../Render/MCD3DRenderEngine/Src/Core/MCD3D.h"
 #include "../../../Common/MCCommon/src/Headers/Utility.h"
 #include "../../../Render/MCD3DRenderEngine/Src/Core/MCRenderWindow.h"
 #include "../../../Common/MCCommon/src/Headers/MasterTimer.h"
@@ -48,9 +48,9 @@ int Sandbox() {
 
 	MC::MCDXGI::Instance()->Initialize(&renderConfig, pRenderWindow);
 
-	auto d3dWrapper = std::make_unique<MC::D3DWrapper>(renderConfig);
+	auto mcd3d = std::make_unique<MC::MCD3D>(renderConfig);
 
-	d3dWrapper->Init();
+	mcd3d->Init();
 
 	pRenderWindow->RegisterResizeCallback(
 		[]() {
@@ -82,7 +82,7 @@ int Sandbox() {
 			frame.CameraPosition.y = pRenderWindow->GetRadius()*cosf(pRenderWindow->GetPhi());
 			frame.Time = masterTimer->TotalTime();
 
-			d3dWrapper->RenderFrame(&frame);
+			mcd3d->RenderFrame(&frame);
 
 			frameCount++;
 
