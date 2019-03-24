@@ -71,4 +71,8 @@ namespace MCD3D12RenderUtilities {
 		return defaultBuffer;
 	}
 
+	void OrderedStaticDestroy() {
+		MCD3D::Instance()->OrderedStaticDestroy();
+	}
+
 }}

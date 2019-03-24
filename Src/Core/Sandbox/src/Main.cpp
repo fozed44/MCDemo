@@ -48,9 +48,7 @@ int Sandbox() {
 
 	MC::MCDXGI::Instance()->Initialize(&renderConfig, pRenderWindow);
 
-	auto mcd3d = std::make_unique<MC::MCD3D>(renderConfig);
-
-	mcd3d->Init();
+	MC::MCD3D::Instance()->Initialize(renderConfig);
 
 	pRenderWindow->RegisterResizeCallback(
 		[]() {
@@ -82,7 +80,7 @@ int Sandbox() {
 			frame.CameraPosition.y = pRenderWindow->GetRadius()*cosf(pRenderWindow->GetPhi());
 			frame.Time = masterTimer->TotalTime();
 
-			mcd3d->RenderFrame(&frame);
+			MC::MCD3D::Instance()->RenderFrame(&frame);
 
 			frameCount++;
 
@@ -144,7 +142,7 @@ void CriticalSectionTest() {
 
 int main(int argc, char ** argv) {
 	try {
-		return Sandbox();
+		Sandbox();
 		/*for (int x = 0; x < 100; ++x)
 			CriticalSectionTest();
 		char t;
@@ -156,4 +154,6 @@ int main(int argc, char ** argv) {
 	catch (MCException ex) {
 		MessageBox(nullptr, ex.what().c_str(), "MCException", MB_OK);
 	}
+
+	MC::MCD3D12RenderUtilities::OrderedStaticDestroy();
 }

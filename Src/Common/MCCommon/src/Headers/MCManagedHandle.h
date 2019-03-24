@@ -16,7 +16,7 @@ namespace MC {
 			_handle = t;
 		}
 		MCManagedHandle(MCManagedHandle&)             = delete;
-		MCManagedHandle& operator= (MCManagedHandle&) = delete;
+		MCManagedHandle& operator= (MCManagedHandle&) = delete;		
 		MCManagedHandle(MCManagedHandle&& o) {
 			this->_handle = o._handle;
 			o._handle = {};
@@ -43,6 +43,13 @@ namespace MC {
 		inline void Initialize(tManagedHandle handle) {
 			assert(_handle);
 			_handle = handle;
+		}
+
+		inline void Destroy() {
+			if (this->_handle)
+				tDerivedManager::Instance()->RemoveRef(*this);
+
+			_handle = {};
 		}
 
 	private:

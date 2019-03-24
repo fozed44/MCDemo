@@ -20,8 +20,8 @@ namespace MC {
 
 #pragma region CtorDtor
 
-	MCD3D::MCD3D(const RENDER_CONFIG& renderConfig) 
-		: _initialConfiguration(renderConfig),
+	MCD3D::MCD3D() 
+		: _initialConfiguration{},
 		  _pObjectConstantBuffer(nullptr),
 		  _pElementLayoutDescriptions{} {}
 
@@ -31,10 +31,12 @@ namespace MC {
 
 #pragma region Initialization
 
-	void MCD3D::Init() {
+	void MCD3D::Initialize(const RENDER_CONFIG& renderConfig) {
 		MC_INFO("Begin render initialization.");
 
 		assert(MCDXGI::Instance()->Initialized());
+
+		*const_cast<RENDER_CONFIG*>(&_initialConfiguration) = renderConfig;
 
 		EnsureValidWindowConfig();
 
@@ -831,22 +833,10 @@ namespace MC {
 		_scissorRect.bottom = newHeight;
 	}
 
-	void MCD3D::ExecSync(void (*func)()) {
-
-		MCThrowIfFailed(_pCommandAllocator->Reset());
-
-		MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));
-
-		func();
-
-		MCThrowIfFailed(_pCommandList->Close());
-
-		ID3D12CommandList* pCommandList = _pCommandList.Get();
-		_pCommandQueue->ExecuteCommandLists(1, &pCommandList);
-
-		INIT_TRACE("--Letting the GPU catch up to release the upload buffer.");
-		FlushCommandQueue();
-	}
-
 #pragma endregion
+
+	void MCD3D::OrderedStaticDestroy() {
+		_hVertexShader.Destroy();
+		_hPixelShader.Destroy();
+	}
 }

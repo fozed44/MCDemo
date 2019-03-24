@@ -28,16 +28,47 @@ namespace MC {
 
 	class MCD3D {
 	public:
-		MCD3D(const RENDER_CONFIG& renderConfig);
+		/*
+			MC3D is a singleton. Delete all copy and assignment methods.
+		*/
+		MCD3D(MCD3D&)              = delete;
+		MCD3D(MCD3D&&)             = delete;
+		MCD3D& operator= (MCD3D&)  = delete;
+		MCD3D& operator= (MCD3D&&) = delete;
+
+		/*
+			Simple destructor. MCD3D does not own any heap objects.
+		*/
 		~MCD3D();
 
+		/*
+			Access to the MCD3D singleton instance.
+		*/
+		inline static MCD3D *Instance() {
+			static MCD3D instance;
+			return &instance;
+		}
+
+	private:
+		/*
+			MCD3D is a singleton. The constructor is private.
+		*/
+		MCD3D();
+
 	public:
-		void Init();
+		/*
+			Initializes the MCD3D instance. This method associates an initial configuration with the instance
+			and initializes the instance. This method must be the first method call to the instance.
+		*/
+		void Initialize(const RENDER_CONFIG& renderConfig);
 
 		void RenderFrame(const MCFrame *pFrame);
 
 		void QuickDraw();
 		void FlushCommandQueue();
+
+	public:
+		void OrderedStaticDestroy();
 
 	private:
 
@@ -119,9 +150,6 @@ namespace MC {
 		void InitBoxPSO();
 
 		void TestUpdate(const MCFrame* pFrame);
-
-		// execute GPU commands synchronously
-		void ExecSync(void (*func)());
 
 		std::unique_ptr<MCStaticMesh16<MCVertex1Color>> _pSphereMesh;
 		std::unique_ptr<MCDynamicMesh16<MC::MCVertex1Color>> _pCubeMesh;
