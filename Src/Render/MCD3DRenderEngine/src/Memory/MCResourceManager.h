@@ -7,13 +7,12 @@
 //
 //namespace MC {
 //
-//	enum MCRESOURCE_TYPE {
-//		MCRESOURCE_TYPE_CONSTANT_BUFFER
-//	};
-//
 //	struct MCResourceHandle {
 //		ID3D12Resource* pResource;
 //		__int64         FenceValue;
+//		operator bool() const {
+//			return pResource == 0;
+//		}
 //	};
 //
 //	class MCResourceManager;
