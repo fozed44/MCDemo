@@ -9,6 +9,7 @@
 #include "../../../Common/MCCommon/src/Headers/MasterTimer.h"
 #include "../../../Common/MCCommon/src/Headers/MCFrame.h"
 #include "../../../Common/MCCommon/src/Headers/MCCriticalSection.h"
+#include "../../../Render/MCD3DRenderEngine/src/Memory/MCResourceManager.h"
 #include <iostream>
 #include <thread>
 #include <atomic>
@@ -49,6 +50,8 @@ int Sandbox() {
 	MC::MCDXGI::Instance()->Initialize(&renderConfig, pRenderWindow);
 
 	MC::MCD3D::Instance()->Initialize(renderConfig);
+
+	MC::MCResourceManager::Instance()->Initialize();
 
 	pRenderWindow->RegisterResizeCallback(
 		[]() {

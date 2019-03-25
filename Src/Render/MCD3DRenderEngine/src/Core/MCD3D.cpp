@@ -23,7 +23,8 @@ namespace MC {
 	MCD3D::MCD3D() 
 		: _initialConfiguration{},
 		  _pObjectConstantBuffer(nullptr),
-		  _pElementLayoutDescriptions{} {}
+		  _pElementLayoutDescriptions{},
+		  _initialized{ false } {}
 
 	MCD3D::~MCD3D() {}
 
@@ -61,6 +62,11 @@ namespace MC {
 		InitFinalize();
 
 		InitTest();
+
+		/*
+			Initialized() should now return true.
+		*/
+		_initialized = true;
 
 		MC_INFO("End render initialization.");
 	}

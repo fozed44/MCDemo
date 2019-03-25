@@ -24,12 +24,8 @@ namespace TMCCommon
 	struct PersonHandle {
 		Person* ptr;
 		__int64 fence;
-		//Person* Key() { return ptr; }
 		Person* Key() { return ptr; }
 	};
-/*
-	class ManagedKeyedPersonManager;
-	typedef MCManagedKeyedHandle<PersonHandle, Person*, ManagedKeyedPersonManager> ManagedKeyedPersonHandle;*/
 
 	class ManagedKeyedPersonManager : public MCManagedKeyedHandleManager<PersonHandle, Person*, std::shared_ptr<Person>, ManagedKeyedPersonManager> {
 	public:

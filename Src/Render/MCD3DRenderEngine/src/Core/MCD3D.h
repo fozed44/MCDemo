@@ -62,6 +62,11 @@ namespace MC {
 		*/
 		void Initialize(const RENDER_CONFIG& renderConfig);
 
+		/*
+			Return false, until the Initialize method has been called.
+		*/
+		bool Initialized() { return _initialized; }
+
 		void RenderFrame(const MCFrame *pFrame);
 
 		void QuickDraw();
@@ -178,5 +183,8 @@ namespace MC {
 		// calling GXGIWrapper.CreateConfiguredOrDefault3DDevice or if the MCDXGI
 		// goes out of scope, this pointer will be destroyed.
 		ID3D12Device *_pDevice;
+
+		// Set to true at the end of the Initialize method.
+		bool _initialized;
 	};
 }
