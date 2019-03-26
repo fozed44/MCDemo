@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 #include "MCUploadBuffer.h"
+#include "../Memory/MCResourceManager.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -248,6 +249,101 @@ namespace MC {
 	private:
 		D3D12_VERTEX_BUFFER_VIEW _vertexBufferView;
 		D3D12_INDEX_BUFFER_VIEW  _indexBufferView;
+	};
+
+	/*
+	MCStaticMesh16 is a static mesh, (D3D12_HEAP_TYPE_DEFAULT) with a vertex type of VERTEX_TYPE and an
+	index type of DXGI_FORMAT_R16_UINT
+	*/
+	template <typename TVERTEX_TYPE>
+	class MCStaticAllocatedMesh16 {
+	public:
+		MCStaticAllocatedMesh16(std::string& name) {
+			_name = name;
+		}
+		MCStaticAllocatedMesh16(const char* pName) {
+			_name = std::string(pName);
+		}
+		MCStaticAllocatedMesh16(MCStaticAllocatedMesh16&) = delete;
+		MCStaticAllocatedMesh16& operator=(MCStaticAllocatedMesh16&) = delete;
+		~MCStaticAllocatedMesh16() {}
+
+		void Upload(TVERTEX_TYPE *pVert, UINT vSize, unsigned short *pIndicies, UINT iSize) {
+			assert(_hVertexBuffer.Handle().pResource == nullptr);
+			assert(_hIndexBuffer.Handle().pResource == nullptr);
+
+			// Store the meta information about this mesh.
+			_vertexByteStride     = sizeof(TVERTEX_TYPE);
+			_vertexBufferByteSize = vSize;
+			_indexBufferByteSize  = iSize;
+
+			_hVertexBuffer = MCResourceManager::Instance()->CreateDefaultBufferTemp(pVert, vSize);
+			auto vertexBufferResource = MCResourceManager::Instance()->GetResourceSync(_hVertexBuffer);
+			vertexBufferResource->SetName(s2ws(_name + std::string(" gpu vertex buffer")).c_str());
+
+			_hIndexBuffer = MCResourceManager::Instance()->CreateDefaultBufferTemp(pIndicies, iSize);
+			auto indexBufferResource = MCResourceManager::Instance()->GetResourceSync(_hIndexBuffer);
+			indexBufferResource->SetName(s2ws(_name + std::string(" gpu index buffer")).c_str());
+
+			// Next we add the entire mesh as a subMesh, allowing the client to call DrawSubMesh using the name of this mesh
+			// to draw the whole mesh.
+			AddSubMesh(_name.c_str(), iSize / sizeof(unsigned short), 0, 0);
+
+
+			_vertexBufferView.BufferLocation = vertexBufferResource->GetGPUVirtualAddress();
+			_vertexBufferView.StrideInBytes  = _vertexByteStride;
+			_vertexBufferView.SizeInBytes    = _vertexBufferByteSize;
+
+			_indexBufferView.BufferLocation = indexBufferResource->GetGPUVirtualAddress();
+			_indexBufferView.Format         = _indexFormat;
+			_indexBufferView.SizeInBytes    = _indexBufferByteSize;
+		}
+
+	public:
+		const std::string& Name() const { return _name; }
+
+		const D3D12_VERTEX_BUFFER_VIEW* VertexBufferView() const { assert(_uploadersDisposed); return &_vertexBufferView; }
+		const D3D12_INDEX_BUFFER_VIEW*  IndexBufferView()  const { assert(_uploadersDisposed); return &_indexBufferView; }
+
+	public:
+
+		void SetIABuffers(ID3D12GraphicsCommandList *pCommandList) const {
+			pCommandList->IASetVertexBuffers(0, 1, &_vertexBufferView);
+			pCommandList->IASetIndexBuffer(&_indexBufferView);
+		}
+
+		void DrawSubMesh(const char *pMeshName, ID3D12GraphicsCommandList *pCommandList) {
+			auto subMesh = _subMeshes[pMeshName];
+			pCommandList->DrawIndexedInstanced(subMesh.IndexCount, 1, subMesh.StartIndexLocation, subMesh.BaseVertexLocation, 0);
+		}
+
+	public:
+
+		void AddSubMesh(const char *pMeshName, UINT indexCount, UINT startIndexLocation, UINT baseVertexLocation) {
+			MCSubMesh subMesh;
+			subMesh.IndexCount = indexCount;
+			subMesh.StartIndexLocation = startIndexLocation;
+			subMesh.BaseVertexLocation = baseVertexLocation;
+			_subMeshes[pMeshName] = subMesh;
+		}
+
+	private:
+		MCResourceManager::tManagedKeyedHandle _hVertexBuffer;
+		MCResourceManager::tManagedKeyedHandle _hIndexBuffer;
+
+	private:
+		std::string _name;
+		UINT        _vertexByteStride;
+		UINT        _vertexBufferByteSize;
+		DXGI_FORMAT _indexFormat = DXGI_FORMAT_R16_UINT;
+		UINT        _indexBufferByteSize;
+
+	private:
+		D3D12_VERTEX_BUFFER_VIEW _vertexBufferView;
+		D3D12_INDEX_BUFFER_VIEW  _indexBufferView;
+
+	private:
+		std::unordered_map<std::string, MCSubMesh> _subMeshes;
 	};
 
 }

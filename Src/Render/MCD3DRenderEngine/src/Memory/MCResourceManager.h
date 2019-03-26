@@ -52,9 +52,14 @@ namespace MC {
 
 		MCResourceHandle CreateResource(MC_RESOURCE_MANAGER_RESOURCE_TYPE, size_t sizeInBytes);
 		
+		inline MCResourceManager::tManagedKeyedHandle CreateDefaultBufferTemp(void *pInitData, unsigned __int64 sizeInBytes)
+		{
+			return CreateDefaultBuffer(pInitData, sizeInBytes);
+		}
+
 	private:
 		MCResourceHandle CreateConstantBuffer(size_t sizeInBytes);
-		MCResourceManager::tManagedKeyedHandle CreateDefaultBuffer(void *pInitData, __int64 sizeInBytes);
+		MCResourceManager::tManagedKeyedHandle CreateDefaultBuffer(void *pInitData, unsigned __int64 sizeInBytes);
 	private:
 		ComPtr<ID3D12CommandAllocator>     _pCommandAllocator;
 		ComPtr<ID3D12GraphicsCommandList>  _pCommandList;

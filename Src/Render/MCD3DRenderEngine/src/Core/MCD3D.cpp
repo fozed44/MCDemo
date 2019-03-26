@@ -63,6 +63,8 @@ namespace MC {
 		InitMatrices();
 		InitFinalize();
 
+		MCResourceManager::Instance()->Initialize();
+
 		InitTest();
 
 		/*
@@ -461,7 +463,7 @@ namespace MC {
 
 		_pSphereMesh = std::make_unique<MCStaticMesh16<MCVertex1Color>>("Sphere");
 
-		_pCubeMesh = std::make_unique<MCDynamicMesh16<MCVertex1Color>>("Cube");
+		_pCubeMesh = std::make_unique<MCStaticAllocatedMesh16<MCVertex1Color>>("Cube");
 
 		auto disposer = _pSphereMesh->Upload(
 			_pDevice,
@@ -470,9 +472,16 @@ namespace MC {
 			&indicies[0], (std::uint16_t)(sizeof(uint16_t) * indicies.size())
 		);
 
-		_pCubeMesh->Upload(
+		/*_pCubeMesh->Upload(
 			_pDevice,
 			_pCommandList.Get(),
+			cubeVerts,
+			sizeof(cubeVerts),
+			cubeIndicies,
+			sizeof(cubeIndicies)
+		);*/
+
+		_pCubeMesh->Upload(
 			cubeVerts,
 			sizeof(cubeVerts),
 			cubeIndicies,

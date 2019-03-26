@@ -5,7 +5,7 @@
 namespace MC {
 
 	void MCResourceManager::Initialize() {
-		assert(MCD3D::Instance()->Initialized());
+		//assert(MCD3D::Instance()->Initialized());
 		assert(MCDXGI::Instance()->Initialized());
 
 		// Create a new allocator
@@ -31,16 +31,21 @@ namespace MC {
 			)
 		);
 
+		MCThrowIfFailed(_pCommandList->Close());
+
 	}
 
 	/*
 	Note:
 	'uploadBuffer' has to be kept alive until AFTER the command list is executed.
 	*/
-	MCResourceManager::tManagedKeyedHandle MCResourceManager::CreateDefaultBuffer(void *pInitData, __int64 sizeInBytes) {
+	MCResourceManager::tManagedKeyedHandle MCResourceManager::CreateDefaultBuffer(void *pInitData, unsigned __int64 sizeInBytes) {
 
 		// the result.
 		ComPtr<ID3D12Resource> defaultBuffer;
+
+		MCThrowIfFailed(_pCommandAllocator->Reset());
+		MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));
 
 		MCThrowIfFailed(MCDXGI::Instance()->Get3DDevice()->CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
@@ -96,6 +101,8 @@ namespace MC {
 				D3D12_RESOURCE_STATE_GENERIC_READ
 			)
 		);
+
+		MCThrowIfFailed(_pCommandList->Close());
 
 		MCD3D::Instance()->ExecuteCommandList(_pCommandList.Get());
 

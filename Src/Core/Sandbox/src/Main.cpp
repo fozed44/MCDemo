@@ -51,7 +51,7 @@ int Sandbox() {
 
 	MC::MCD3D::Instance()->Initialize(renderConfig);
 
-	MC::MCResourceManager::Instance()->Initialize();
+	//MC::MCResourceManager::Instance()->Initialize();
 
 	pRenderWindow->RegisterResizeCallback(
 		[]() {

@@ -169,8 +169,8 @@ namespace MC {
 
 		void TestUpdate(const MCFrame* pFrame);
 
-		std::unique_ptr<MCStaticMesh16<MCVertex1Color>> _pSphereMesh;
-		std::unique_ptr<MCDynamicMesh16<MC::MCVertex1Color>> _pCubeMesh;
+		std::unique_ptr<MCStaticMesh16<MCVertex1Color>>              _pSphereMesh;
+		std::unique_ptr<MCStaticAllocatedMesh16<MC::MCVertex1Color>> _pCubeMesh;
 
 		ComPtr<ID3D12RootSignature> _pBoxRootSignature;
 		D3D12_INPUT_ELEMENT_DESC    _pElementLayoutDescriptions[2];
