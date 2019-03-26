@@ -11,6 +11,7 @@
 #include "MCMesh.h"
 
 #include "../Shader/MCShaderManager.h"
+#include <atomic>
 
 using Microsoft::WRL::ComPtr;
 
@@ -56,16 +57,28 @@ namespace MC {
 		MCD3D();
 
 	public:
-		/*
-			Initializes the MCD3D instance. This method associates an initial configuration with the instance
-			and initializes the instance. This method must be the first method call to the instance.
-		*/
+		/*  Initializes the MCD3D instance. This method associates an initial configuration with the instance
+			and initializes the instance. This method must be the first method call to the instance. */
 		void Initialize(const RENDER_CONFIG& renderConfig);
 
-		/*
-			Return false, until the Initialize method has been called.
-		*/
+		/*	Return false, until the Initialize method has been called. */ 
 		bool Initialized() { return _initialized; }
+
+		/*	Get the current fence value. */
+		unsigned __int64 GetCurrentFenceValue() const;
+
+		/*	Create a new fence and return it. */
+		unsigned __int64 GetNewFenceValue();
+
+		/*	Block until the specified fence is reached. */
+		void WaitForFenceValue(unsigned __int64 fenceValue) const;
+
+	public:
+		/* Execute the command list. */
+		void ExecuteCommandList(ID3D12CommandList *pCommandList) const;
+
+		/* Execute the command lists. */
+		void ExecuteCommandLists(int numCommandLists, ID3D12CommandList* const *pCommandLists) const;
 
 		void RenderFrame(const MCFrame *pFrame);
 
@@ -78,7 +91,7 @@ namespace MC {
 	private:
 
 		ComPtr<ID3D12Fence>               _pFence;
-		UINT64                            _currentFence;
+		std::atomic_int64_t               _currentFence;
 
 		ComPtr<ID3D12CommandAllocator>    _pCommandAllocator;
 		ComPtr<ID3D12CommandQueue>        _pCommandQueue;

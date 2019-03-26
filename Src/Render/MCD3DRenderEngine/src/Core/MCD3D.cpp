@@ -35,6 +35,8 @@ namespace MC {
 	void MCD3D::Initialize(const RENDER_CONFIG& renderConfig) {
 		MC_INFO("Begin render initialization.");
 
+		MC_INFO("atomic fence is lock free: {0:d}", (int)_currentFence.is_lock_free());
+
 		assert(MCDXGI::Instance()->Initialized());
 
 		*const_cast<RENDER_CONFIG*>(&_initialConfiguration) = renderConfig;
@@ -736,32 +738,62 @@ namespace MC {
 
 #pragma endregion
 
-#pragma region Utilities	
+#pragma region fencing
 
-	void MCD3D::FlushCommandQueue()
-	{
-		// Advance the fence value to mark commands up to this fence point.
-		_currentFence++;
+	/*
+		Get the current completed value of _pFence.
+	*/
+	unsigned __int64 MCD3D::GetCurrentFenceValue() const {
+		return _pFence->GetCompletedValue();
+	}
 
-		// Add an instruction to the command queue to set a new fence point.  Because we 
-		// are on the GPU timeline, the new fence point won't be set until the GPU finishes
-		// processing all the commands prior to this Signal().
-		MCThrowIfFailed(_pCommandQueue->Signal(_pFence.Get(), _currentFence));
+	/*
+		Block the calling thread until _pFence reaches fenceValue.
+	*/
+	void MCD3D::WaitForFenceValue(unsigned __int64 fenceValue) const {
+		if (_pFence->GetCompletedValue() < fenceValue) {
+			HANDLE eventHandle = CreateEventEx(nullptr, nullptr, 0, EVENT_ALL_ACCESS);
 
-		// Wait until the GPU has completed commands up to this fence point.
-		if (_pFence->GetCompletedValue() < _currentFence)
-		{
-			HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
-
-			// Fire event when GPU hits current fence.  
-			MCThrowIfFailed(_pFence->SetEventOnCompletion(_currentFence, eventHandle));
-
-			// Wait until the GPU hits current fence event is fired.
+			MCThrowIfFailed(_pFence->SetEventOnCompletion(fenceValue, eventHandle));
+			
 			WaitForSingleObject(eventHandle, INFINITE);
 			CloseHandle(eventHandle);
 		}
 	}
 
+	/*
+		increment _currentFence, then use the new value to signal the command queue.
+	*/
+	unsigned __int64 MCD3D::GetNewFenceValue() {
+		unsigned __int64 nextFence = _currentFence.fetch_add(1);
+		MCThrowIfFailed(_pCommandQueue->Signal(_pFence.Get(), nextFence));
+		return nextFence;
+	}
+
+	/*
+		Create a new fence, then block until that fence completes.
+	*/
+	void MCD3D::FlushCommandQueue()
+	{
+		auto nextFenceValue = GetNewFenceValue();
+		WaitForFenceValue(nextFenceValue);
+	}
+
+#pragma endregion
+
+#pragma region Command list support
+
+	void MCD3D::ExecuteCommandList(ID3D12CommandList *pCommandList) const {
+		_pCommandQueue->ExecuteCommandLists(1, &pCommandList);
+	}
+
+	void MCD3D::ExecuteCommandLists(int numCommandLists, ID3D12CommandList* const *pCommandLists) const {
+		_pCommandQueue->ExecuteCommandLists(numCommandLists, pCommandLists);
+	}
+
+#pragma endregion
+
+#pragma region Utilities	
 	
 
 	void MCD3D::Resize() {

@@ -10,15 +10,15 @@ using Microsoft::WRL::ComPtr;
 namespace MC {
 
 	struct MCResourceHandle {
-		ID3D12Resource* pResource;
-		__int64         FenceValue;
+		ID3D12Resource*  pResource;
+		unsigned __int64 FenceValue;
 		inline ID3D12Resource* Key() { return pResource; }
 	};
 
 	enum MC_RESOURCE_MANAGER_ERROR {
 		MC_RESOURCE_MANAGER_ERROR_OK,
 		MC_RESOURCE_MANAGER_ERROR_RESOURCE_LOST,
-		MC_RESOURCE_MANAGER_ERROR_LOADING
+		MC_RESOURCE_MANAGER_ERROR_UPLOADING
 	};
 
 	enum MC_RESOURCE_MANAGER_RESOURCE_TYPE {
@@ -26,7 +26,7 @@ namespace MC {
 		MC_RESOURCE_MANAGER_RESOURCE_TYPE_DYNAMIC
 	};
 
-	class MCResourceManager : MCManagedKeyedHandleManager<MCResourceHandle, ID3D12Resource*, ComPtr<ID3D12Resource>, MCResourceManager> {
+	class MCResourceManager : public MCManagedKeyedHandleManager<MCResourceHandle, ID3D12Resource*, ComPtr<ID3D12Resource>, MCResourceManager> {
 	public:
 		MCResourceManager(MCResourceManager&)              = delete;
 		MCResourceManager(MCResourceManager&&)             = delete;
@@ -46,14 +46,19 @@ namespace MC {
 		void Initialize();
 
 		MC_RESOURCE_MANAGER_ERROR GetResource(const MCResourceManager::tManagedKeyedHandle& handle, ID3D12Resource** ppResource);
-		MC_RESOURCE_MANAGER_ERROR GetResourceSync(const MCResourceManager::tManagedKeyedHandle& handle, ID3D12Resource **pResouce);
+		MC_RESOURCE_MANAGER_ERROR GetResourceSync(const MCResourceManager::tManagedKeyedHandle& handle, ID3D12Resource **pResource);
+		ID3D12Resource *GetResourceSync(const MCResourceManager::tManagedKeyedHandle& handle);
 		
 
 		MCResourceHandle CreateResource(MC_RESOURCE_MANAGER_RESOURCE_TYPE, size_t sizeInBytes);
 		
 	private:
+		MCResourceHandle CreateConstantBuffer(size_t sizeInBytes);
+		MCResourceManager::tManagedKeyedHandle CreateDefaultBuffer(void *pInitData, __int64 sizeInBytes);
+	private:
 		ComPtr<ID3D12CommandAllocator>     _pCommandAllocator;
 		ComPtr<ID3D12GraphicsCommandList>  _pCommandList;
+		ComPtr<ID3D12Resource>             _pUploadBuffer;
 		__int64 _lastFenceValue;
 		MCResourceManager() {}
 	};
