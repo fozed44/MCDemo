@@ -61,13 +61,14 @@ int Sandbox() {
 
 	MSG msg = {};
 	
-	float frameCount = 0;
+	__int64 frameCount = 1;
 
 	MC::MCFrame frame;
 	frame.CameraPosition = { 0.0f, 0.0f, -10.0f, 1.0f };
 	frame.LookAt         = { 0.0f, 0.0f, 0.0f, 0.0f };
 	
-
+	const __int64 frameCountBufferSize = 50;
+	float frameCountBuffer[frameCountBufferSize];
 	while (msg.message != WM_QUIT)
 	{
 		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
@@ -89,7 +90,12 @@ int Sandbox() {
 
 			
 
-			float fps = frameCount / masterTimer->TotalTime();
+			//float fps = frameCount / masterTimer->TotalTime();
+
+			frameCountBuffer[frameCount % frameCountBufferSize] = masterTimer->TotalTime();
+
+			float fps = 1.0f / ((frameCountBuffer[frameCount % frameCountBufferSize] - frameCountBuffer[(frameCount + 1) % frameCountBufferSize]) /
+				((float)frameCountBufferSize));
 
 			std::string t = std::string("MCDemo Frame(") + std::to_string(frameCount) + std::string(") fps: ") + std::to_string(fps);
 

@@ -712,8 +712,10 @@ namespace MC {
 		_pSphereMesh->SetIABuffers(_pCommandList.Get());
 		_pSphereMesh->DrawSubMesh("Sphere", _pCommandList.Get());
 
-		_pCubeMesh->SetIABuffers(_pCommandList.Get());
-		_pCubeMesh->DrawSubMesh("Cube", _pCommandList.Get());
+		//_pCubeMesh->SetIABuffers(_pCommandList.Get());
+		//_pCubeMesh->DrawSubMesh("Cube", _pCommandList.Get());
+
+		_pCubeMesh->Draw(_pCommandList.Get());
 
 		_pCommandList->ResourceBarrier(
 			1,

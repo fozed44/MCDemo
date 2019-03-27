@@ -322,7 +322,7 @@ namespace MC {
 	}
 
 	HRESULT MCDXGI::Present() {
-		return _pSwapChain->Present(0, 0);
+		return _pSwapChain->Present(1, 0);
 	}
 
 	void MCDXGI::ForceResize() {

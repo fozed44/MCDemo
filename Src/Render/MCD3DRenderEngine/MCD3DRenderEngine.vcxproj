@@ -152,6 +152,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Render\FrameRenderer.h" />
+    <ClInclude Include="src\Render\RenderManager.h" />
+    <ClInclude Include="src\Render\RenderItem.h" />
     <ClInclude Include="src\Memory\MCResourceManager.h" />
     <ClInclude Include="src\Core\MCD3D12RenderUtilities.h" />
     <ClInclude Include="src\Core\MCD3D.h" />
@@ -170,6 +173,9 @@
     <ClInclude Include="src\Shader\MCShaderManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Render\FrameRenderer.cpp" />
+    <ClCompile Include="src\Render\RenderManager.cpp" />
+    <ClCompile Include="src\Render\RenderItem.cpp" />
     <ClCompile Include="src\Memory\MCResourceManager.cpp" />
     <ClCompile Include="src\Shader\MCShaderManager.cpp" />
     <ClCompile Include="src\Core\MCD3D.cpp" />
