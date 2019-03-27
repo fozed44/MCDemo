@@ -152,6 +152,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Configuration\MCRenderEngineConfiguration.h" />
+    <ClInclude Include="src\Core\MCD3D12RenderEngine.h" />
+    <ClInclude Include="src\Configuration\MCRenderEngineConfigurationLoader.h" />
     <ClInclude Include="src\Render\FrameRenderer.h" />
     <ClInclude Include="src\Render\RenderManager.h" />
     <ClInclude Include="src\Render\RenderItem.h" />
@@ -167,12 +170,14 @@
     <ClInclude Include="src\Core\MCMath.h" />
     <ClInclude Include="src\Core\MCMesh.h" />
     <ClInclude Include="src\Core\MCUploadBuffer.h" />
-    <ClInclude Include="src\Core\RenderConfig.h" />
+    <ClInclude Include="src\Configuration\RenderConfig.h" />
     <ClInclude Include="src\Core\TestFunctions.h" />
     <ClInclude Include="src\Core\MCRenderWindow.h" />
     <ClInclude Include="src\Shader\MCShaderManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\MCD3D12RenderEngine.cpp" />
+    <ClCompile Include="src\Configuration\MCRenderEngineConfigurationLoader.cpp" />
     <ClCompile Include="src\Render\FrameRenderer.cpp" />
     <ClCompile Include="src\Render\RenderManager.cpp" />
     <ClCompile Include="src\Render\RenderItem.cpp" />
@@ -183,7 +188,7 @@
     <ClCompile Include="src\Font\MCFontRenderer.cpp" />
     <ClCompile Include="src\Core\MCD3D12RenderUtilities.cpp" />
     <ClCompile Include="src\Font\MCFontLoader.cpp" />
-    <ClCompile Include="src\Core\RenderConfig.cpp" />
+    <ClCompile Include="src\Configuration\RenderConfig.cpp" />
     <ClCompile Include="src\Core\TestFunctions.cpp" />
     <ClCompile Include="src\Core\MCRenderWindow.cpp" />
   </ItemGroup>

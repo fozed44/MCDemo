@@ -1,4 +1,4 @@
-#include "MCD3DRenderEngine.h"
+#include "MCD3D12RenderEngine.h"
 
 namespace MC {
 
@@ -8,8 +8,7 @@ namespace MC {
   MCResourceManager* MCD3D12RenderEngine::pResourceManager;
   MCShaderManager*   MCD3D12RenderEngine::pShaderManager;
 
-  MCD3DRenderEngine::MCD3DRenderEngine() {
-    pResourceManager = _pResourceManager.Get();
-  }
+  MCD3D12RenderEngine::MCD3D12RenderEngine(const RENDER_ENGINE_CONFIGURATION *pConfiguration)
+	  : _initialConfiguration{ *pConfiguration } {}
 
 }
