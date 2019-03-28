@@ -1,13 +1,28 @@
 #pragma once
 
+#include "MCPrimitives.h"
+#include <vector>
+
 namespace MC {
 
 
-	struct MCVector4 {
-		float x;
-		float y;
-		float z;
-		float w;
+	typedef char* MCFrameItemHandle;
+
+	struct MCCamera {
+		MCFLOAT3 Position;
+		MCFLOAT3 LookAt;
+	};
+
+	struct MCSimpleFrameRenderItem2D {
+		MCFrameItemHandle Handle;
+		MCFLOAT2 Position;
+		MCFLOAT2 Look;
+	};
+
+	struct MCSimpleFrameRenderItem3D {
+		MCFrameItemHandle Handle;
+		MCFLOAT3 Position;
+		MCFLOAT3 Look;
 	};
 
 	/*
@@ -15,16 +30,18 @@ namespace MC {
 
 		MCFrame contains all of the information required by the renderer to draw a single frame.
 	*/
-	struct MCFrame {
-
-		// The position of the camera.
-		MCVector4 CameraPosition;
-
-		// The direction the camera is pointing.
-		MCVector4 LookAt;
-
+	struct MCFrame3D {
 		// The current frame time;
 		float Time;
+		// The camera position.
+		MCCamera Camera;
+		std::vector<MCSimpleFrameRenderItem3D> SimpleRenderItems;
+	};
+
+	struct MCFrame2D {
+		float Time;
+		MCCamera Camera;
+		std::vector<MCSimpleFrameRenderItem2D> SimpleRenderItems;
 	};
 
 }

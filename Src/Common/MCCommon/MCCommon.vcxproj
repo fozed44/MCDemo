@@ -134,6 +134,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Data\MCPrimitives.h" />
     <ClInclude Include="src\Headers\GlobalSwitches.h" />
     <ClInclude Include="src\Headers\MasterTimer.h" />
     <ClInclude Include="src\Headers\MCCriticalSection.h" />

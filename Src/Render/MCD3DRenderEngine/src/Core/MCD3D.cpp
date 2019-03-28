@@ -600,19 +600,19 @@ namespace MC {
 
 #pragma region QuickDraw
 
-	void MCD3D::TestUpdate(const MCFrame* pFrame) {
+	void MCD3D::TestUpdate(const MCFrame3D* pFrame) {
 
 		DirectX::XMVECTOR target = DirectX::XMVectorSet(
-										pFrame->LookAt.x,
-										pFrame->LookAt.y,
-										pFrame->LookAt.z,
-										pFrame->LookAt.w
+										pFrame->Camera.LookAt.x,
+										pFrame->Camera.LookAt.y,
+										pFrame->Camera.LookAt.z,
+										0.0f
 								   );
 		DirectX::XMVECTOR cameraPos = DirectX::XMVectorSet(
-										pFrame->CameraPosition.x,
-										pFrame->CameraPosition.y, 
-										pFrame->CameraPosition.z,
-										pFrame->CameraPosition.w
+										pFrame->Camera.Position.x,
+										pFrame->Camera.Position.y, 
+										pFrame->Camera.Position.z,
+										1.0f
 								   );
 		DirectX::XMVECTOR up        = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
@@ -734,7 +734,7 @@ namespace MC {
 
 #pragma region Render
 
-	void MCD3D::RenderFrame(const MCFrame* pFrame) {
+	void MCD3D::RenderFrame(const MCFrame3D* pFrame) {
 		TestUpdate(pFrame);
 		QuickDraw();
 	}

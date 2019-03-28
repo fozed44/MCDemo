@@ -52,7 +52,7 @@ namespace MC {
 		/* Execute the command lists. */
 		void ExecuteCommandLists(int numCommandLists, ID3D12CommandList* const *pCommandLists) const;
 
-		void RenderFrame(const MCFrame *pFrame);
+		void RenderFrame(const MCFrame3D *pFrame);
 
 		void QuickDraw();
 		void FlushCommandQueue();
@@ -141,7 +141,7 @@ namespace MC {
 		// Init the pipeline state for the box
 		void InitBoxPSO();
 
-		void TestUpdate(const MCFrame* pFrame);
+		void TestUpdate(const MCFrame3D* pFrame);
 
 		std::unique_ptr<MCStaticMesh16<MCVertex1Color>>              _pSphereMesh;
 		std::unique_ptr<MCStaticAllocatedMesh16<MC::MCVertex1Color>> _pCubeMesh;
