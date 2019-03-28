@@ -136,6 +136,7 @@
   <ItemGroup>
     <ClInclude Include="src\Data\MCPrimitives.h" />
     <ClInclude Include="src\Data\MCResult.h" />
+    <ClInclude Include="src\Data\MCThreads.h" />
     <ClInclude Include="src\Headers\GlobalSwitches.h" />
     <ClInclude Include="src\Headers\MasterTimer.h" />
     <ClInclude Include="src\Headers\MCCriticalSection.h" />
@@ -146,6 +147,7 @@
     <ClInclude Include="src\Headers\Utility.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Data\MCThreads.cpp" />
     <ClCompile Include="src\Source\MasterTimer.cpp" />
     <ClCompile Include="src\Source\MCCriticalSection.cpp" />
     <ClCompile Include="src\Source\Paths.cpp" />
