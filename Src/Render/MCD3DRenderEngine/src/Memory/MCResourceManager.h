@@ -5,6 +5,7 @@
 #include "../../../../Common/MCCommon/src/Headers/MCManagedKeyedHandle.h"
 #include "../Core/MCD3D12Core.h"
 #include "../Core/MCREGlobals.h"
+#include "../../../../Common/MCCommon/src/Data/MCResult.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -14,17 +15,6 @@ namespace MC {
 		ID3D12Resource*  pResource;
 		unsigned __int64 FenceValue;
 		inline ID3D12Resource* Key() { return pResource; }
-	};
-
-	enum MC_RESOURCE_MANAGER_ERROR {
-		MC_RESOURCE_MANAGER_ERROR_OK,
-		MC_RESOURCE_MANAGER_ERROR_RESOURCE_LOST,
-		MC_RESOURCE_MANAGER_ERROR_UPLOADING
-	};
-
-	enum MC_RESOURCE_MANAGER_RESOURCE_TYPE {
-		MC_RESOURCE_MANAGER_RESOURCE_TYPE_CONSTANT,
-		MC_RESOURCE_MANAGER_RESOURCE_TYPE_DYNAMIC
 	};
 
 	class MCResourceManager : public MCManagedKeyedHandleManager<MCResourceHandle, ID3D12Resource*, ComPtr<ID3D12Resource>, MCResourceManager> {
@@ -40,12 +30,12 @@ namespace MC {
 			return MCREGlobals::pResourceManager;
 		}
 	public:
-		MC_RESOURCE_MANAGER_ERROR GetResource(const MCResourceManager::tManagedKeyedHandle& handle, ID3D12Resource** ppResource);
-		MC_RESOURCE_MANAGER_ERROR GetResourceSync(const MCResourceManager::tManagedKeyedHandle& handle, ID3D12Resource **pResource);
+		MC_RESULT GetResource(const MCResourceManager::tManagedKeyedHandle& handle, ID3D12Resource** ppResource);
+		MC_RESULT GetResourceSync(const MCResourceManager::tManagedKeyedHandle& handle, ID3D12Resource **pResource);
 		ID3D12Resource *GetResourceSync(const MCResourceManager::tManagedKeyedHandle& handle);
 		
 
-		MCResourceHandle CreateResource(MC_RESOURCE_MANAGER_RESOURCE_TYPE, size_t sizeInBytes);
+		//MCResourceHandle CreateResource(MC_RESOURCE_MANAGER_RESOURCE_TYPE, size_t sizeInBytes);
 		
 		inline MCResourceManager::tManagedKeyedHandle CreateDefaultBufferTemp(void *pInitData, unsigned __int64 sizeInBytes)
 		{

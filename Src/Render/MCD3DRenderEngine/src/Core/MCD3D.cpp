@@ -460,7 +460,7 @@ namespace MC {
 		auto disposer = _pSphereMesh->Upload(
 			_pDevice,
 			_pCommandList.Get(),
-			&verts[0], sizeof(MCVertex1Color) * verts.size(),
+			&verts[0], (UINT)(sizeof(MCVertex1Color) * verts.size()),
 			&indicies[0], (std::uint16_t)(sizeof(uint16_t) * indicies.size())
 		);
 
