@@ -16,7 +16,7 @@ namespace MC {
 		FrameRenderer& operator=(FrameRenderer&&) = delete;
 
 	public:
-		void Render();
+		void Render(const MCFrame* pFrame);
 
 	};
 

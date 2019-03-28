@@ -7,7 +7,7 @@
 #include "../../../Common/MCCommon/src/Headers/Utility.h"
 #include "../../../Render/MCD3DRenderEngine/Src/Core/MCRenderWindow.h"
 #include "../../../Common/MCCommon/src/Headers/MasterTimer.h"
-#include "../../../Common/MCCommon/src/Headers/MCFrame.h"
+#include "../../../Common/MCCommon/src/Data/MCFrame.h"
 #include "../../../Common/MCCommon/src/Headers/MCCriticalSection.h"
 #include "../../../Render/MCD3DRenderEngine/src/Memory/MCResourceManager.h"
 #include "../../../Render/MCD3DRenderEngine/src/Configuration/RenderConfig.h"

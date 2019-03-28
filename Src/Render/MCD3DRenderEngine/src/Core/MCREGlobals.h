@@ -27,8 +27,7 @@ namespace MC {
 		fashion is that there are too many singletons in to many translation units, preventing a known order of destruction.
 	*/
 
-	class MCREGlobals {
-	public:
+	struct MCREGlobals {
 		static MCD3D12RenderEngine *pRenderEngine;
 		static MCD3D               *pMCD3D;
 		static MCDXGI              *pMCDXGI;

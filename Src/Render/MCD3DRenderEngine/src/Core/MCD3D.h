@@ -5,7 +5,7 @@
 #include "MCDXGI.h"
 #include "MCUploadBuffer.h"
 #include "MCMath.h"
-#include "../../../../Common/MCCommon/src/Headers/MCFrame.h"
+#include "../../../../Common/MCCommon/src/Data/MCFrame.h"
 
 #include "MCMesh.h"
 
