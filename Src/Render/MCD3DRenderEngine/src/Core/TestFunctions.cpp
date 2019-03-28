@@ -55,7 +55,7 @@ namespace MCTest {
 	}
 
 	int GetIndexByPosition(const std::vector<MC::MCVertex1Color> *pVerts, const DirectX::XMFLOAT3 *pLocation) {
-		for (int x = 0; x < pVerts->size(); ++x) {
+		for (int x = 0; x < (int)pVerts->size(); ++x) {
 			auto currentPosition = (*pVerts)[x].Position;
 			if(MC::MCMath::Abs(pLocation->x - currentPosition.x) < 0.001
 			&& MC::MCMath::Abs(pLocation->y - currentPosition.y) < 0.001
@@ -70,10 +70,10 @@ namespace MCTest {
 		std::vector<MC::MCVertex1Color> tempVerts;
 		std::vector<uint16_t>           tempIndicies;
 
-		for (int i = 0; i < pVerts->size(); ++i)
+		for (int i = 0; i < (int)pVerts->size(); ++i)
 			tempVerts.push_back((*pVerts)[i]);
 
-		for (int i = 0; i < pIndicies->size(); ++i)
+		for (int i = 0; i < (int)pIndicies->size(); ++i)
 			tempIndicies.push_back((*pIndicies)[i]);
 
 		pVerts->clear();
@@ -256,7 +256,7 @@ namespace MCTest {
 		for (unsigned int i = 0; i < numSubdivisions; ++i) {
 			Subdivide(pVertDest, pIndDest);
 			if (i < 3) {
-				for (int x = 0; x < pVertDest->size(); ++x) {
+				for (int x = 0; x < (int)pVertDest->size(); ++x) {
 					(*pVertDest)[x].Color.x = MC::MCMath::RandF();
 					(*pVertDest)[x].Color.y = MC::MCMath::RandF();
 					(*pVertDest)[x].Color.z = MC::MCMath::RandF();
@@ -265,7 +265,7 @@ namespace MCTest {
 			}
 		}
 
-		for (int i = 0; i < pVertDest->size(); ++i) {
+		for (int i = 0; i < (int)pVertDest->size(); ++i) {
 
 			DirectX::XMVECTOR n = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&(*pVertDest)[i].Position));
 			DirectX::XMFLOAT3 r;

@@ -21,7 +21,7 @@ namespace MCXMLImp {
 			}
 			++it;
 		}
-		return string.size()>minSize && it == string.end();
+		return (int)string.size()>minSize && it == string.end();
 	}
 
 	inline bool isInteger(const std::string & s)

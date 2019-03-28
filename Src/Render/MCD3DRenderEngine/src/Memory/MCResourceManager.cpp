@@ -38,7 +38,7 @@ namespace MC {
 	Note:
 	'uploadBuffer' has to be kept alive until AFTER the command list is executed.
 	*/
-	MCResourceManager::tManagedKeyedHandle MCResourceManager::CreateDefaultBuffer(void *pInitData, unsigned __int64 sizeInBytes) {
+	MCResourceManager::tManagedKeyedHandle MCResourceManager::CreateDefaultBuffer(void *pInitData, UINT64 sizeInBytes) {
 
 		// the result.
 		ComPtr<ID3D12Resource> defaultBuffer;
@@ -70,7 +70,7 @@ namespace MC {
 
 		D3D12_SUBRESOURCE_DATA subResourceData = {};
 		subResourceData.pData      = pInitData;
-		subResourceData.RowPitch   = sizeInBytes;
+		subResourceData.RowPitch   = (LONG_PTR)sizeInBytes;
 		subResourceData.SlicePitch = subResourceData.RowPitch;
 
 		_pCommandList->ResourceBarrier(

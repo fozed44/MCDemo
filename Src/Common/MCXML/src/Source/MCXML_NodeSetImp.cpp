@@ -16,7 +16,7 @@ namespace MCXMLImp {
 		pugi::xpath_node xPathNode;
 
 		try {
-			if (pos >= _nodes.size()) {
+			if (pos >=(int32_t) _nodes.size()) {
 				XML_WARN("Failed to get element {0:d}, reason: pos out of range.", pos);
 				return nullptr;
 			}

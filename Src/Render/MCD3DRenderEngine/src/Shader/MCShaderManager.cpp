@@ -34,7 +34,7 @@ namespace MC {
 			MCTHROW(std::string("Error opening file ") + pFilename);
 
 		ComPtr<ID3DBlob> blob;
-		MCThrowIfFailed(D3DCreateBlob(size, &blob));
+		MCThrowIfFailed(D3DCreateBlob((size_t)size, &blob));
 
 		fin.read((char*)blob->GetBufferPointer(), size);
 		fin.close();

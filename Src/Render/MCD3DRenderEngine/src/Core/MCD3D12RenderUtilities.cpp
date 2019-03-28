@@ -38,8 +38,8 @@ namespace MCD3D12RenderUtilities {
 		));
 
 		D3D12_SUBRESOURCE_DATA subResourceData = {};
-		subResourceData.pData = initData;
-		subResourceData.RowPitch = byteSize;
+		subResourceData.pData      = initData;
+		subResourceData.RowPitch   = (LONG_PTR)byteSize;
 		subResourceData.SlicePitch = subResourceData.RowPitch;
 
 		pCommandList->ResourceBarrier(
