@@ -4,6 +4,7 @@
 
 #include "../../../../Common/MCCommon/src/Headers/MCManagedKeyedHandle.h"
 #include "../Core/MCD3D12Core.h"
+#include "../Core/MCREGlobals.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -28,6 +29,7 @@ namespace MC {
 
 	class MCResourceManager : public MCManagedKeyedHandleManager<MCResourceHandle, ID3D12Resource*, ComPtr<ID3D12Resource>, MCResourceManager> {
 	public:
+		MCResourceManager();
 		MCResourceManager(MCResourceManager&)              = delete;
 		MCResourceManager(MCResourceManager&&)             = delete;
 		MCResourceManager& operator= (MCResourceManager&)  = delete;
@@ -35,16 +37,9 @@ namespace MC {
 		~MCResourceManager() {}
 	public:
 		static MCResourceManager* Instance() {
-			static MCResourceManager instance;
-			return &instance;
+			return MCREGlobals::pResourceManager;
 		}
 	public:
-		/*
-			Initialize the resource manager. This method must be called before any other resource manager method. It also
-			must be called AFTER MCDXGI and MCD3D have been initialized.
-		*/
-		void Initialize();
-
 		MC_RESOURCE_MANAGER_ERROR GetResource(const MCResourceManager::tManagedKeyedHandle& handle, ID3D12Resource** ppResource);
 		MC_RESOURCE_MANAGER_ERROR GetResourceSync(const MCResourceManager::tManagedKeyedHandle& handle, ID3D12Resource **pResource);
 		ID3D12Resource *GetResourceSync(const MCResourceManager::tManagedKeyedHandle& handle);
@@ -65,6 +60,5 @@ namespace MC {
 		ComPtr<ID3D12GraphicsCommandList>  _pCommandList;
 		ComPtr<ID3D12Resource>             _pUploadBuffer;
 		__int64 _lastFenceValue;
-		MCResourceManager() {}
 	};
 }

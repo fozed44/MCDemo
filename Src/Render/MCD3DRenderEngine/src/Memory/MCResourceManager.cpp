@@ -1,16 +1,15 @@
 #include "MCResourceManager.h"
 #include "../Core/MCD3D.h"
-
+#include "../Core/MCREGlobals.h"
 
 namespace MC {
 
-	void MCResourceManager::Initialize() {
-		//assert(MCD3D::Instance()->Initialized());
-		assert(MCDXGI::Instance()->Initialized());
+	MCResourceManager::MCResourceManager() {
+		assert(MCREGlobals::pMCDXGI);
 
 		// Create a new allocator
 		MCThrowIfFailed(
-			MCDXGI::Instance()->Get3DDevice()->
+			MCREGlobals::pMCDXGI->Get3DDevice()->
 				CreateCommandAllocator(
 					D3D12_COMMAND_LIST_TYPE_DIRECT,
 					__uuidof(_pCommandAllocator),
@@ -20,7 +19,7 @@ namespace MC {
 
 		// Create a new command list.
 		MCThrowIfFailed(
-			MCDXGI::Instance()->Get3DDevice()->
+			MCREGlobals::pMCDXGI->Get3DDevice()->
 			CreateCommandList(
 				0,
 				D3D12_COMMAND_LIST_TYPE_DIRECT,
@@ -47,7 +46,7 @@ namespace MC {
 		MCThrowIfFailed(_pCommandAllocator->Reset());
 		MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));
 
-		MCThrowIfFailed(MCDXGI::Instance()->Get3DDevice()->CreateCommittedResource(
+		MCThrowIfFailed(MCREGlobals::pMCDXGI->Get3DDevice()->CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 			D3D12_HEAP_FLAG_NONE,
 			&CD3DX12_RESOURCE_DESC::Buffer(sizeInBytes),
@@ -59,7 +58,7 @@ namespace MC {
 
 		// In order to copy CPU memory data (initData) into a GPU default buffer (defaultBuffer) an intermediate upload
 		// buffer must be created.
-		MCThrowIfFailed(MCDXGI::Instance()->Get3DDevice()->CreateCommittedResource(
+		MCThrowIfFailed(MCREGlobals::pMCDXGI->Get3DDevice()->CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 			D3D12_HEAP_FLAG_NONE,
 			&CD3DX12_RESOURCE_DESC::Buffer(sizeInBytes),
@@ -104,9 +103,9 @@ namespace MC {
 
 		MCThrowIfFailed(_pCommandList->Close());
 
-		MCD3D::Instance()->ExecuteCommandList(_pCommandList.Get());
+		MCREGlobals::pMCD3D->ExecuteCommandList(_pCommandList.Get());
 
-		auto nextFence = MCD3D::Instance()->GetNewFenceValue();
+		auto nextFence = MCREGlobals::pMCD3D->GetNewFenceValue();
 
 		MCResourceHandle newHandle{ defaultBuffer.Get(), nextFence };
 
@@ -114,7 +113,7 @@ namespace MC {
 	}
 
 	MC_RESOURCE_MANAGER_ERROR MCResourceManager::GetResource(const MCResourceManager::tManagedKeyedHandle& handle, ID3D12Resource **ppResource) {
-		if (MCD3D::Instance()->GetCurrentFenceValue() < handle.Handle().FenceValue)
+		if (MCREGlobals::pMCD3D->GetCurrentFenceValue() < handle.Handle().FenceValue)
 			return MC_RESOURCE_MANAGER_ERROR_UPLOADING;
 		*ppResource = handle.Handle().pResource;
 		return MC_RESOURCE_MANAGER_ERROR_OK;
@@ -125,7 +124,7 @@ namespace MC {
 	}
 
 	ID3D12Resource *MCResourceManager::GetResourceSync(const MCResourceManager::tManagedKeyedHandle& handle) {
-		MCD3D::Instance()->WaitForFenceValue(handle.Handle().FenceValue);
+		MCREGlobals::pMCD3D->WaitForFenceValue(handle.Handle().FenceValue);
 		return handle.Handle().pResource;
 	}
 }

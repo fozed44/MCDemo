@@ -10,6 +10,9 @@
 #include "../../../Common/MCCommon/src/Headers/MCFrame.h"
 #include "../../../Common/MCCommon/src/Headers/MCCriticalSection.h"
 #include "../../../Render/MCD3DRenderEngine/src/Memory/MCResourceManager.h"
+#include "../../../Render/MCD3DRenderEngine/src/Configuration/RenderConfig.h"
+#include "../../../Render/MCD3DRenderEngine/src/Core/MCD3D12RenderEngine.h"
+#include "../../../Render/MCD3DRenderEngine/src/Core/MCREGlobals.h"
 #include <iostream>
 #include <thread>
 #include <atomic>
@@ -43,19 +46,24 @@ int Sandbox() {
 	MC::RENDER_CONFIG renderConfig;
 	MC::LoadRenderConfig(&renderConfig);
 
-	auto pRenderWindow = std::make_shared<MC::MCRenderWindow>(renderConfig);
+	//MC::MCD3D12RenderEngine::Initialize(&renderConfig);
+
+	auto t = std::make_unique<MC::MCD3D12RenderEngine>(&renderConfig);
+
+	/*auto pRenderWindow = std::make_shared<MC::MCRenderWindow>(renderConfig);
 
 	pRenderWindow->Init();
 
 	MC::MCDXGI::Instance()->Initialize(&renderConfig, pRenderWindow);
 
-	MC::MCD3D::Instance()->Initialize(renderConfig);
+	MC::MCD3D::Instance()->Initialize(renderConfig);*/
 
 	//MC::MCResourceManager::Instance()->Initialize();
 
-	pRenderWindow->RegisterResizeCallback(
+
+	MC::MCREGlobals::pRenderWindow->RegisterResizeCallback(
 		[]() {
-			MC::MCDXGI::Instance()->QueueResize();
+			MC::MCREGlobals::pMCDXGI->QueueResize();
 		}
 	);
 
@@ -79,12 +87,12 @@ int Sandbox() {
 		else {
 			masterTimer->Tick();
 
-			frame.CameraPosition.x = pRenderWindow->GetRadius()*sinf(pRenderWindow->GetPhi())*cosf(pRenderWindow->GetTheta());
-			frame.CameraPosition.z = pRenderWindow->GetRadius()*sinf(pRenderWindow->GetPhi())*sinf(pRenderWindow->GetTheta());
-			frame.CameraPosition.y = pRenderWindow->GetRadius()*cosf(pRenderWindow->GetPhi());
+			frame.CameraPosition.x = MC::MCREGlobals::pRenderWindow->GetRadius()*sinf(MC::MCREGlobals::pRenderWindow->GetPhi())*cosf(MC::MCREGlobals::pRenderWindow->GetTheta());
+			frame.CameraPosition.z = MC::MCREGlobals::pRenderWindow->GetRadius()*sinf(MC::MCREGlobals::pRenderWindow->GetPhi())*sinf(MC::MCREGlobals::pRenderWindow->GetTheta());
+			frame.CameraPosition.y = MC::MCREGlobals::pRenderWindow->GetRadius()*cosf(MC::MCREGlobals::pRenderWindow->GetPhi());
 			frame.Time = masterTimer->TotalTime();
 
-			MC::MCD3D::Instance()->RenderFrame(&frame);
+			MC::MCREGlobals::pMCD3D->RenderFrame(&frame);
 
 			frameCount++;
 
@@ -99,7 +107,7 @@ int Sandbox() {
 
 			std::string t = std::string("MCDemo Frame(") + std::to_string(frameCount) + std::string(") fps: ") + std::to_string(fps);
 
-			SetWindowTextA(pRenderWindow->hWnd(), t.c_str());
+			SetWindowTextA(MC::MCREGlobals::pRenderWindow->hWnd(), t.c_str());
 
 		}
 	}
@@ -164,5 +172,4 @@ int main(int argc, char ** argv) {
 		MessageBox(nullptr, ex.what().c_str(), "MCException", MB_OK);
 	}
 
-	MC::MCD3D12RenderUtilities::OrderedStaticDestroy();
 }

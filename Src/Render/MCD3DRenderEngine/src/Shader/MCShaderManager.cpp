@@ -6,10 +6,14 @@
 
 #include "../Core/d3dx12.h"
 #include "d3dcompiler.h"
+#include "../Core/MCREGlobals.h"
 
 namespace MC {
 
-	MCShaderManager::MCShaderManager() {}
+	MCShaderManager::MCShaderManager() {
+		// Make sure the shader manager is only created a single time.
+		assert(!MCREGlobals::pShaderManager);
+	}
 
 	MCShaderManager::~MCShaderManager() {}
 

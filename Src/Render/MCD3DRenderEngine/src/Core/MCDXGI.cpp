@@ -4,46 +4,23 @@
 #include "MCMath.h"
 #include "../../../../Common/MCLog/src/Headers/MCLog.h"
 #include "../../../../Common/MCCommon/src/Headers/Utility.h"
+#include "MCREGlobals.h"
+#include "MCRenderWindow.h"
 
 namespace MC {
 
-	MCDXGI::MCDXGI()
-		: _initialized(false),
-		  _initialConfiguration{},
-		  _pRenderWindow{ nullptr },
-		  _cachedAspectRatio{ 0 }
-	{}
-
-	MCDXGI::~MCDXGI(){}
-
-	void MCDXGI::Initialize(const RENDER_CONFIG *pConfig, std::shared_ptr<MCRenderWindow>& renderWindow) {
-
-		// save the pointer to the window wrapper for later. The first place we will use it is
-		// when we create the swap chain. ---- Remember that while CreateConfiguredOrDefaltSwapchain is
-		// defined in the MCDXGI class, CreateConfiguredOrDefaltSwapchain will actually be called by MCD3D
-		// during its initialization.
-		_pRenderWindow = renderWindow;
-
-		// Ensure that the render window has been initialized.
-		if (!_pRenderWindow->Initialized()) {
-			INIT_ERROR("Window wrapper must be initialized before calling MCDXGI.Init");
-			MCTHROW("Window wrapper must be initialized before calling MCDXGI.Init");
-		}
+	MCDXGI::MCDXGI() : _cachedAspectRatio{ 0 } {
+		assert(MCREGlobals::pRenderWindow);
 
 		MC_INFO("Begin DXGI initialization.");
 
-		InitConfiguration(pConfig);
 		InitDXGIFactory();
 		LogAdapters();
-
-		_initialized = true;
 
 		MC_INFO("End DXGI initialization.");
 	}
 
-	void MCDXGI::InitConfiguration(const RENDER_CONFIG *pConfig) {
-		const_cast<RENDER_CONFIG&>(_initialConfiguration) = *pConfig;
-	}
+	MCDXGI::~MCDXGI(){}
 
 	void MCDXGI::LogAdapters() {
 		int i = 0;
@@ -83,7 +60,6 @@ namespace MC {
 			MCSAFE_RELEASE(pOutput);
 			++i;
 		}
-
 	}
 
 	void MCDXGI::LogOutputDisplayModes(IDXGIOutput* pOutput, DXGI_FORMAT format) {
@@ -119,7 +95,7 @@ namespace MC {
 		//	This debug layer is enabled via the _initialCOnfiguration.DEBUG_ENABLE_DX_DEBUG flag
 		//  this flag also triggers CreateConfiguredOrDefault3DDevice to call EnableDebugLayer before
 		//  creating a new device.
-		if (_initialConfiguration.DEBUG_ENABLE_DX_DEBUG) {
+		if (MCREGlobals::InitialConfiguration.DEBUG_ENABLE_DX_DEBUG) {
 			INIT_INFO("Enabling debug for dxgi factory.");
 			dxgiCreateFlags |= DXGI_CREATE_FACTORY_DEBUG;
 		}
@@ -180,8 +156,8 @@ namespace MC {
 	IDXGIAdapter *MCDXGI::CreateConfiguredOrDefaultAdapter() {
 		assert(_pAdapter == nullptr);
 		ComPtr<IDXGIAdapter> tempAdapter;
-		INIT_INFO("Attempting to get configured adapter: {0:d}", _initialConfiguration.DISPLAY_ADAPTER_DEVICE_ID);
-		auto configuredAdapter = GetAdapterByDeviceID(_initialConfiguration.DISPLAY_ADAPTER_DEVICE_ID);
+		INIT_INFO("Attempting to get configured adapter: {0:d}", MCREGlobals::InitialConfiguration.DISPLAY_ADAPTER_DEVICE_ID);
+		auto configuredAdapter = GetAdapterByDeviceID(MCREGlobals::InitialConfiguration.DISPLAY_ADAPTER_DEVICE_ID);
 
 		if (configuredAdapter != nullptr) {
 			INIT_INFO("Adapter found.");
@@ -190,7 +166,7 @@ namespace MC {
 			return configuredAdapter;
 		}
 
-		INIT_INFO("Failed to locate adapter: {0:d}", _initialConfiguration.DISPLAY_ADAPTER_DEVICE_ID);
+		INIT_INFO("Failed to locate adapter: {0:d}", MCREGlobals::InitialConfiguration.DISPLAY_ADAPTER_DEVICE_ID);
 		INIT_INFO("Loading default adapter");
 
 		auto defaultAdapter = GetDefaultAdapter();
@@ -217,7 +193,7 @@ namespace MC {
 		//	This debug layer is enabled via the _initialCOnfiguration.DEBUG_ENABLE_DX_DEBUG flag
 		//  this flag also triggers CreateConfiguredOrDefault3DDevice to call EnableDebugLayer before
 		//  creating a new device.
-		if (_initialConfiguration.DEBUG_ENABLE_DX_DEBUG) {
+		if (MCREGlobals::InitialConfiguration.DEBUG_ENABLE_DX_DEBUG) {
 			INIT_INFO("Enabling debug for d3d12 device.");
 			EnableDXDebugLayer();
 		}
@@ -261,12 +237,12 @@ namespace MC {
 
 		// Ensure that the window configuration is valid... We will be using the dimensions of the window
 		// as the dimensions of the back buffer.
-		EnsureValidWindowConfig();
+		EnsureValidWindowConfig(MCREGlobals::InitialConfiguration);
 
 		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
 		swapChainDesc.BufferCount = FRAME_BUFFER_COUNT;
-		swapChainDesc.Width       = _initialConfiguration.DISPLAY_OUTPUT_WIDTH;
-		swapChainDesc.Height      = _initialConfiguration.DISPLAY_OUTPUT_HEIGHT;
+		swapChainDesc.Width       = MCREGlobals::InitialConfiguration.DISPLAY_OUTPUT_WIDTH;
+		swapChainDesc.Height      = MCREGlobals::InitialConfiguration.DISPLAY_OUTPUT_HEIGHT;
 		swapChainDesc.Format      = BACK_BUFFER_FORMAT;
 		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		swapChainDesc.SwapEffect  = DXGI_SWAP_EFFECT_FLIP_DISCARD;
@@ -276,10 +252,12 @@ namespace MC {
 		//	Add tearing support.
 
 		ComPtr<IDXGISwapChain1> swapChain;
+		
+		assert(MCREGlobals::pRenderWindow->hWnd());
 
 		MCThrowIfFailed(_pDXGIFactory->CreateSwapChainForHwnd(
 			pCommandQueue,
-			_pRenderWindow->hWnd(),
+			MCREGlobals::pRenderWindow->hWnd(),
 			&swapChainDesc,
 			nullptr,
 			nullptr,
@@ -298,16 +276,16 @@ namespace MC {
 	Examine the window width and height in _renderConfig. Throw an exception if the values do not
 	fall within an acceptable range.
 	*/
-	void MCDXGI::EnsureValidWindowConfig() {
-		if (_initialConfiguration.DISPLAY_OUTPUT_WIDTH <= 0
-			|| _initialConfiguration.DISPLAY_OUTPUT_WIDTH > MAX_VALID_WINDOW_WIDTH) {
-			INIT_ERROR("Detected an invalid window width ({0:d}) in the config file.", _initialConfiguration.DISPLAY_OUTPUT_WIDTH);
+	void MCDXGI::EnsureValidWindowConfig(const RENDER_CONFIG& renderConfig) const {
+		if (renderConfig.DISPLAY_OUTPUT_WIDTH <= 0
+			|| renderConfig.DISPLAY_OUTPUT_WIDTH > MAX_VALID_WINDOW_WIDTH) {
+			INIT_ERROR("Detected an invalid window width ({0:d}) in the config file.", renderConfig.DISPLAY_OUTPUT_WIDTH);
 			MCTHROW("Detected an invalid window width in the config file.");
 		}
 
-		if (_initialConfiguration.DISPLAY_OUTPUT_HEIGHT <= 0
-			|| _initialConfiguration.DISPLAY_OUTPUT_WIDTH > MAX_VALID_WINDOW_HEIGHT) {
-			INIT_ERROR("Detected an invalid window height ({0:d}) in the config file.", _initialConfiguration.DISPLAY_OUTPUT_HEIGHT);
+		if (renderConfig.DISPLAY_OUTPUT_HEIGHT <= 0
+			|| renderConfig.DISPLAY_OUTPUT_WIDTH > MAX_VALID_WINDOW_HEIGHT) {
+			INIT_ERROR("Detected an invalid window height ({0:d}) in the config file.", renderConfig.DISPLAY_OUTPUT_HEIGHT);
 			MCTHROW("Detected an invalid window height in the config file.");
 		}
 	}

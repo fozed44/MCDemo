@@ -3,7 +3,8 @@
 #include "d3dx12.h"
 
 #include "MCD3D.h"
-#include "RenderConfig.h"
+#include "../Configuration/RenderConfig.h"
+#include "MCREGlobals.h"
 #include "../../../../Common/MCLog/src/Headers/MCLog.h"
 #include "../../../../Common/MCCommon/src/Headers/Utility.h"
 #include "../../../../Common/MCCommon/src/Headers/Paths.h"
@@ -21,31 +22,20 @@ namespace MC {
 #pragma region CtorDtor
 
 	MCD3D::MCD3D() 
-		: _initialConfiguration{},
-		  _pObjectConstantBuffer(nullptr),
-		  _pElementLayoutDescriptions{},
-		  _initialized{ false } {}
-
-	MCD3D::~MCD3D() {}
-
-#pragma endregion 
-
-#pragma region Initialization
-
-	void MCD3D::Initialize(const RENDER_CONFIG& renderConfig) {
+		: _pObjectConstantBuffer(nullptr),
+		  _pElementLayoutDescriptions{} {
 		MC_INFO("Begin render initialization.");
 
 		MC_INFO("atomic fence is lock free: {0:d}", (int)_currentFence.is_lock_free());
 
-		assert(MCDXGI::Instance()->Initialized());
+		assert(MCREGlobals::pMCDXGI);
 
-		*const_cast<RENDER_CONFIG*>(&_initialConfiguration) = renderConfig;
 
-		EnsureValidWindowConfig();
+		EnsureValidWindowConfig(MCREGlobals::InitialConfiguration);
 
 		// initialize the current fence value
 		_currentFence = 0;
-		
+
 		Init3DDevice();
 		InitFence();
 		InitCommandQueue();
@@ -63,17 +53,14 @@ namespace MC {
 		InitMatrices();
 		InitFinalize();
 
-		MCResourceManager::Instance()->Initialize();
-
-		InitTest();
-
-		/*
-			Initialized() should now return true.
-		*/
-		_initialized = true;
-
 		MC_INFO("End render initialization.");
 	}
+
+	MCD3D::~MCD3D() {}
+
+#pragma endregion 
+
+#pragma region Initialization
 
 	void MCD3D::InitFence() {
 		INIT_TRACE("Begin d3d12 fence init.");
@@ -86,6 +73,7 @@ namespace MC {
 		_pFence->SetName(L"MCD3D fence.");
 		INIT_TRACE("End d3d12 fence init.");
 	}
+
 	void MCD3D::InitCommandQueue() {
 		INIT_TRACE("Begin d3d12 command queue init.");
 
@@ -103,6 +91,7 @@ namespace MC {
 
 		INIT_TRACE("End d3d12 command queue init.");
 	}
+
 	void MCD3D::InitCommandAllocator() {
 		INIT_TRACE("Begin d3d12 command allocator queue init.");
 
@@ -141,7 +130,7 @@ namespace MC {
 	void MCD3D::InitSwapChain() {
 		INIT_TRACE("Begin swapchain init.");
 
-		MCDXGI::Instance()->CreateConfiguredOrDefaltSwapchain(_pCommandQueue.Get());
+		MCREGlobals::pMCDXGI->CreateConfiguredOrDefaltSwapchain(_pCommandQueue.Get());
 
 		INIT_TRACE("End swapchain init.");
 	}
@@ -149,7 +138,7 @@ namespace MC {
 	void MCD3D::Init3DDevice() {
 		INIT_TRACE("Begin 3d device init.");
 
-		_pDevice = MCDXGI::Instance()->CreateConfiguredOrDefault3DDevice();
+		_pDevice = MCREGlobals::pMCDXGI->CreateConfiguredOrDefault3DDevice();
 
 		INIT_TRACE("End 3d device init.");
 	}
@@ -197,7 +186,7 @@ namespace MC {
 
 		// Create a render target view for each swap chain buffer
 		for (int n = 0; n < FRAME_BUFFER_COUNT; n++) {
-			MCDXGI::Instance()->GetFrameBuffer(n, __uuidof(_ppRenderTargets[n]), &_ppRenderTargets[n]);
+			MCREGlobals::pMCDXGI->GetFrameBuffer(n, __uuidof(_ppRenderTargets[n]), &_ppRenderTargets[n]);
 		}
 
 		INIT_TRACE("End init render targets.");
@@ -221,7 +210,7 @@ namespace MC {
 
 		int width, height;
 
-		MCDXGI::Instance()->GetFrameBufferSize(&width, &height);
+		MCREGlobals::pMCDXGI->GetFrameBufferSize(&width, &height);
 
 		D3D12_RESOURCE_DESC depthStencilBufferDesc = {};
 		depthStencilBufferDesc.Dimension        = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -306,18 +295,21 @@ namespace MC {
 	void MCD3D::InitViewPort() {
 		INIT_TRACE("Begin init view port.");
 
+		auto width = MCREGlobals::InitialConfiguration.DISPLAY_OUTPUT_WIDTH;
+		auto height = MCREGlobals::InitialConfiguration.DISPLAY_OUTPUT_HEIGHT;
+
 		_viewPort = {};
 		_viewPort.TopLeftX = 0.0f;
 		_viewPort.TopLeftY = 0.0f;
-		_viewPort.Width    = static_cast<float>(_initialConfiguration.DISPLAY_OUTPUT_WIDTH);
-		_viewPort.Height   = static_cast<float>(_initialConfiguration.DISPLAY_OUTPUT_HEIGHT);
+		_viewPort.Width    = static_cast<float>(width);
+		_viewPort.Height   = static_cast<float>(height);
 		_viewPort.MinDepth = 0.0f;
 		_viewPort.MaxDepth = 1.0f;
 
 		_scissorRect.top    = 0;
 		_scissorRect.left   = 0;
-		_scissorRect.right  = _initialConfiguration.DISPLAY_OUTPUT_WIDTH;
-		_scissorRect.bottom = _initialConfiguration.DISPLAY_OUTPUT_HEIGHT;
+		_scissorRect.right  = width;
+		_scissorRect.bottom = height;
 		/*_pCommandList->RSSetViewports(1, &_viewPort);*/
 
 		INIT_TRACE("End view port.");
@@ -368,16 +360,16 @@ namespace MC {
 		Examine the window width and height in _initialConfiguration. Throw an exception if the values do not
 		fall within an acceptable range.
 	*/
-	void MCD3D::EnsureValidWindowConfig() {
-		if (_initialConfiguration.DISPLAY_OUTPUT_WIDTH <= 0
-			|| _initialConfiguration.DISPLAY_OUTPUT_WIDTH > MAX_VALID_WINDOW_WIDTH) {
-			INIT_ERROR("Detected an invalid window width ({0:d}) in the config file.", _initialConfiguration.DISPLAY_OUTPUT_WIDTH);
+	void MCD3D::EnsureValidWindowConfig(const RENDER_CONFIG& renderConfig) const {
+		if (renderConfig.DISPLAY_OUTPUT_WIDTH <= 0
+			|| renderConfig.DISPLAY_OUTPUT_WIDTH > MAX_VALID_WINDOW_WIDTH) {
+			INIT_ERROR("Detected an invalid window width ({0:d}) in the config file.", renderConfig.DISPLAY_OUTPUT_WIDTH);
 			MCTHROW("Detected an invalid window width in the config file.");
 		}
 
-		if (_initialConfiguration.DISPLAY_OUTPUT_HEIGHT <= 0
-			|| _initialConfiguration.DISPLAY_OUTPUT_WIDTH > MAX_VALID_WINDOW_HEIGHT) {
-			INIT_ERROR("Detected an invalid window height ({0:d}) in the config file.", _initialConfiguration.DISPLAY_OUTPUT_HEIGHT);
+		if (renderConfig.DISPLAY_OUTPUT_HEIGHT <= 0
+			|| renderConfig.DISPLAY_OUTPUT_WIDTH > MAX_VALID_WINDOW_HEIGHT) {
+			INIT_ERROR("Detected an invalid window height ({0:d}) in the config file.", renderConfig.DISPLAY_OUTPUT_HEIGHT);
 			MCTHROW("Detected an invalid window height in the config file.");
 		}
 	}
@@ -629,7 +621,7 @@ namespace MC {
 
 		// TODO::
 		// Aspect ratio needs to be tracked
-		float aspectRatio = MCDXGI::Instance()->GetAspectRatio();
+		float aspectRatio = MCREGlobals::pMCDXGI->GetAspectRatio();
 		DirectX::XMMATRIX proj = DirectX::XMMatrixPerspectiveFovLH(0.25f*3.14159f, aspectRatio, 1.0f, 1000.0f);
 		DirectX::XMStoreFloat4x4(&_projectionMatrix, proj);
 
@@ -650,7 +642,7 @@ namespace MC {
 
 	void MCD3D::QuickDraw() {
 
-		if (MCDXGI::Instance()->IsResizeQueued())
+		if (MCREGlobals::pMCDXGI->IsResizeQueued())
 			Resize();
 
 		MCThrowIfFailed(_pCommandAllocator->Reset());
@@ -660,7 +652,7 @@ namespace MC {
 		_pCommandList->RSSetViewports(1, &_viewPort);
 		_pCommandList->RSSetScissorRects(1, &_scissorRect);
 
-		UINT currentBackBufferIndex = MCDXGI::Instance()->GetCurrentBackBufferIndex();
+		UINT currentBackBufferIndex = MCREGlobals::pMCDXGI->GetCurrentBackBufferIndex();
 
 		_pCommandList->ResourceBarrier(
 			1,
@@ -731,7 +723,7 @@ namespace MC {
 		ID3D12CommandList* cmdsLists[] = { _pCommandList.Get() };
 		_pCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
-		MCThrowIfFailed(MCDXGI::Instance()->Present());
+		MCThrowIfFailed(MCREGlobals::pMCDXGI->Present());
 
 		FlushCommandQueue();
 
@@ -828,7 +820,7 @@ namespace MC {
 		
 
 		assert(_pDevice);
-		assert(MCDXGI::Instance()->Initialized());
+		assert(MCREGlobals::pMCDXGI);
 		assert(_pCommandAllocator);
 
 		// Make sure the command queue is flushed.
@@ -842,7 +834,7 @@ namespace MC {
 
 		_pDepthStencil.Reset();
 
-		MCDXGI::Instance()->ForceResize();
+		MCREGlobals::pMCDXGI->ForceResize();
 
 		InitRenderTargets();
 		InitRenderTargetViews();
@@ -866,7 +858,7 @@ namespace MC {
 		FlushCommandQueue();
 
 		int newWidth, newHeight;
-		MCDXGI::Instance()->GetFrameBufferSize(&newWidth, &newHeight);
+		MCREGlobals::pMCDXGI->GetFrameBufferSize(&newWidth, &newHeight);
 
 		_viewPort = {};
 		_viewPort.TopLeftX = 0.0f;

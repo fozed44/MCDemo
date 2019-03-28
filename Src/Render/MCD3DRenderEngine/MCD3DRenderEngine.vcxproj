@@ -152,9 +152,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Configuration\MCRenderEngineConfiguration.h" />
     <ClInclude Include="src\Core\MCD3D12RenderEngine.h" />
-    <ClInclude Include="src\Configuration\MCRenderEngineConfigurationLoader.h" />
+    <ClInclude Include="src\Core\MCREGlobals.h" />
     <ClInclude Include="src\Render\FrameRenderer.h" />
     <ClInclude Include="src\Render\RenderManager.h" />
     <ClInclude Include="src\Render\RenderItem.h" />
@@ -177,7 +176,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\MCD3D12RenderEngine.cpp" />
-    <ClCompile Include="src\Configuration\MCRenderEngineConfigurationLoader.cpp" />
+    <ClCompile Include="src\Core\MCREGlobals.cpp" />
     <ClCompile Include="src\Render\FrameRenderer.cpp" />
     <ClCompile Include="src\Render\RenderManager.cpp" />
     <ClCompile Include="src\Render\RenderItem.cpp" />

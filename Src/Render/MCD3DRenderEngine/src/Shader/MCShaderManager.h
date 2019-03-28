@@ -3,6 +3,7 @@
 #include "../Core/MCD3D12Core.h"
 #include <map>
 #include "../../../../Common/MCCommon/Src/Headers/MCCriticalSection.h"
+#include "../Core/MCREGlobals.h"
 
 #include "../../../../Common/MCCommon/src/Headers/MCManagedHandle.h"
 
@@ -16,17 +17,16 @@ namespace MC {
 
 	class MCShaderManager : public MCManagedHandleManager<ID3DBlob*, ComPtr<ID3DBlob>, MCShaderManager> {
 	public:
+		MCShaderManager();
 		MCShaderManager(MCShaderManager&)              = delete;
 		MCShaderManager(MCShaderManager&&)             = delete;
 		MCShaderManager& operator= (MCShaderManager&)  = delete;
 		MCShaderManager& operator= (MCShaderManager&&) = delete;
 		~MCShaderManager();
 	private:
-		MCShaderManager();
 	public:
 		inline static MCShaderManager* Instance() {
-			static MCShaderManager instance;
-			return &instance;
+			return MCREGlobals::pShaderManager;
 		}
 	public:
 		MCShaderHandle Load(const char *pFilename);

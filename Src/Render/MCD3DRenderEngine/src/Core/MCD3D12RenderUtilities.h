@@ -34,6 +34,6 @@ namespace MCD3D12RenderUtilities {
 		Therefore, this method must be called before application shutdown (or before the framework singletons go out of scope)
 		to prevent exceptions.
 	*/
-	void OrderedStaticDestroy();
+	//void OrderedStaticDestroy();
 
 }}

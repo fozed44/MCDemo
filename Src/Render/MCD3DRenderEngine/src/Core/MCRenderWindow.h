@@ -2,21 +2,20 @@
 
 #include "MCD3D12Core.h"
 #include "DirectXMath.h"
-#include "RenderConfig.h"
+#include "../Configuration/RenderConfig.h"
+
 #include <functional>
 namespace MC {
 
 	class MCRenderWindow {
 	public:
-		MCRenderWindow(const RENDER_CONFIG& renderConfig);
+		MCRenderWindow();
 		MCRenderWindow(const MCRenderWindow&)            = delete;
 		MCRenderWindow(const MCRenderWindow&&)           = delete;
 		MCRenderWindow& operator=(const MCRenderWindow&) = delete;
 		~MCRenderWindow();
 
-		HWND Init();
-		inline bool Initialized() { return _initialized; }
-		inline HWND hWnd()        { return _hwnd; }
+		inline HWND hWnd() { return _hwnd; }
 
 		void RegisterResizeCallback(std::function<void()> callback) const;
 
@@ -36,12 +35,10 @@ namespace MC {
 		/*****************************************************/
 		void RegisterMCWindowClass();
 		void CreateMCWindow();
-		void EnsureValidWindowConfig();
+		void EnsureValidWindowConfig(const RENDER_CONFIG& renderConfig) const;
 
 	private:
-		bool                _initialized;
-		HWND                _hwnd;
-		const RENDER_CONFIG _renderConfig;
+		HWND _hwnd;
 	};
 
 }

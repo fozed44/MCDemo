@@ -1,10 +1,7 @@
 #pragma once
 
-
 #include "MCD3D12Core.h"
-#include "RenderConfig.h"
-#include "MCRenderWindow.h"
-
+#include "../Configuration/RenderConfig.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -12,43 +9,17 @@ namespace MC {
 
 	class MCDXGI {
 	public:
-		/*
-			MCDXGI is a singleton class. All copy constructors and assignment operators are deleted.
-		*/
-		MCDXGI(MCDXGI&)              = delete;
-		MCDXGI(MCDXGI&&)             = delete;
-		MCDXGI& operator= (MCDXGI&)  = delete;
-		MCDXGI& operator= (MCDXGI&&) = delete;
+		MCDXGI();
 		/*
 			Simple destructor - MCDXGI owns no heap memory.
 		*/
 		~MCDXGI();
-
-		/*
-			Retrieve the singleton instance.
-		*/
-		static inline MCDXGI* Instance() {
-			static MCDXGI instance;
-			return &instance;
-		}
-
-	private:
-		/*
-			MCDXGI is a singleton. The constructor is private.
-		*/
-		MCDXGI();
+		MCDXGI(MCDXGI&)              = delete;
+		MCDXGI(MCDXGI&&)             = delete;
+		MCDXGI& operator= (MCDXGI&)  = delete;
+		MCDXGI& operator= (MCDXGI&&) = delete;
 
 	public:
-		/*
-			Initialize must be called on the MCDXGI instance prior to any other methods. Initialize attaches a target
-			render window and a RENDER_CONFIG object to the MCDXGI instance.
-		*/
-		void Initialize(const RENDER_CONFIG* pConfig, std::shared_ptr<MCRenderWindow>& renderWindow);
-		
-		/*
-			Return true if the instance has been initialized (Initialize has been called). Otherwise, return false.
-		*/
-		inline bool Initialized() { return _initialized; }
 		
 		/*
 			Creates a new device based on the configuration and the render window supplied to the Initialize method.
@@ -79,9 +50,7 @@ namespace MC {
 				After calling Present. The frame at the index previously returned from GetCurrentBackBufferIndex
 				will now be drawn to the screen and GetCurrentBackBufferIndex will return a new index.
 		*/
-		HRESULT Present();
-
-		
+		HRESULT Present();		
 
 		/*
 			Query the memory info the adapter associated with the current ID3D12Device.
@@ -115,7 +84,7 @@ namespace MC {
 		       void ForceResize();
 
 		/*
-			Get the dimensions of (one of) the framebuffer. The number of buffers actually being used by
+			Get the dimensions of (one of) the frame buffer. The number of buffers actually being used by
 			the swapchain is not relevant because they all must be the same size.
 		*/
 		void GetFrameBufferSize(int *pWidth, int *pHeight);
@@ -129,19 +98,14 @@ namespace MC {
 		IDXGIAdapter *GetDefaultAdapter();
 		void LogOutputDisplayModes(IDXGIOutput *pOutput, DXGI_FORMAT format);
 		void InitDXGIFactory();
-		void InitConfiguration(const RENDER_CONFIG *pConfig);
-		void EnsureValidWindowConfig();
+		void EnsureValidWindowConfig(const RENDER_CONFIG& renderConfig) const;
 
 		void EnableDXDebugLayer();
-
-		bool                            _initialized;
-		const RENDER_CONFIG             _initialConfiguration;
-		std::shared_ptr<MCRenderWindow> _pRenderWindow;
-
+		
 		/*
 			Updated when a swapchain is created or resized.
 		*/
-		float                          _cachedAspectRatio;
+		float _cachedAspectRatio;
 
 		/*
 			Set to true by the QueueResize method.

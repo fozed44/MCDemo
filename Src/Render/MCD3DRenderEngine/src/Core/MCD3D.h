@@ -2,7 +2,6 @@
 
 #include "MCD3D12Core.h"
 
-#include "RenderConfig.h"
 #include "MCDXGI.h"
 #include "MCUploadBuffer.h"
 #include "MCMath.h"
@@ -29,41 +28,14 @@ namespace MC {
 
 	class MCD3D {
 	public:
-		/*
-			MC3D is a singleton. Delete all copy and assignment methods.
-		*/
+		MCD3D();
+		~MCD3D();
 		MCD3D(MCD3D&)              = delete;
 		MCD3D(MCD3D&&)             = delete;
 		MCD3D& operator= (MCD3D&)  = delete;
 		MCD3D& operator= (MCD3D&&) = delete;
 
-		/*
-			Simple destructor. MCD3D does not own any heap objects.
-		*/
-		~MCD3D();
-
-		/*
-			Access to the MCD3D singleton instance.
-		*/
-		inline static MCD3D *Instance() {
-			static MCD3D instance;
-			return &instance;
-		}
-
-	private:
-		/*
-			MCD3D is a singleton. The constructor is private.
-		*/
-		MCD3D();
-
 	public:
-		/*  Initializes the MCD3D instance. This method associates an initial configuration with the instance
-			and initializes the instance. This method must be the first method call to the instance. */
-		void Initialize(const RENDER_CONFIG& renderConfig);
-
-		/*	Return false, until the Initialize method has been called. */ 
-		bool Initialized() { return _initialized; }
-
 		/*	Get the current fence value. */
 		unsigned __int64 GetCurrentFenceValue() const;
 
@@ -144,14 +116,16 @@ namespace MC {
 		void InitFinalize();
 		void InitMatrices();
 
-		void EnsureValidWindowConfig();
+		void EnsureValidWindowConfig(const RENDER_CONFIG& renderConfig)const;
 
 		// Test methods that may be deleted
 		////////////////////////////////////////////////////////////
 
+	public:
 		/// Main Test init that is called by Init();
 		void InitTest();
 
+	private:
 		// Get test data into _boxVerts and _boxIndicies.
 		void InitBoxGeometry();
 
@@ -190,15 +164,11 @@ namespace MC {
 		void Resize();
 
 	private:
-		const RENDER_CONFIG _initialConfiguration;
-
 		// The device is actually created and owned by the MCDXGI. Specifically
 		// calling GXGIWrapper.CreateConfiguredOrDefault3DDevice or if the MCDXGI
 		// goes out of scope, this pointer will be destroyed.
 		ID3D12Device *_pDevice;
 
-		// Set to true at the end of the Initialize method.
-		bool _initialized;
 	};	
 	
 }

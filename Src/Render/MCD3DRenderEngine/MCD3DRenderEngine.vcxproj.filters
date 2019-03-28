@@ -72,13 +72,10 @@
     <ClInclude Include="src\Core\MCD3D12RenderEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Configuration\MCRenderEngineConfiguration.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Configuration\MCRenderEngineConfigurationLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Configuration\RenderConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\MCREGlobals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -122,10 +119,10 @@
     <ClCompile Include="src\Core\MCD3D12RenderEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Configuration\MCRenderEngineConfigurationLoader.cpp">
+    <ClCompile Include="src\Configuration\RenderConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Configuration\RenderConfig.cpp">
+    <ClCompile Include="src\Core\MCREGlobals.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
