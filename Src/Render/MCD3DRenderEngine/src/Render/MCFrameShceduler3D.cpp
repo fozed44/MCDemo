@@ -11,4 +11,9 @@ namespace MC {
 	{
 	}
 
+	void MCFrameScheduler3D::QueueFrame3D(MCFrame3D *pFrame) {
+		_ppExecuters[0]->QueueNextFrame(pFrame);
+
+	}
+
 }

@@ -18,3 +18,9 @@
 	leave __DEBUG_MCCRITICAL_SECTION__ defined unnecessarily.
 */
 //#define __DEBUG_MCCRITICAL_SECTION__
+
+/*
+	Defining __MC_THREAD_EXCEPTION_REPORTING__ turns on the wrapping of top level thread methods in try
+	catch blocks that will report caught exceptions to windows message boxes.
+*/
+#define __MC_THREAD_EXCEPTION_REPORTING__

@@ -25,11 +25,21 @@ namespace MC {
 
 	public:
 		MC_RESULT Update(float gameTime);
-		MC_RESULT QueueFrame3D(const MCFrame3D& frame);
-		MC_RESULT QueueFrame2D(const MCFrame2D& frame);
+
+		/*
+			Queue the frame to be rendered.
+
+			NOTE:
+			
+			If QueueFrame3D returns MC_RESULT_OK then the renderer has taken owner ship of the frame memory.
+			If, however, QueueFrame3d returns an fail result such as MC_RESULT_FAIL_NOT_READY then the caller
+			is still responsible for the frame memory.
+		*/
+		MC_RESULT QueueFrame3D(MCFrame3D *pFrame);
+		MC_RESULT QueueFrame2D(MCFrame2D *pFrame);
 
 	private:
-		MCFrameRendererExecuter3D _pFrameRenderers[FRAME_BUFFER_COUNT];
+		std::unique_ptr<MCFrameRendererExecuter3D> _ppExecuters[FRAME_BUFFER_COUNT];
 		std::queue<MCFrame3D> _frameQueue3D;
 		std::queue<MCFrame2D> _frameQueue2D;
 	};
