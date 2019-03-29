@@ -9,7 +9,7 @@ namespace MC {
 
 	enum MC_THREAD_CLASS {
 		MC_THREAD_CLASS_MAIN = 0,
-		MC_THREAD_CLASS_
+		MC_THREAD_CLASS_FRAME_RENDERER_EXECUTER = 1
 	};
 
 	class MCThreads {

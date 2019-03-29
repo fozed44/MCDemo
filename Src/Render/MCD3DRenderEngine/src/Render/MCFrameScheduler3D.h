@@ -4,7 +4,7 @@
 #include "../Core/MCD3D.h"
 #include "../../../../Common/MCCommon/src/Data/MCResult.h"
 #include "../../../../Common/MCCommon/src/Data/MCFrame.h"
-#include "MCFrameRenderer3D.h"
+#include "MCFrameRendererExecuter3D.h"
 
 #include <queue>
 
@@ -29,7 +29,7 @@ namespace MC {
 		MC_RESULT QueueFrame2D(const MCFrame2D& frame);
 
 	private:
-		MCFrameRenderer3D _pFrameRenderers[FRAME_BUFFER_COUNT];
+		MCFrameRendererExecuter3D _pFrameRenderers[FRAME_BUFFER_COUNT];
 		std::queue<MCFrame3D> _frameQueue3D;
 		std::queue<MCFrame2D> _frameQueue2D;
 	};

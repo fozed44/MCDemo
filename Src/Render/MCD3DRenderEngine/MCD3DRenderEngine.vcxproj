@@ -154,7 +154,7 @@
   <ItemGroup>
     <ClInclude Include="src\Core\MCD3D12RenderEngine.h" />
     <ClInclude Include="src\Core\MCREGlobals.h" />
-    <ClInclude Include="src\Render\MCFrameRenderer3D.h" />
+    <ClInclude Include="src\Render\MCFrameRendererExecuter3D.h" />
     <ClInclude Include="src\Render\MCFrameScheduler3D.h" />
     <ClInclude Include="src\Render\MCRenderItem3D.h" />
     <ClInclude Include="src\Memory\MCResourceManager.h" />
@@ -177,7 +177,7 @@
   <ItemGroup>
     <ClCompile Include="src\Core\MCD3D12RenderEngine.cpp" />
     <ClCompile Include="src\Core\MCREGlobals.cpp" />
-    <ClCompile Include="src\Render\MCFrameRenderer3D.cpp" />
+    <ClCompile Include="src\Render\MCFrameRendererExecuter3D.cpp" />
     <ClCompile Include="src\Render\MCFrameShceduler3D.cpp" />
     <ClCompile Include="src\Render\MCRenderItem3D.cpp" />
     <ClCompile Include="src\Memory\MCResourceManager.cpp" />
