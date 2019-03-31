@@ -27,10 +27,7 @@ namespace MC {
 	public:
 		MCManagedKeyedHandle() {
 			_handle = {};
-		}
-		MCManagedKeyedHandle(const tKeyedHandle& t) {
-			_handle = t;
-		}
+		}		
 		MCManagedKeyedHandle(MCManagedKeyedHandle&) = delete;
 		MCManagedKeyedHandle& operator= (MCManagedKeyedHandle&) = delete;
 		MCManagedKeyedHandle(MCManagedKeyedHandle&& o) {
@@ -54,47 +51,48 @@ namespace MC {
 				tDerivedManager::Instance()->RemoveRef(*this);
 		}
 
-		inline const tKeyedHandle Handle() const { return _handle; }
+	private:
+		MCManagedKeyedHandle(const tKeyedHandle& t) {
+			_handle = t;
+		}
+		inline const tKeyedHandle& Handle() const { return _handle; }
 
 		inline tKey Key() { return _handle.Key(); }
 
-		inline void Initialize(tKeyedHandle handle) {
+		/*inline void Initialize(tKeyedHandle handle) {
 			assert(!_handle.Key());
 			_handle = handle;
-		}
-
-		inline void Destroy() {
-			if (this->_handle.Key())
-				tDerivedManager::Instance()->RemoveRef(*this);
-
-			_handle = {};
-		}
+		}*/
 
 	private:
 		tKeyedHandle _handle;
+		template<typename T, typename U, typename V, typename w>
+		friend class MCManagedKeyedHandleManager;
+		friend MCManagedKeyedHandle<tKeyedHandle, tKey, tDerivedManager>;
 	};
 
 	template <typename tKeyedHandle, typename tKey, typename tManagedItem, typename tDerived>
 	class MCManagedKeyedHandleManager {
 	public:
+		typedef MCManagedKeyedHandle<tKeyedHandle, tKey, tDerived> HandleType;
+	public:
 		MCManagedKeyedHandleManager() { MCCriticalSection::InitializeLock(&_lock); }
 		virtual ~MCManagedKeyedHandleManager() {}
 
-		typedef MCManagedKeyedHandle<tKeyedHandle, tKey, tDerived> tManagedKeyedHandle;
 
 	protected:
-		tManagedKeyedHandle CreateRef(tKeyedHandle& handle, tManagedItem &contextItem) {
+		HandleType CreateRef(tKeyedHandle& handle, tManagedItem &contextItem) {
 			ENTER_CRITICAL_SECTION(MCManagedHandleManager_CreateRef, &_lock);
 			auto itemIterator = _itemMap.find(handle.Key());
 			if (itemIterator == _itemMap.end())
 				_itemMap.emplace(handle.Key(), ManagedContext{ contextItem, 1 });
 			else
 				itemIterator->second.RefCount++;
-			return tManagedKeyedHandle(handle);
+			return HandleType(handle);
 			EXIT_CRITICAL_SECTION;
 		}
 
-		void RemoveRef(tManagedKeyedHandle& handle) {
+		void RemoveRef(HandleType& handle) {
 			ENTER_CRITICAL_SECTION(MCManagedHandleManager_RemoveRef, &_lock);
 			auto itemIterator = _itemMap.find(handle.Key());
 			assert(itemIterator->second.RefCount);
@@ -106,6 +104,9 @@ namespace MC {
 			EXIT_CRITICAL_SECTION;
 		}
 
+		const tKeyedHandle& UnwrapHandle(const HandleType& handle) const {
+			return handle.Handle();
+		}
 
 	protected:
 		struct ManagedContext {

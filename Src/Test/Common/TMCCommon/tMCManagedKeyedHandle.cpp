@@ -40,7 +40,7 @@ namespace TMCCommon
 			static ManagedKeyedPersonManager instance;
 			return &instance;
 		}
-		inline ManagedKeyedPersonManager::tManagedKeyedHandle NewHandle(std::shared_ptr<Person>& p) {
+		inline ManagedKeyedPersonManager::HandleType NewHandle(std::shared_ptr<Person>& p) {
 			return CreateRef(PersonHandle{ p.get(), 0 }, p);
 		}
 	};
@@ -55,7 +55,7 @@ namespace TMCCommon
 			auto testPerson = std::make_shared<Person>(1, 1);
 			auto pTestPerson = testPerson.get();
 			{
-				ManagedKeyedPersonManager::tManagedKeyedHandle testHandle;
+				ManagedKeyedPersonManager::HandleType testHandle;
 				// No handles have been created; there the reference count should be 0.
 				Assert::AreEqual(0, ManagedKeyedPersonManager::Instance()->GetRefCount(pTestPerson));
 				testHandle = ManagedKeyedPersonManager::Instance()->NewHandle(testPerson);
@@ -63,7 +63,7 @@ namespace TMCCommon
 				Assert::AreEqual(1, ManagedKeyedPersonManager::Instance()->GetRefCount(pTestPerson));
 			}
 			{
-				ManagedKeyedPersonManager::tManagedKeyedHandle testHandle2;
+				ManagedKeyedPersonManager::HandleType testHandle2;
 				// Test handle has gone out of scope, we should be back to 0.
 				Assert::AreEqual(0, ManagedKeyedPersonManager::Instance()->GetRefCount(pTestPerson));
 
@@ -71,7 +71,7 @@ namespace TMCCommon
 				// We have created another handle for testPerson, reference count should be 1.
 				Assert::AreEqual(1, ManagedKeyedPersonManager::Instance()->GetRefCount(pTestPerson));
 			}
-			ManagedKeyedPersonManager::tManagedKeyedHandle testHandle3;
+			ManagedKeyedPersonManager::HandleType testHandle3;
 			// testHandle1 and testHandle2 have been destructed, we should once again be at 0.
 			Assert::AreEqual(0, ManagedKeyedPersonManager::Instance()->GetRefCount(pTestPerson));
 		}
@@ -82,8 +82,8 @@ namespace TMCCommon
 			auto pTestPerson = testPerson.get();
 			{
 				// This test will create 2 handles for the same test person.
-				ManagedKeyedPersonManager::tManagedKeyedHandle testHandle;
-				ManagedKeyedPersonManager::tManagedKeyedHandle testHandle2;
+				ManagedKeyedPersonManager::HandleType testHandle;
+				ManagedKeyedPersonManager::HandleType testHandle2;
 				// NO handles have been created yet, so the reference count should be at 0.
 				Assert::AreEqual(0, ManagedKeyedPersonManager::Instance()->GetRefCount(pTestPerson));
 
@@ -104,11 +104,11 @@ namespace TMCCommon
 			auto testPerson = std::make_shared<Person>(1, 1);
 			auto pTestPerson = testPerson.get();
 			{
-				ManagedKeyedPersonManager::tManagedKeyedHandle testHandle;
+				ManagedKeyedPersonManager::HandleType testHandle;
 				{
 					// This test will create 2 handles for the same test person.
 					// But one handle exists in the outer scope while one exists in the inner scope.
-					ManagedKeyedPersonManager::tManagedKeyedHandle testHandle2;
+					ManagedKeyedPersonManager::HandleType testHandle2;
 
 					// NO handles have been created yet, so the reference count should be at 0.
 					Assert::AreEqual(0, ManagedKeyedPersonManager::Instance()->GetRefCount(pTestPerson));
@@ -136,14 +136,14 @@ namespace TMCCommon
 			{
 				// Calling NewHandle (which called MCManagedHandleManager.CreateRef) and storing the result in
 				// the SAME handle should keep the reference count at 1.
-				ManagedKeyedPersonManager::tManagedKeyedHandle testHandle;
+				ManagedKeyedPersonManager::HandleType testHandle;
 				Assert::AreEqual(0, ManagedKeyedPersonManager::Instance()->GetRefCount(pTestPerson));
 				testHandle = ManagedKeyedPersonManager::Instance()->NewHandle(testPerson);
 				Assert::AreEqual(1, ManagedKeyedPersonManager::Instance()->GetRefCount(pTestPerson));
 				testHandle = ManagedKeyedPersonManager::Instance()->NewHandle(testPerson);
 				Assert::AreEqual(1, ManagedKeyedPersonManager::Instance()->GetRefCount(pTestPerson));
 			}
-			ManagedKeyedPersonManager::tManagedKeyedHandle testHandle;
+			ManagedKeyedPersonManager::HandleType testHandle;
 			Assert::AreEqual(0, ManagedKeyedPersonManager::Instance()->GetRefCount(pTestPerson));
 		}
 
@@ -153,16 +153,16 @@ namespace TMCCommon
 			auto pTestPerson = testPerson.get();
 			std::vector<std::thread> threads;
 			{
-				ManagedKeyedPersonManager::tManagedKeyedHandle testHandle;
+				ManagedKeyedPersonManager::HandleType testHandle;
 				for (int x = 0; x < 1000; x++) {
 					threads.push_back(std::thread([&]()
 					{
 						{
-							ManagedKeyedPersonManager::tManagedKeyedHandle testHandle2;
+							ManagedKeyedPersonManager::HandleType testHandle2;
 							{
 								// This test will create 2 handles for the same test person.
 								// But one handle exists in the outer scope while one exists in the inner scope.
-								ManagedKeyedPersonManager::tManagedKeyedHandle testHandle3;
+								ManagedKeyedPersonManager::HandleType testHandle3;
 								testHandle = ManagedKeyedPersonManager::Instance()->NewHandle(testPerson);
 								testHandle2 = ManagedKeyedPersonManager::Instance()->NewHandle(testPerson);
 								testHandle3 = ManagedKeyedPersonManager::Instance()->NewHandle(testPerson);

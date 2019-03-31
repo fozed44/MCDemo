@@ -876,8 +876,8 @@ namespace MC {
 
 #pragma endregion
 
-	void MCD3D::OrderedStaticDestroy() {
+	/*void MCD3D::OrderedStaticDestroy() {
 		_hVertexShader.Destroy();
 		_hPixelShader.Destroy();
-	}
+	}*/
 }

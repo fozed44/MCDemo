@@ -38,7 +38,7 @@ namespace MC {
 	Note:
 	'uploadBuffer' has to be kept alive until AFTER the command list is executed.
 	*/
-	MCResourceManager::tManagedKeyedHandle MCResourceManager::CreateDefaultBuffer(void *pInitData, UINT64 sizeInBytes) {
+	MCResourceManager::HandleType MCResourceManager::CreateDefaultBuffer(void *pInitData, UINT64 sizeInBytes) {
 
 		// the result.
 		ComPtr<ID3D12Resource> defaultBuffer;
@@ -112,19 +112,20 @@ namespace MC {
 		return this->CreateRef(newHandle, defaultBuffer);
 	}
 
-	MC_RESULT MCResourceManager::GetResource(const MCResourceManager::tManagedKeyedHandle& handle, ID3D12Resource **ppResource) {
-		if (MCREGlobals::pMCD3D->GetCurrentFenceValue() < handle.Handle().FenceValue)
+	MC_RESULT MCResourceManager::GetResource(const MCResourceManager::HandleType& handle, ID3D12Resource **ppResource) {
+		if (MCREGlobals::pMCD3D->GetCurrentFenceValue() < UnwrapHandle(handle).FenceValue)
 			return MC_RESULT_FAIL_UPLOADING;
-		*ppResource = handle.Handle().pResource;
+		*ppResource = UnwrapHandle(handle).pResource;
 		return MC_RESULT_OK;
 	}
-	MC_RESULT MCResourceManager::GetResourceSync(const MCResourceManager::tManagedKeyedHandle& handle, ID3D12Resource **ppResource) {
+	MC_RESULT MCResourceManager::GetResourceSync(const MCResourceManager::HandleType& handle, ID3D12Resource **ppResource) {
 		*ppResource = GetResourceSync(handle);
 		return MC_RESULT_OK;
 	}
 
-	ID3D12Resource *MCResourceManager::GetResourceSync(const MCResourceManager::tManagedKeyedHandle& handle) {
-		MCREGlobals::pMCD3D->WaitForFenceValue(handle.Handle().FenceValue);
-		return handle.Handle().pResource;
+	ID3D12Resource *MCResourceManager::GetResourceSync(const MCResourceManager::HandleType& handle) {
+		auto unwrappedHandle = UnwrapHandle(handle);
+		MCREGlobals::pMCD3D->WaitForFenceValue(unwrappedHandle.FenceValue);
+		return unwrappedHandle.pResource;
 	}
 }

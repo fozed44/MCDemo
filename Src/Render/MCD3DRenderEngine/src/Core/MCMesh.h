@@ -292,9 +292,6 @@ namespace MC {
 		~MCStaticAllocatedMesh16() {}
 	public:
 		void Upload(TVERTEX_TYPE *pVert, UINT vSize, unsigned short *pIndicies, UINT iSize) {
-			assert(_hVertexBuffer.Handle().pResource == nullptr);
-			assert(_hIndexBuffer.Handle().pResource == nullptr);
-
 			// Store the meta information about this mesh.
 			_vertexByteStride     = sizeof(TVERTEX_TYPE);
 			_vertexBufferByteSize = vSize;
@@ -351,8 +348,8 @@ namespace MC {
 		}
 
 	private:
-		MCResourceManager::tManagedKeyedHandle _hVertexBuffer;
-		MCResourceManager::tManagedKeyedHandle _hIndexBuffer;
+		MCResourceManager::HandleType _hVertexBuffer;
+		MCResourceManager::HandleType _hIndexBuffer;
 
 	private:
 		UINT        _vertexByteStride;

@@ -134,6 +134,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Data\MCLinearBuffer.h" />
     <ClInclude Include="src\Data\MCPrimitives.h" />
     <ClInclude Include="src\Data\MCResult.h" />
     <ClInclude Include="src\Data\MCThreads.h" />
@@ -143,10 +144,12 @@
     <ClInclude Include="src\Data\MCFrame.h" />
     <ClInclude Include="src\Headers\MCManagedKeyedHandle.h" />
     <ClInclude Include="src\Headers\MCManagedHandle.h" />
+    <ClInclude Include="src\Headers\MCManagedLinearBufferHandle.h" />
     <ClInclude Include="src\Headers\Paths.h" />
     <ClInclude Include="src\Headers\Utility.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Data\MCResult.cpp" />
     <ClCompile Include="src\Data\MCThreads.cpp" />
     <ClCompile Include="src\Source\MasterTimer.cpp" />
     <ClCompile Include="src\Source\MCCriticalSection.cpp" />

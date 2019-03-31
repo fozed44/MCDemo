@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Core/MCD3D12Core.h"
-#include "../Core/MCD3D.h"
+#include "../../Core/MCD3D12Core.h"
+#include "../../Core/MCD3D.h"
 #include "MCFrameRenderer3D.h"
 
 #include <atomic>

@@ -5,6 +5,14 @@
 #include <map>
 #include <tuple>
 
+#include "../Headers/GlobalSwitches.h"
+
+#ifdef __ENABLE_THREAD_ASSERT__
+#define MCTHREAD_ASSERT(x) MC::MCThreads::Assert((x))
+#else
+#define MCTHREAD_ASSERT(x)
+#endif __ENABLE_THREAD_ASSERT__
+
 namespace MC {
 
 	enum MC_THREAD_CLASS {

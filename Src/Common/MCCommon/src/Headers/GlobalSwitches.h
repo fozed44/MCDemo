@@ -24,3 +24,9 @@
 	catch blocks that will report caught exceptions to windows message boxes.
 */
 #define __MC_THREAD_EXCEPTION_REPORTING__
+
+/*
+	Defining __ENABLE_THREAD_ASSERT__ causes the MCTHREAD_ASSERT macro to expand to a call to MC::MCThreads::Assert.
+	Without this #define, the MCTHREAD_ASSERT macro expands to nothing.
+*/
+#define __ENABLE_THREAD_ASSERT__

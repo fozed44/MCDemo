@@ -43,7 +43,7 @@ namespace MC {
 	}
 
 	D3D12_SHADER_BYTECODE MCShaderManager::GetByteCode(const MCShaderHandle &handle) {
-		auto pBlob = handle.Handle();
+		auto pBlob = UnwrapHandle(handle);
 		return D3D12_SHADER_BYTECODE{
 			static_cast<BYTE*>(pBlob->GetBufferPointer()),
 			pBlob->GetBufferSize()

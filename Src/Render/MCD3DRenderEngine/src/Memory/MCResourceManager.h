@@ -30,21 +30,21 @@ namespace MC {
 			return MCREGlobals::pResourceManager;
 		}
 	public:
-		MC_RESULT GetResource(const MCResourceManager::tManagedKeyedHandle& handle, ID3D12Resource** ppResource);
-		MC_RESULT GetResourceSync(const MCResourceManager::tManagedKeyedHandle& handle, ID3D12Resource **pResource);
-		ID3D12Resource *GetResourceSync(const MCResourceManager::tManagedKeyedHandle& handle);
+		MC_RESULT GetResource(const MCResourceManager::HandleType& handle, ID3D12Resource** ppResource);
+		MC_RESULT GetResourceSync(const MCResourceManager::HandleType& handle, ID3D12Resource **pResource);
+		ID3D12Resource *GetResourceSync(const MCResourceManager::HandleType& handle);
 		
 
 		//MCResourceHandle CreateResource(MC_RESOURCE_MANAGER_RESOURCE_TYPE, size_t sizeInBytes);
 		
-		inline MCResourceManager::tManagedKeyedHandle CreateDefaultBufferTemp(void *pInitData, unsigned __int64 sizeInBytes)
+		inline MCResourceManager::HandleType CreateDefaultBufferTemp(void *pInitData, unsigned __int64 sizeInBytes)
 		{
 			return CreateDefaultBuffer(pInitData, sizeInBytes);
 		}
 
 	private:
 		MCResourceHandle CreateConstantBuffer(size_t sizeInBytes);
-		MCResourceManager::tManagedKeyedHandle CreateDefaultBuffer(void *pInitData, unsigned __int64 sizeInBytes);
+		MCResourceManager::HandleType CreateDefaultBuffer(void *pInitData, unsigned __int64 sizeInBytes);
 	private:
 		ComPtr<ID3D12CommandAllocator>     _pCommandAllocator;
 		ComPtr<ID3D12GraphicsCommandList>  _pCommandList;

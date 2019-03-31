@@ -69,16 +69,19 @@
     <ClInclude Include="src\Core\MCREGlobals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Render\MCRenderItem3D.h">
+    <ClInclude Include="src\Render\Render3D\MCFrameRenderer3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Render\MCFrameScheduler3D.h">
+    <ClInclude Include="src\Render\Render3D\MCFrameRendererExecuter3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Render\MCFrameRendererExecuter3D.h">
+    <ClInclude Include="src\Render\Render3D\MCFrameScheduler3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Render\MCFrameRenderer3D.h">
+    <ClInclude Include="src\Render\Render3D\MCRenderItem3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Render\MCRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -119,16 +122,19 @@
     <ClCompile Include="src\Core\MCREGlobals.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Render\MCRenderItem3D.cpp">
+    <ClCompile Include="src\Render\Render3D\MCFrameRenderer3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Render\MCFrameShceduler3D.cpp">
+    <ClCompile Include="src\Render\Render3D\MCFrameRendererExecuter3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Render\MCFrameRendererExecuter3D.cpp">
+    <ClCompile Include="src\Render\Render3D\MCRenderItem3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Render\MCFrameRenderer3D.cpp">
+    <ClCompile Include="src\Render\MCRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Render\Render3D\MCFrameScheduler3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

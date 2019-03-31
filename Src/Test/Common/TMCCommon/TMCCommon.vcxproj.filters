@@ -32,5 +32,8 @@
     <ClCompile Include="tMCManagedKeyedHandle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="tMCLinearBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

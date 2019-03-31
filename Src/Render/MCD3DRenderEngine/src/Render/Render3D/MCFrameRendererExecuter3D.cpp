@@ -1,6 +1,6 @@
 #include "MCFrameRendererExecuter3D.h"
-#include "../../../../Common/MCCommon/src/Data/MCThreads.h"
-#include "../../../../Common/MCCommon/src/Headers/GlobalSwitches.h"
+#include "../../../../../Common/MCCommon/src/Data/MCThreads.h"
+#include "../../../../../Common/MCCommon/src/Headers/GlobalSwitches.h"
 
 
 namespace MC {
@@ -23,6 +23,7 @@ namespace MC {
 
 		assert(_readyForNextFrame.load()); // should ALWAYS be true;
 		_readyForNextFrame.store(false);
+		return MC_RESULT_OK;
 	}
 
 	void MCFrameRendererExecuter3D::RenderLoop() {
