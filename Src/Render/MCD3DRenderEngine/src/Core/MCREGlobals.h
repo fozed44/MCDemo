@@ -10,6 +10,8 @@ namespace MC {
 	class MCRenderWindow;
 	class MCResourceManager;
 	class MCShaderManager;
+	class MCPipelineStateObjectManager;
+	class MCRootSignatureManager;
 	
 
 	/*
@@ -28,12 +30,14 @@ namespace MC {
 	*/
 
 	struct MCREGlobals {
-		static MCD3D12RenderEngine *pRenderEngine;
-		static MCD3D               *pMCD3D;
-		static MCDXGI              *pMCDXGI;
-		static MCRenderWindow      *pRenderWindow;
-		static MCResourceManager   *pResourceManager;
-		static MCShaderManager     *pShaderManager;
+		static MCD3D12RenderEngine          *pRenderEngine;
+		static MCD3D                        *pMCD3D;
+		static MCDXGI                       *pMCDXGI;
+		static MCRenderWindow               *pRenderWindow;
+		static MCResourceManager            *pResourceManager;
+		static MCShaderManager              *pShaderManager;
+		static MCPipelineStateObjectManager *pPSOManager;
+		static MCRootSignatureManager       *pRSManager;
 		static RENDER_CONFIG        InitialConfiguration;
 	};
 }

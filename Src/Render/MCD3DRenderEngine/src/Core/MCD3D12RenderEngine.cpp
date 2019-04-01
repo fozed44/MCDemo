@@ -26,7 +26,11 @@ namespace MC {
 	  _pShaderManager = std::make_unique<MCShaderManager>();
 	  MCREGlobals::pShaderManager = _pShaderManager.get();
 
-	  _pMCD3D->InitTest();
+	  _pPSOManager = std::make_unique<MCPipelineStateObjectManager>();
+	  MCREGlobals::pPSOManager = _pPSOManager.get();
+
+	  _pRSManager = std::make_unique<MCRootSignatureManager>();
+	  MCREGlobals::pRSManager = _pRSManager.get();
 
 	  MCREGlobals::pRenderEngine = this;
   }
