@@ -84,6 +84,9 @@
     <ClInclude Include="src\Render\MCRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Render\Common\MCFrameRendererBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Shader\MCShaderManager.cpp">
@@ -135,6 +138,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Render\Render3D\MCFrameScheduler3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Render\Common\MCFrameRendererBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

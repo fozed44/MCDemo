@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Render\Common\MCFrameRendererBase.h" />
     <ClInclude Include="src\Render\MCRenderer.h" />
     <ClInclude Include="src\Render\Render3D\MCFrameRenderer3D.h" />
     <ClInclude Include="src\Core\MCD3D12RenderEngine.h" />
@@ -177,6 +178,7 @@
     <ClInclude Include="src\Shader\MCShaderManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Render\Common\MCFrameRendererBase.cpp" />
     <ClCompile Include="src\Render\MCRenderer.cpp" />
     <ClCompile Include="src\Render\Render3D\MCFrameRenderer3D.cpp" />
     <ClCompile Include="src\Core\MCD3D12RenderEngine.cpp" />
