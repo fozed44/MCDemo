@@ -15,11 +15,18 @@ namespace MC {
 	MCFrameRendererBase::MCFrameRendererBase(const std::string& name, unsigned int frameIndex) 
 		: _name{ name },
 		  _frameIndex{ frameIndex } {
+
+		// A Frame renderer should only be constructed on the main thread.
+		MCThreads::Assert(MC_THREAD_CLASS_MAIN);
+
 		InitializeBase();
 	}
 
 
-	MCFrameRendererBase::~MCFrameRendererBase() { }
+	MCFrameRendererBase::~MCFrameRendererBase() { 
+		// A Frame renderer should only be destructed on the main thread.
+		MCThreads::Assert(MC_THREAD_CLASS_MAIN);
+	}
 
 #pragma region Initialization
 
@@ -28,9 +35,6 @@ namespace MC {
 
 		InitializeCommandObjects();
 		InitializeViewPort();
-
-		// Set the render target alias.
-		AcquireRenderTargetAlias();
 
 		INIT_TRACE("End initialization of renderer {0}.", _name);
 	}
@@ -84,10 +88,24 @@ namespace MC {
 		INIT_TRACE("End view port.");
 	}
 
-	void MCFrameRendererBase::AcquireRenderTargetAlias() {
-		// TODO:
-		//	Take care of multi-threading support.
-		_pRenderTargetAlias = MCREGlobals::pMCD3D->GetRenderTarget(_frameIndex);
+#pragma endregion
+
+#pragma region set / unset the rendering flag
+
+	void MCFrameRendererBase::BeginRender() {
+		MCTHREAD_ASSERT(MC_THREAD_CLASS_FRAME_RENDERER_EXECUTER);
+		assert(!_rendering.load());
+		_rendering.store(true);
+	}
+
+	void MCFrameRendererBase::EndRender() {
+		MCTHREAD_ASSERT(MC_THREAD_CLASS_FRAME_RENDERER_EXECUTER);
+		assert(_rendering.load());
+		_rendering.store(false);
+	}
+
+	bool MCFrameRendererBase::Rendering() {
+		return _rendering.load();
 	}
 
 #pragma endregion

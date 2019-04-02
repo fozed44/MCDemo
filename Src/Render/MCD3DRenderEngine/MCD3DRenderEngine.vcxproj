@@ -154,6 +154,7 @@
   <ItemGroup>
     <ClInclude Include="src\PipelineStateObject\MCPipelineStateObjectManager.h" />
     <ClInclude Include="src\Render\Common\MCFrameRendererBase.h" />
+    <ClInclude Include="src\Render\Common\MCFrameRenderTargetInfo.h" />
     <ClInclude Include="src\Render\MCRenderer.h" />
     <ClInclude Include="src\Render\Render3D\MCFrameRenderer3D.h" />
     <ClInclude Include="src\Core\MCD3D12RenderEngine.h" />
@@ -176,6 +177,7 @@
     <ClInclude Include="src\Configuration\RenderConfig.h" />
     <ClInclude Include="src\Core\TestFunctions.h" />
     <ClInclude Include="src\Core\MCRenderWindow.h" />
+    <ClInclude Include="src\Render\Render3D\MCSpaceRenderer\MCSpaceRenderer.h" />
     <ClInclude Include="src\RootSignature\MCRootSignatureManager.h" />
     <ClInclude Include="src\Shader\MCShaderManager.h" />
   </ItemGroup>
@@ -190,6 +192,7 @@
     <ClCompile Include="src\Render\Render3D\MCFrameScheduler3D.cpp" />
     <ClCompile Include="src\Render\Render3D\MCRenderItem3D.cpp" />
     <ClCompile Include="src\Memory\MCResourceManager.cpp" />
+    <ClCompile Include="src\Render\Render3D\MCSpaceRenderer\MCSpaceRenderer.cpp" />
     <ClCompile Include="src\RootSignature\MCRootSignatureManager.cpp" />
     <ClCompile Include="src\Shader\MCShaderManager.cpp" />
     <ClCompile Include="src\Core\MCD3D.cpp" />

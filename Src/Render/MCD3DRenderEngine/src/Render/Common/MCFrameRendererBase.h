@@ -23,9 +23,14 @@ namespace MC {
 		const std::string& Name() const { return _name; }
 		      std::string& Name()       { return _name; }
 
-	protected:
+	public: /* set / unset the _rendering flag */
 
-		void AcquireRenderTargetAlias();
+		// Should be called by the derived class on the render thread (at the beginning and end of the
+		// render method) . The render flag can then be used for DEBUGING concurrency with the 
+		// render method.
+		void BeginRender();
+		void EndRender();
+		bool Rendering();
 
 	protected: /* D3D12 Objects */
 
@@ -33,8 +38,6 @@ namespace MC {
 		ComPtr<ID3D12CommandAllocator>    _pCommandAllocator;
 
 		ComPtr<ID3D12DescriptorHeap>      _CBVDescriptorHeap;
-
-		ID3D12Resource*                   _pRenderTargetAlias; 
 
 		DirectX::XMFLOAT4X4 _projectionMatrix;
 
@@ -64,6 +67,11 @@ namespace MC {
 		/* Associates this renderer with an index into the MCD3D._ppRenderTargets array. Assigned once
 		   and only once during construction. */
 		const unsigned int _frameIndex;
+
+		/* True between calls to BeginRender and EndRender */
+		std::atomic_bool   _rendering;
+
+		std::atomic<unsigned __int64> _renderFence;
 	};
 
 }

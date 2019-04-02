@@ -205,8 +205,20 @@ namespace MC {
 		/* Execute the command lists. */
 		void ExecuteCommandLists(int numCommandLists, ID3D12CommandList* const *pCommandLists) const;
 
+	public: /* RenderTarget / DepthStencil access */
 		/* Get a pointer to a specific render target. */
-		ID3D12Resource* GetRenderTarget(unsigned int frameBufferIndex);
+		ID3D12Resource* GetRenderTarget(unsigned int index);
+
+		/* Get a descriptor to a specific render target. */
+		D3D12_CPU_DESCRIPTOR_HANDLE GetRenderTargetCPUHandle(unsigned int index);
+		D3D12_GPU_DESCRIPTOR_HANDLE GetRenderTargetGPUHandle(unsigned int index);
+
+		/* Get a pointer to a specific depth stencil. There will be one less DS than RT. */
+		ID3D12Resource* GetDepthStencil(unsigned int index);
+
+		/* Get a CPU descriptor to a specific depth stencil. */
+		D3D12_CPU_DESCRIPTOR_HANDLE GetDepthStencilCPUHandle(unsigned int index);
+		D3D12_GPU_DESCRIPTOR_HANDLE GetDepthStencilGPUHandle(unsigned int index);
 
 	private:
 

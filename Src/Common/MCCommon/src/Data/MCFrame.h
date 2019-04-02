@@ -5,6 +5,10 @@
 
 namespace MC {
 
+	struct MCFrameRenderOptions {
+		bool EnableUI;
+		bool WireFrame;
+	};
 
 	typedef char* MCFrameItemHandle;
 
@@ -44,20 +48,19 @@ namespace MC {
 		The renderer determines the frame type based on the MC_FRAME_TYPE FrameType member
 		of all frame structures. This is why all structures contain this property as the first field.
 	*/
-	struct MCFrame3D {
+	struct MCFrame {
+		/* The frame type. */
 		MC_FRAME_TYPE FrameType;
-		// The current frame time;
+		/* The current frame time. */
 		float Time;
-		// The camera position.
+		/* The camera position. */
 		MCCamera Camera;
-		std::vector<MCSimpleFrameRenderItem3D> SimpleRenderItems;
 	};
 
-	struct MCFrame2D {
-		MC_FRAME_TYPE FrameType;
-		float Time;
-		MCCamera Camera;
-		std::vector<MCSimpleFrameRenderItem2D> SimpleRenderItems;
-	};
+	struct MCFrame3D {};
+
+	struct MCSpaceFrame : MCFrame3D {};
+
+	struct MCFrame2D : MCFrame { };
 
 }

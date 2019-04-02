@@ -1152,10 +1152,53 @@ void MCD3D::InitFinalize() {
 
 #pragma endregion 
 
-ID3D12Resource* MCD3D::GetRenderTarget(unsigned int frameIndex) {
-	assert(frameIndex < FRAME_BUFFER_COUNT);
-	return _ppRenderTargets[frameIndex].Get();
+#pragma region RenderTarget / DepthStencil access
+
+/* Access the specific render target associated with 'index' */
+ID3D12Resource* MCD3D::GetRenderTarget(unsigned int index) {
+	assert(index < FRAME_BUFFER_COUNT);
+	return _ppRenderTargets[index].Get();
 }
+
+/* Access the CPU descriptor handle for the render target associated with 'index' */
+D3D12_CPU_DESCRIPTOR_HANDLE MCD3D::GetRenderTargetCPUHandle(unsigned int index) {
+	assert(index < FRAME_BUFFER_COUNT);
+	CD3DX12_CPU_DESCRIPTOR_HANDLE handle(_pRTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	handle.Offset(index, _RTVDescriptorSize);
+	return (D3D12_CPU_DESCRIPTOR_HANDLE)handle;
+}
+
+/* Access the GPU descriptor handle for the render target associated with 'index' */
+D3D12_GPU_DESCRIPTOR_HANDLE MCD3D::GetRenderTargetGPUHandle(unsigned int index) {
+	assert(index < FRAME_BUFFER_COUNT);
+	CD3DX12_GPU_DESCRIPTOR_HANDLE handle(_pRTVDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+	handle.Offset(index, _RTVDescriptorSize);
+	return (D3D12_GPU_DESCRIPTOR_HANDLE)handle;
+}
+
+/* Access to the DepthStencil associated with 'index' */
+ID3D12Resource* MCD3D::GetDepthStencil(unsigned int index) {
+	assert(index < FRAME_BUFFER_COUNT - 1);
+	return _ppDepthStencils[index].Get();
+}
+
+/* Access the CPU descriptor handle for the depth stencil associated with 'index' */
+D3D12_CPU_DESCRIPTOR_HANDLE MCD3D::GetDepthStencilCPUHandle(unsigned int index) {
+	assert(index < FRAME_BUFFER_COUNT - 1);
+	CD3DX12_CPU_DESCRIPTOR_HANDLE handle(_pDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+	handle.Offset(index, _DSVDescriptorSize);
+	return (D3D12_CPU_DESCRIPTOR_HANDLE)handle;
+}
+
+/* Access the CPU descriptor handle for the depth stencil associated with 'index' */
+D3D12_GPU_DESCRIPTOR_HANDLE MCD3D::GetDepthStencilGPUHandle(unsigned int index) {
+	assert(index < FRAME_BUFFER_COUNT - 1);
+	CD3DX12_GPU_DESCRIPTOR_HANDLE handle(_pDSVDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+	handle.Offset(index, _DSVDescriptorSize);
+	return (D3D12_GPU_DESCRIPTOR_HANDLE)handle;
+}
+
+#pragma endregion
 
 
 #pragma region fencing
@@ -1193,8 +1236,7 @@ unsigned __int64 MCD3D::GetNewFenceValue() {
 /*
 Create a new fence, then block until that fence completes.
 */
-void MCD3D::FlushCommandQueue()
-{
+void MCD3D::FlushCommandQueue() {
 	auto nextFenceValue = GetNewFenceValue();
 	WaitForFenceValue(nextFenceValue);
 }
