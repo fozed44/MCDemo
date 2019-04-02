@@ -30,9 +30,8 @@ namespace MC {
 	};
 
 	typedef enum MC_FRAME_TYPE {
-		MC_FRAME_TYPE_INVALID = 0,
-		MC_FRAME_TYPE_MCFRAME_3D,
-		MC_FRAME_TYPE_MCFRAME_2D
+		MC_FRAME_TYPE_INVALID       = 0,
+		MC_FRAME_TYPE_MCFRAME_SPACE = 1
 	} MC_FRAME_TYPE;
 
 	/*
@@ -57,10 +56,10 @@ namespace MC {
 		MCCamera Camera;
 	};
 
-	struct MCFrame3D {};
+	struct MCFrame3D : public MCFrame {};
 
-	struct MCSpaceFrame : MCFrame3D {};
+	struct MCSpaceFrame : public MCFrame3D {};
 
-	struct MCFrame2D : MCFrame { };
+	struct MCFrame2D : public MCFrame { };
 
 }

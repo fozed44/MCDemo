@@ -90,24 +90,4 @@ namespace MC {
 
 #pragma endregion
 
-#pragma region set / unset the rendering flag
-
-	void MCFrameRendererBase::BeginRender() {
-		MCTHREAD_ASSERT(MC_THREAD_CLASS_FRAME_RENDERER_EXECUTER);
-		assert(!_rendering.load());
-		_rendering.store(true);
-	}
-
-	void MCFrameRendererBase::EndRender() {
-		MCTHREAD_ASSERT(MC_THREAD_CLASS_FRAME_RENDERER_EXECUTER);
-		assert(_rendering.load());
-		_rendering.store(false);
-	}
-
-	bool MCFrameRendererBase::Rendering() {
-		return _rendering.load();
-	}
-
-#pragma endregion
-
 }

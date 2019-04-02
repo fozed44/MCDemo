@@ -10,7 +10,7 @@ namespace MC {
 	{
 	public: /* ctor / dtor / assignment */
 		MCFrameRenderer3D(const std::string& name, unsigned int frameIndex);
-		~MCFrameRenderer3D();
+		virtual ~MCFrameRenderer3D();
 		MCFrameRenderer3D(MCFrameRenderer3D&)              = delete;
 		MCFrameRenderer3D(MCFrameRenderer3D&&)             = delete;
 		MCFrameRenderer3D& operator= (MCFrameRenderer3D&)  = delete;

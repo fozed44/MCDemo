@@ -9,10 +9,20 @@ using Microsoft::WRL::ComPtr;
 
 namespace MC {
 
+	struct MCFrameRendererTargetInfo {
+		ID3D12Resource *pRenderTarget;
+		D3D12_CPU_DESCRIPTOR_HANDLE hCPURenderTarget;
+		D3D12_GPU_DESCRIPTOR_HANDLE hGPURenderTarget;
+
+		ID3D12Resource *pDepthStencil;
+		D3D12_CPU_DESCRIPTOR_HANDLE hCPUDepthStencil;
+		D3D12_GPU_DESCRIPTOR_HANDLE hGPUDepthStencil;
+	};
+
 	class MCFrameRendererBase {
 	public: /* ctor / dtor / assignment*/
 		MCFrameRendererBase(const std::string& name, unsigned int frameIndex);
-		~MCFrameRendererBase();
+		virtual ~MCFrameRendererBase();
 		MCFrameRendererBase(MCFrameRendererBase&)              = delete;
 		MCFrameRendererBase(MCFrameRendererBase&&)             = delete;
 		MCFrameRendererBase& operator= (MCFrameRendererBase&)  = delete;
@@ -23,14 +33,8 @@ namespace MC {
 		const std::string& Name() const { return _name; }
 		      std::string& Name()       { return _name; }
 
-	public: /* set / unset the _rendering flag */
-
-		// Should be called by the derived class on the render thread (at the beginning and end of the
-		// render method) . The render flag can then be used for DEBUGING concurrency with the 
-		// render method.
-		void BeginRender();
-		void EndRender();
-		bool Rendering();
+	public: /* RenderFrame */
+		virtual unsigned __int64 RenderFrame(void *pVframe, const MCFrameRendererTargetInfo& frameTarget) = 0;
 
 	protected: /* D3D12 Objects */
 
@@ -67,11 +71,6 @@ namespace MC {
 		/* Associates this renderer with an index into the MCD3D._ppRenderTargets array. Assigned once
 		   and only once during construction. */
 		const unsigned int _frameIndex;
-
-		/* True between calls to BeginRender and EndRender */
-		std::atomic_bool   _rendering;
-
-		std::atomic<unsigned __int64> _renderFence;
 	};
 
 }

@@ -2,22 +2,21 @@
 
 #include "../../../../../../Common/MCCommon/src/Data/MCResult.h"
 #include "../../../../../../Common/MCCommon/src/Data/MCFrame.h"
-#include "../../Common/MCFrameRenderTargetInfo.h"
 #include "../MCFrameRenderer3D.h"
 
 namespace MC {
 
-	class MCSpaceRenderer : MCFrameRenderer3D {
+	class MCSpaceRenderer : public MCFrameRenderer3D {
 	public: /* ctor */
 		MCSpaceRenderer(const std::string& name, unsigned int frameIndex);
-		~MCSpaceRenderer();
+		virtual ~MCSpaceRenderer();
 		MCSpaceRenderer(MCSpaceRenderer&)              = delete;
 		MCSpaceRenderer(MCSpaceRenderer&&)             = delete;
 		MCSpaceRenderer& operator= (MCSpaceRenderer&)  = delete;
 		MCSpaceRenderer& operator= (MCSpaceRenderer&&) = delete;
 
 	public: /* Render Frame */
-		void RenderFrame(std::unique_ptr<MCSpaceFrame> pFrame, const MCFrameRenderTargetInfo& targetInfo);
+		unsigned __int64 RenderFrame(void *pVframe, const MCFrameRendererTargetInfo& targetInfo) override;
 
 	public: /* Render options. */
 

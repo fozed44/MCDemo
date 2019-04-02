@@ -60,13 +60,15 @@ namespace MC {
 
 #pragma region Draw
 
-	void MCSpaceRenderer::RenderFrame(
-		std::unique_ptr<MCSpaceFrame> pFrame,
-		const MCFrameRenderTargetInfo& targetInfo
+	unsigned __int64 MCSpaceRenderer::RenderFrame(
+		void *pVframe,
+		const MCFrameRendererTargetInfo& targetInfo
 	) {
-		BeginRender();
 		// Render should only be called by a render executer, on an executer thread.
 		MCTHREAD_ASSERT(MC_THREAD_CLASS_FRAME_RENDERER_EXECUTER);
+
+		std::unique_ptr<MCSpaceFrame> pFrame(static_cast<MCSpaceFrame*>(pVframe));
+		assert(pFrame->FrameType == MC_FRAME_TYPE_MCFRAME_SPACE);
 
 		MCThrowIfFailed(_pCommandAllocator->Reset());
 		MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));
@@ -114,7 +116,7 @@ namespace MC {
 
 		MCREGlobals::pMCD3D->ExecuteCommandList(_pCommandList.Get());
 
-		EndRender();
+		return MCREGlobals::pMCD3D->GetNewFenceValue();
 	}
 
 #pragma endregion
@@ -124,7 +126,6 @@ namespace MC {
 	void MCSpaceRenderer::SetRenderOptions(const MCFrameRenderOptions& renderOptions) {
 		// SetRenderOptions is not thread safe. It must be synchronized by some
 		// outside force.
-		assert(!Rendering());
 		_renderOptions = renderOptions;
 	}
 
