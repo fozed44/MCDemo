@@ -9,12 +9,21 @@ namespace MC {
 
 	MCFrameRendererExecuter::MCFrameRendererExecuter()
 		: _readyForNextFrame{ true },
-		  _executionStage   { MCFRAME_RENDERER_EXECUTION_STAGE_IDLE }
-	{
+		  _exitFlag{ false },
+		  _executionStage   { MCFRAME_RENDERER_EXECUTION_STAGE_IDLE } {
+
+		// An executer should only be created on the main thread.
+		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
+
 		_pThread = std::make_unique<std::thread>(&MCFrameRendererExecuter::RenderLoop, this);
 	}
 
-	MCFrameRendererExecuter::~MCFrameRendererExecuter() { }
+	MCFrameRendererExecuter::~MCFrameRendererExecuter() {
+		// An executer should only be destroyed on the main thread.
+		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
+
+		KillRenderer();
+	}
 
 	MC_RESULT MCFrameRendererExecuter::QueueNextFrame(void *pFrame, const MCFrameRendererTargetInfo& targetInfo) {
 
@@ -36,6 +45,12 @@ namespace MC {
 		_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_IDLE);
 	}
 
+	void MCFrameRendererExecuter::KillRenderer() {
+		_exitFlag = true;
+		if(_pThread && _pThread->joinable())
+			_pThread->join();
+	}
+
 	void MCFrameRendererExecuter::RenderLoop() {
 
 #ifdef __MC_THREAD_EXCEPTION_REPORTING__
@@ -47,7 +62,7 @@ namespace MC {
 			MC_THREAD_CLASS_FRAME_RENDERER_EXECUTER
 		);
 
-		while (1) {
+		while (!_exitFlag) {
 			if (!_readyForNextFrame.load() && _executionStage.load() == MCFRAME_RENDERER_EXECUTION_STAGE_IDLE) {
 				std::unique_ptr<void> _pCurrentFrame = std::move(_pNextFrame);
 				_readyForNextFrame.store(true);

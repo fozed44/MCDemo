@@ -30,6 +30,8 @@ namespace MC {
 		MC_RESULT QueueNextFrame(void *pNextFrame, const MCFrameRendererTargetInfo& targetInfo);
 		void NotifyFramePresented();
 
+		void KillRenderer();
+
 	public: /* query */
 
 		MCFRAME_RENDERER_EXECUTION_STAGE QueryExecutionStage() const {
@@ -41,6 +43,7 @@ namespace MC {
 	private:
 		std::atomic<bool>					_readyForNextFrame;
 		std::atomic<unsigned int>           _executionStage;
+		bool                                _exitFlag;
 
 		void RenderLoop();
 		std::unique_ptr<std::thread>       _pThread;

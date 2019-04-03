@@ -18,27 +18,60 @@ namespace MC {
 	MCFrameScheduler::~MCFrameScheduler() {
 	}
 
+#pragma region Public
+
+	MC_RESULT MCFrameScheduler::ScheduleFrame(void *pFrame) {
+		if (_frameQueue.size() >= FRAME_QUEUE_SIZE)
+			return MC_RESULT_FAIL_NOT_READY;
+
+		ENTER_CRITICAL_SECTION(MCFrameScheduler_PresentNext, &_lock);
+			if (_frameQueue.size() >= FRAME_QUEUE_SIZE)
+				return MC_RESULT_FAIL_NOT_READY;
+			_frameQueue.push(std::make_unique<void>(pFrame));
+		EXIT_CRITICAL_SECTION
+	}
+
+	void MCFrameScheduler::UpdateSchedule() {
+		TryPresentNext();
+		TryQueueNextFrame();
+	}
+
 #pragma endregion
 
-	MC_RESULT MCFrameScheduler::QueueFrame(void *pFrame) {
+#pragma endregion Queue and Present
+
+	void MCFrameScheduler::TryQueueNextFrame() {
+		if (_frameQueue.empty())
+			return;
+
+		int readyExecuterIndex;
+		if ((readyExecuterIndex = GetReadyExecuterIndex()) == -1)
+			return;
+
+		std::unique_ptr<void> nextFramePtr;
+
+
+		ENTER_CRITICAL_SECTION(MCFrameScheduler_UpdateSchedule, &_lock);
+			if (_frameQueue.empty())
+				return;
+			nextFramePtr = std::move(_frameQueue.front);
+			_frameQueue.pop();
+		EXIT_CRITICAL_SECTION
+	}
+
+	void MCFrameScheduler::QueueFrame(void *pFrame, unsigned int executerIndex) {
 		// This method is not thread safe. It can only be called from the main
 		// thread.
 		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
-
-		unsigned int readyExecuterIndex;
-		if (readyExecuterIndex = GetReadyExecuterIndex())
-			return MC_RESULT_FAIL_NOT_READY;
 
 		IncrementCounters();
 
 		MCFrameRendererTargetInfo targetInfo;
 		GetRenderTargetInfo(&targetInfo);
 
-		auto queryFrameResult = _ppExecuters[readyExecuterIndex]->QueueNextFrame(pFrame, targetInfo);
-		_presentQueue.push(readyExecuterIndex);
+		auto queryFrameResult = _ppExecuters[executerIndex]->QueueNextFrame(pFrame, targetInfo);
+		_presentQueue.push(executerIndex);
 		assert(queryFrameResult == MC_RESULT_OK);
-
-		return MC_RESULT_OK;
 	}
 
 	void MCFrameScheduler::IncrementCounters() {
@@ -63,21 +96,17 @@ namespace MC {
 		pInfo->hGPUDepthStencil = MCREGlobals::pMCD3D->GetDepthStencilGPUHandle(_nextDepthBufferIndex);		
 	}
 
-	MC_RESULT MCFrameScheduler::PresentNext() {
+	void MCFrameScheduler::TryPresentNext() {
 		if (_presentQueue.empty())
-			return MC_RESULT_FAIL_NOT_READY;
+			return;
 
 		unsigned int nextExecuterIndex = _presentQueue.front();
 
 		if (_ppExecuters[nextExecuterIndex]->QueryExecutionStage() == MCFRAME_RENDERER_EXECUTION_STAGE_WAITING_TO_PRESENT) {
 			MCREGlobals::pMCDXGI->Present();
 			_ppExecuters[nextExecuterIndex]->NotifyFramePresented();
-			ENTER_CRITICAL_SECTION(MCFrameScheduler_PresentNext, &_lock);
+			
 			_presentQueue.pop();
-			EXIT_CRITICAL_SECTION;
-			return MC_RESULT_OK;
 		}
-
-		return MC_RESULT_FAIL_NOT_READY;
 	}
 }
