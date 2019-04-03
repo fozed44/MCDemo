@@ -8,7 +8,7 @@ namespace MC {
 #pragma region ctor
 
 	MCFrameRenderer3D::MCFrameRenderer3D(const std::string& name, unsigned int frameIndex) 
-		: MCFrameRendererBase(name, frameIndex) {
+		: MCFrameRenderer(name, frameIndex) {
 		InitializeRenderer3D();
 	}
 

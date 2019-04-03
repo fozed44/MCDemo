@@ -2,7 +2,7 @@
 
 #include "../../Core/MCD3D12Core.h"
 #include "../../Core/MCD3D.h"
-#include "MCFrameRenderer3D.h"
+#include "MCFrameRenderer.h"
 
 #include <atomic>
 #include <thread>
@@ -16,19 +16,27 @@ namespace MC {
 		MCFRAME_RENDERER_EXECUTION_STAGE_WAITING_TO_PRESENT
 	} MCFRAME_RENDERER_EXECUTION_STAGE;
 
-	class MCFrameRendererExecuter3D {
-	public:
-		MCFrameRendererExecuter3D();
-		~MCFrameRendererExecuter3D();
+	class MCFrameRendererExecuter {
+	public: /* ctor */
+		MCFrameRendererExecuter();
+		~MCFrameRendererExecuter();
 
-		MCFrameRendererExecuter3D(MCFrameRendererExecuter3D&)			  = delete;
-		MCFrameRendererExecuter3D(MCFrameRendererExecuter3D&&)			  = delete;
-		MCFrameRendererExecuter3D& operator=(MCFrameRendererExecuter3D&)  = delete;
-		MCFrameRendererExecuter3D& operator=(MCFrameRendererExecuter3D&&) = delete;
+		MCFrameRendererExecuter(MCFrameRendererExecuter&)			  = delete;
+		MCFrameRendererExecuter(MCFrameRendererExecuter&&)			  = delete;
+		MCFrameRendererExecuter& operator=(MCFrameRendererExecuter&)  = delete;
+		MCFrameRendererExecuter& operator=(MCFrameRendererExecuter&&) = delete;
 
-	public:
+	public: /* Render control */
 		MC_RESULT QueueNextFrame(void *pNextFrame, const MCFrameRendererTargetInfo& targetInfo);
 		void NotifyFramePresented();
+
+	public: /* query */
+
+		MCFRAME_RENDERER_EXECUTION_STAGE QueryExecutionStage() const {
+			return (MCFRAME_RENDERER_EXECUTION_STAGE)_executionStage.load();
+		}
+
+		bool QueryReadyForNextFrame() const { return _readyForNextFrame.load(); }
 
 	private:
 		std::atomic<bool>					_readyForNextFrame;
@@ -36,12 +44,10 @@ namespace MC {
 
 		void RenderLoop();
 		std::unique_ptr<std::thread>       _pThread;
-		std::unique_ptr<MCFrameRenderer3D> _pRenderer;
+		std::unique_ptr<MCFrameRenderer>   _pRenderer;
 
 		std::unique_ptr<void>   	       _pNextFrame;
 		MCFrameRendererTargetInfo          _nextTargetInfo;
-	private:
-		static std::atomic_uint s_nextThreadID;
 	};
 
 }

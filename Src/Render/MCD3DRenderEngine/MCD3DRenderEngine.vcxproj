@@ -153,13 +153,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\PipelineStateObject\MCPipelineStateObjectManager.h" />
-    <ClInclude Include="src\Render\Common\MCFrameRendererBase.h" />
+    <ClInclude Include="src\Render\Common\MCFrameRenderer.h" />
     <ClInclude Include="src\Render\MCRenderer.h" />
     <ClInclude Include="src\Render\Render3D\MCFrameRenderer3D.h" />
     <ClInclude Include="src\Core\MCD3D12RenderEngine.h" />
     <ClInclude Include="src\Core\MCREGlobals.h" />
-    <ClInclude Include="src\Render\Render3D\MCFrameRendererExecuter3D.h" />
-    <ClInclude Include="src\Render\Render3D\MCFrameScheduler3D.h" />
+    <ClInclude Include="src\Render\Common\MCFrameRendererExecuter.h" />
+    <ClInclude Include="src\Render\Common\MCFrameScheduler.h" />
     <ClInclude Include="src\Render\Render3D\MCRenderItem3D.h" />
     <ClInclude Include="src\Memory\MCResourceManager.h" />
     <ClInclude Include="src\Core\MCD3D12RenderUtilities.h" />
@@ -182,13 +182,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\PipelineStateObject\MCPipelineStateObjectManager.cpp" />
-    <ClCompile Include="src\Render\Common\MCFrameRendererBase.cpp" />
+    <ClCompile Include="src\Render\Common\MCFrameRenderer.cpp" />
     <ClCompile Include="src\Render\MCRenderer.cpp" />
     <ClCompile Include="src\Render\Render3D\MCFrameRenderer3D.cpp" />
     <ClCompile Include="src\Core\MCD3D12RenderEngine.cpp" />
     <ClCompile Include="src\Core\MCREGlobals.cpp" />
-    <ClCompile Include="src\Render\Render3D\MCFrameRendererExecuter3D.cpp" />
-    <ClCompile Include="src\Render\Render3D\MCFrameScheduler3D.cpp" />
+    <ClCompile Include="src\Render\Common\MCFrameRendererExecuter.cpp" />
+    <ClCompile Include="src\Render\Common\MCFrameScheduler.cpp" />
     <ClCompile Include="src\Render\Render3D\MCRenderItem3D.cpp" />
     <ClCompile Include="src\Memory\MCResourceManager.cpp" />
     <ClCompile Include="src\Render\Render3D\MCSpaceRenderer\MCSpaceRenderer.cpp" />

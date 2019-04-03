@@ -1,4 +1,4 @@
-#include "MCFrameRendererExecuter3D.h"
+#include "MCFrameRendererExecuter.h"
 #include "../../../../../Common/MCCommon/src/Data/MCThreads.h"
 #include "../../../../../Common/MCCommon/src/Headers/GlobalSwitches.h"
 
@@ -7,16 +7,16 @@ namespace MC {
 
 	std::atomic_uint s_nextThreadID{ 0 };
 
-	MCFrameRendererExecuter3D::MCFrameRendererExecuter3D()
+	MCFrameRendererExecuter::MCFrameRendererExecuter()
 		: _readyForNextFrame{ true },
 		  _executionStage   { MCFRAME_RENDERER_EXECUTION_STAGE_IDLE }
 	{
-		_pThread = std::make_unique<std::thread>(&MCFrameRendererExecuter3D::RenderLoop, this);
+		_pThread = std::make_unique<std::thread>(&MCFrameRendererExecuter::RenderLoop, this);
 	}
 
-	MCFrameRendererExecuter3D::~MCFrameRendererExecuter3D() { }
+	MCFrameRendererExecuter::~MCFrameRendererExecuter() { }
 
-	MC_RESULT MCFrameRendererExecuter3D::QueueNextFrame(void *pFrame, const MCFrameRendererTargetInfo& targetInfo) {
+	MC_RESULT MCFrameRendererExecuter::QueueNextFrame(void *pFrame, const MCFrameRendererTargetInfo& targetInfo) {
 
 		if (!_readyForNextFrame.load())
 			return MC_RESULT_FAIL_NOT_READY;
@@ -31,12 +31,12 @@ namespace MC {
 		return MC_RESULT_OK;
 	}
 
-	void MCFrameRendererExecuter3D::NotifyFramePresented() {
+	void MCFrameRendererExecuter::NotifyFramePresented() {
 		assert(_executionStage.load() == MCFRAME_RENDERER_EXECUTION_STAGE_WAITING_TO_PRESENT);
 		_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_IDLE);
 	}
 
-	void MCFrameRendererExecuter3D::RenderLoop() {
+	void MCFrameRendererExecuter::RenderLoop() {
 
 #ifdef __MC_THREAD_EXCEPTION_REPORTING__
 		try {

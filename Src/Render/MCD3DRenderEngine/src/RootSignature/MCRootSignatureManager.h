@@ -14,8 +14,8 @@ namespace MC {
 		MCRootSignatureManager& operator= (MCRootSignatureManager&&) = delete;
 
 	public: /* Instance access */
-		static MCPipelineStateObjectManager* Instance() {
-			return MCREGlobals
+		static MCRootSignatureManager* Instance() {
+			return MCREGlobals::pRSManager;
 		}
 	};
 

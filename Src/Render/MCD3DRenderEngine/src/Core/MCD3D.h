@@ -242,7 +242,7 @@ namespace MC {
 
 		// Depth Stencils
 		static_assert(FRAME_BUFFER_COUNT > 1, "FRAME_BUFFER_COUNT must be at least 2.");
-		ComPtr<ID3D12Resource>            _ppDepthStencils[FRAME_BUFFER_COUNT - 1];
+		ComPtr<ID3D12Resource>            _ppDepthStencils[DEPTH_BUFFER_COUNT];
 
 	private:
 		void Init3DDevice();

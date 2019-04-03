@@ -1,16 +1,16 @@
 #pragma once
 
 #include "../../../../Common/MCCommon/src/Data/MCResult.h"
-#include "Render3D/MCFrameScheduler3D.h"
+#include "Common/MCFrameScheduler.h"
 
 #include <memory>
 
 namespace MC {
 
 	typedef enum MC_RENDERER_STATE {
-		MC_RENDERER_STATE_OFF = 0,
-		MC_RENDERER_STATE_3D  = 1,
-		MC_RENDERER_STATE_2D  = 2
+		MC_RENDERER_STATE_OFF   = 0,
+		MC_RENDERER_STATE_SPACE = 1,
+		MC_RENDERER_STATE_2D    = 2
 	} MC_RENDERER_STATE;
 
 	class MCRenderer
@@ -40,7 +40,7 @@ namespace MC {
 
 	private:
 		MC_RENDERER_STATE                   _state;
-		std::unique_ptr<MCFrameScheduler3D> _scheduler3D;
+		std::unique_ptr<MCFrameScheduler>   _scheduler;
 	};
 
 }

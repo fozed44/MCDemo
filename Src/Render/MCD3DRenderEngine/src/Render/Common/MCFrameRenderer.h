@@ -19,14 +19,14 @@ namespace MC {
 		D3D12_GPU_DESCRIPTOR_HANDLE hGPUDepthStencil;
 	};
 
-	class MCFrameRendererBase {
+	class MCFrameRenderer {
 	public: /* ctor / dtor / assignment*/
-		MCFrameRendererBase(const std::string& name, unsigned int frameIndex);
-		virtual ~MCFrameRendererBase();
-		MCFrameRendererBase(MCFrameRendererBase&)              = delete;
-		MCFrameRendererBase(MCFrameRendererBase&&)             = delete;
-		MCFrameRendererBase& operator= (MCFrameRendererBase&)  = delete;
-		MCFrameRendererBase& operator= (MCFrameRendererBase&&) = delete;
+		MCFrameRenderer(const std::string& name, unsigned int frameIndex);
+		virtual ~MCFrameRenderer();
+		MCFrameRenderer(MCFrameRenderer&)              = delete;
+		MCFrameRenderer(MCFrameRenderer&&)             = delete;
+		MCFrameRenderer& operator= (MCFrameRenderer&)  = delete;
+		MCFrameRenderer& operator= (MCFrameRenderer&&) = delete;
 
 	public: /* Methods to return the name of the renderer. */
 
@@ -43,10 +43,10 @@ namespace MC {
 
 		ComPtr<ID3D12DescriptorHeap>      _CBVDescriptorHeap;
 
-		DirectX::XMFLOAT4X4 _projectionMatrix;
+		DirectX::XMFLOAT4X4               _projectionMatrix;
 
-		D3D12_VIEWPORT _viewPort;
-		D3D12_RECT     _scissorRect;
+		D3D12_VIEWPORT                    _viewPort;
+		D3D12_RECT                        _scissorRect;
 
 	protected: /* Descriptor handle increment sizes. */
 

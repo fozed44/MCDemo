@@ -1,4 +1,4 @@
-#include "MCFrameRendererBase.h"
+#include "MCFrameRenderer.h"
 
 #include "../../../../../Common/MCCommon/src/Data/MCThreads.h"
 #include "../../../../../Common/MCLog/src/Headers/MCLog.h"
@@ -6,13 +6,13 @@
 
 namespace MC {
 
-#pragma region MCFrameRendererBase static variables
+#pragma region MCFrameRenderer static variables
 
-	UINT MCFrameRendererBase::_CBVDescriptorIncrementSize = 0;
+	UINT MCFrameRenderer::_CBVDescriptorIncrementSize = 0;
 
 #pragma endregion
 
-	MCFrameRendererBase::MCFrameRendererBase(const std::string& name, unsigned int frameIndex) 
+	MCFrameRenderer::MCFrameRenderer(const std::string& name, unsigned int frameIndex) 
 		: _name{ name },
 		  _frameIndex{ frameIndex } {
 
@@ -23,14 +23,14 @@ namespace MC {
 	}
 
 
-	MCFrameRendererBase::~MCFrameRendererBase() { 
+	MCFrameRenderer::~MCFrameRenderer() { 
 		// A Frame renderer should only be destructed on the main thread.
 		MCThreads::Assert(MC_THREAD_CLASS_MAIN);
 	}
 
 #pragma region Initialization
 
-	void MCFrameRendererBase::InitializeBase() {
+	void MCFrameRenderer::InitializeBase() {
 		INIT_TRACE("Begin initialization of renderer {0}.", _name);
 
 		InitializeCommandObjects();
@@ -39,7 +39,7 @@ namespace MC {
 		INIT_TRACE("End initialization of renderer {0}.", _name);
 	}
 
-	void MCFrameRendererBase::InitializeCommandObjects() {
+	void MCFrameRenderer::InitializeCommandObjects() {
 		INIT_TRACE("Initializing command allocator for renderer {0}.", _name);
 		MCThrowIfFailed(
 			MCREGlobals::pMCDXGI->Get3DDevice()->
@@ -66,7 +66,7 @@ namespace MC {
 		INIT_TRACE("Initialization complete.");
 	}
 
-	void MCFrameRendererBase::InitializeViewPort() {
+	void MCFrameRenderer::InitializeViewPort() {
 		INIT_TRACE("Begin init view port.");
 
 		auto width  = MCREGlobals::InitialConfiguration.DISPLAY_OUTPUT_WIDTH;

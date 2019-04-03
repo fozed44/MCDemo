@@ -1,12 +1,12 @@
 #pragma once
 
-#include "../Common/MCFrameRendererBase.h"
+#include "../Common/MCFrameRenderer.h"
 
 using Microsoft::WRL::ComPtr;
 
 namespace MC {
 
-	class MCFrameRenderer3D : public MCFrameRendererBase 
+	class MCFrameRenderer3D : public MCFrameRenderer 
 	{
 	public: /* ctor / dtor / assignment */
 		MCFrameRenderer3D(const std::string& name, unsigned int frameIndex);

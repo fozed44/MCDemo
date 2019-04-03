@@ -1017,8 +1017,7 @@ void MCD3D::InitDescriptorHeaps() {
 	D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
 
 	
-	dsvHeapDesc.NumDescriptors = FRAME_BUFFER_COUNT - 1; // One less descriptor than there are frame buffers
-									                     // (we don't need a ds for the frame that is currently displayed.)
+	dsvHeapDesc.NumDescriptors = DEPTH_BUFFER_COUNT; 
 	dsvHeapDesc.Type  = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 	dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	MCThrowIfFailed(_pDevice->CreateDescriptorHeap(&dsvHeapDesc, __uuidof(_pDSVDescriptorHeap), &_pDSVDescriptorHeap));
@@ -1079,7 +1078,7 @@ void MCD3D::InitDepthStencilBuffers() {
 	optClear.DepthStencil.Depth   = 1.0f;
 	optClear.DepthStencil.Stencil = 0;
 
-	for (unsigned int n = 0; n < FRAME_BUFFER_COUNT - 1; ++n) {
+	for (unsigned int n = 0; n < DEPTH_BUFFER_COUNT; ++n) {
 		INIT_TRACE("**Initializing depth stencil {0:d}.", n);
 		MCThrowIfFailed(_pDevice->CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
@@ -1102,7 +1101,7 @@ void MCD3D::InitDepthStencilBufferViews() {
 
 	CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHeapHandle(_pDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
-	for (unsigned int n = 0; n < FRAME_BUFFER_COUNT - 1; ++n) {
+	for (unsigned int n = 0; n < DEPTH_BUFFER_COUNT; ++n) {
 		INIT_TRACE("**Initialize depth stencil view {0:d}.", n);
 		_pDevice->CreateDepthStencilView(
 			_ppDepthStencils[n].Get(),
@@ -1127,7 +1126,7 @@ void MCD3D::InitFinalize() {
 
 	INIT_TRACE("--Create ds resource barriers.");
 
-	for (unsigned int n; n < FRAME_BUFFER_COUNT - 1; ++n) {
+	for (unsigned int n; n < DEPTH_BUFFER_COUNT; ++n) {
 		_pCommandList->ResourceBarrier(
 			1,
 			&CD3DX12_RESOURCE_BARRIER::Transition(_ppDepthStencils[n].Get(),
@@ -1178,13 +1177,13 @@ D3D12_GPU_DESCRIPTOR_HANDLE MCD3D::GetRenderTargetGPUHandle(unsigned int index) 
 
 /* Access to the DepthStencil associated with 'index' */
 ID3D12Resource* MCD3D::GetDepthStencil(unsigned int index) {
-	assert(index < FRAME_BUFFER_COUNT - 1);
+	assert(index < DEPTH_BUFFER_COUNT);
 	return _ppDepthStencils[index].Get();
 }
 
 /* Access the CPU descriptor handle for the depth stencil associated with 'index' */
 D3D12_CPU_DESCRIPTOR_HANDLE MCD3D::GetDepthStencilCPUHandle(unsigned int index) {
-	assert(index < FRAME_BUFFER_COUNT - 1);
+	assert(index < DEPTH_BUFFER_COUNT);
 	CD3DX12_CPU_DESCRIPTOR_HANDLE handle(_pDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 	handle.Offset(index, _DSVDescriptorSize);
 	return (D3D12_CPU_DESCRIPTOR_HANDLE)handle;
@@ -1192,7 +1191,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE MCD3D::GetDepthStencilCPUHandle(unsigned int index) 
 
 /* Access the CPU descriptor handle for the depth stencil associated with 'index' */
 D3D12_GPU_DESCRIPTOR_HANDLE MCD3D::GetDepthStencilGPUHandle(unsigned int index) {
-	assert(index < FRAME_BUFFER_COUNT - 1);
+	assert(index < DEPTH_BUFFER_COUNT);
 	CD3DX12_GPU_DESCRIPTOR_HANDLE handle(_pDSVDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 	handle.Offset(index, _DSVDescriptorSize);
 	return (D3D12_GPU_DESCRIPTOR_HANDLE)handle;
