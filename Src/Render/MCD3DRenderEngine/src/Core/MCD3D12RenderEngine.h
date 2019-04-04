@@ -4,6 +4,8 @@
 #include "../Core/MCD3D.h"
 #include "../Configuration/RenderConfig.h"
 #include "MCRenderWindow.h"
+#include "../Render/MCRenderer.h"
+#include "../../../../Common/MCCommon/src/Data/MCObjects.h"
 
 namespace MC {
 
@@ -15,15 +17,34 @@ namespace MC {
 		MCD3D12RenderEngine(MCD3D12RenderEngine&&)            = delete;
 		MCD3D12RenderEngine& operator=(MCD3D12RenderEngine&)  = delete;
 		MCD3D12RenderEngine& operator=(MCD3D12RenderEngine&&) = delete;
-	private:
-		private:
-			std::unique_ptr<MCRenderWindow>               _pRenderWindow;
-			std::unique_ptr<MCResourceManager>            _pResourceManager;
-			std::unique_ptr<MCShaderManager>              _pShaderManager;
-			std::unique_ptr<MCPipelineStateObjectManager> _pPSOManager;
-			std::unique_ptr<MCRootSignatureManager>       _pRSManager;
-			std::unique_ptr<MCDXGI>                       _pMCDXGI;
-			std::unique_ptr<MCD3D>                        _pMCD3D;
+
+	public: /* Public API */
+
+		MCHANDLE LoadTexture(MCTEXTURE_DESC desc);
+
+		MCHANDLE LoadMesh(MCMESH_DESC desc);
+
+		MCHANDLE LoadSprite(MCSPRITE_DESC desc);
+		/* Call update once per game loop iteration.*/
+		void      Update();
+
+		/* Queue a frame to the render engine.
+
+			Note:
+				If the result of QueueFrame is MC_RESULT_OK then the render engine has taken
+				control of the memory for the frame. If the result is a fail result, then the
+				caller is still responsible for the memory. */
+		MC_RESULT QueueFrame(void *pFrame);
+	private: /* Private Members */
+		std::unique_ptr<MCRenderer>                   _pRenderer;
+	private: /* Instances that will be copied to MCREGlobals */
+		std::unique_ptr<MCRenderWindow>               _pRenderWindow;
+		std::unique_ptr<MCResourceManager>            _pResourceManager;
+		std::unique_ptr<MCShaderManager>              _pShaderManager;
+		std::unique_ptr<MCPipelineStateObjectManager> _pPSOManager;
+		std::unique_ptr<MCRootSignatureManager>       _pRSManager;
+		std::unique_ptr<MCDXGI>                       _pMCDXGI;
+		std::unique_ptr<MCD3D>                        _pMCD3D;
 	};
   
 }

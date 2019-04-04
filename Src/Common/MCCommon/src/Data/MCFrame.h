@@ -10,23 +10,23 @@ namespace MC {
 		bool WireFrame;
 	};
 
-	typedef char* MCFrameItemHandle;
+	typedef void* MCFrameItemHandle;
 
 	struct MCCamera {
 		MCFLOAT3 Position;
 		MCFLOAT3 LookAt;
 	};
 
-	struct MCSimpleFrameRenderItem2D {
-		MCFrameItemHandle Handle;
-		MCFLOAT2 Position;
-		MCFLOAT2 Look;
+	struct MCFrameRenderItem2D {
+		MCFrameItemHandle hRenderItem;
+		MCFLOAT2          Position;
+		MCFLOAT2          Look;
 	};
 
-	struct MCSimpleFrameRenderItem3D {
-		MCFrameItemHandle Handle;
-		MCFLOAT3 Position;
-		MCFLOAT3 Look;
+	struct MCFrameRenderItem3D {
+		MCFrameItemHandle hRenderItem;
+		MCFLOAT3          Position;
+		MCFLOAT3          Look;
 	};
 
 	typedef enum MC_FRAME_TYPE {
@@ -56,7 +56,9 @@ namespace MC {
 		MCCamera Camera;
 	};
 
-	struct MCFrame3D : public MCFrame {};
+	struct MCFrame3D : public MCFrame {
+		std::vector<MCFrameRenderItem3D> RenderItems;
+	};
 
 	struct MCSpaceFrame : public MCFrame3D {};
 

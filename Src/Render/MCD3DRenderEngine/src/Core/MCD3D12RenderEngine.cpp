@@ -35,4 +35,16 @@ namespace MC {
 	  MCREGlobals::pRenderEngine = this;
   }
 
+#pragma region Public API
+
+  void MCD3D12RenderEngine::Update() {
+
+  }
+
+  MC_RESULT MCD3D12RenderEngine::QueueFrame(void *pFrame) {
+
+  }
+
+#pragma endregion
+
 }

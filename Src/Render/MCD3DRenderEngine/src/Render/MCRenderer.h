@@ -18,14 +18,17 @@ namespace MC {
 	public:
 		MCRenderer();
 		~MCRenderer();
-		MCRenderer(MCRenderer&) = delete;
-		MCRenderer(MCRenderer&&) = delete;
-		MCRenderer& operator= (MCRenderer&) = delete;
+		MCRenderer(MCRenderer&)              = delete;
+		MCRenderer(MCRenderer&&)             = delete;
+		MCRenderer& operator= (MCRenderer&)  = delete;
 		MCRenderer& operator= (MCRenderer&&) = delete;
 
 	public:
 		inline MC_RENDERER_STATE GetState() const { return _state; }
-		inline void SetState(MC_RENDERER_STATE state) { _state = state; }
+		inline void SetState(MC_RENDERER_STATE state);
+
+		/* Call Update once per game loop iteration. */
+		void Update();
 
 		/*
 			Queue the frame to be rendered.
@@ -40,7 +43,7 @@ namespace MC {
 
 	private:
 		MC_RENDERER_STATE                   _state;
-		std::unique_ptr<MCFrameScheduler>   _scheduler;
+		std::unique_ptr<MCFrameScheduler>   _pScheduler;
 	};
 
 }
