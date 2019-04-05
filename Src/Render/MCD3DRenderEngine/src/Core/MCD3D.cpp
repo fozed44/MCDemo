@@ -890,9 +890,6 @@ MCD3D::MCD3D()  {
 
 	assert(MCREGlobals::pMCDXGI);
 
-
-	EnsureValidWindowConfig(MCREGlobals::InitialConfiguration);
-
 	// initialize the current fence value
 	_currentFence = 0;
 
@@ -907,7 +904,6 @@ MCD3D::MCD3D()  {
 	InitRenderTargetViews();
 	InitDepthStencilBuffers();
 	InitDepthStencilBufferViews();
-	InitMatrices();
 	InitFinalize();
 
 	MC_INFO("End render initialization.");
@@ -1015,7 +1011,6 @@ void MCD3D::InitDescriptorHeaps() {
 	// Depth Stencil Buffer Descriptor Heap *************************
 
 	D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
-
 	
 	dsvHeapDesc.NumDescriptors = DEPTH_BUFFER_COUNT; 
 	dsvHeapDesc.Type  = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
@@ -1126,7 +1121,7 @@ void MCD3D::InitFinalize() {
 
 	INIT_TRACE("--Create ds resource barriers.");
 
-	for (unsigned int n; n < DEPTH_BUFFER_COUNT; ++n) {
+	for (unsigned int n = 0; n < DEPTH_BUFFER_COUNT; ++n) {
 		_pCommandList->ResourceBarrier(
 			1,
 			&CD3DX12_RESOURCE_BARRIER::Transition(_ppDepthStencils[n].Get(),
@@ -1162,7 +1157,7 @@ ID3D12Resource* MCD3D::GetRenderTarget(unsigned int index) {
 /* Access the CPU descriptor handle for the render target associated with 'index' */
 D3D12_CPU_DESCRIPTOR_HANDLE MCD3D::GetRenderTargetCPUHandle(unsigned int index) {
 	assert(index < FRAME_BUFFER_COUNT);
-	CD3DX12_CPU_DESCRIPTOR_HANDLE handle(_pRTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	CD3DX12_CPU_DESCRIPTOR_HANDLE handle(_pRTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 	handle.Offset(index, _RTVDescriptorSize);
 	return (D3D12_CPU_DESCRIPTOR_HANDLE)handle;
 }
@@ -1290,23 +1285,23 @@ void MCD3D::Resize() {
 	for (int i = 0; i < FRAME_BUFFER_COUNT; ++i)
 		_ppRenderTargets[i].Reset();
 
-	_pDepthStencil.Reset();
+	/*_pDepthStencil.Reset();*/
 
 	MCREGlobals::pMCDXGI->ForceResize();
 
 	InitRenderTargets();
 	InitRenderTargetViews();
 
-	InitDepthStencilBuffer();
-	InitDepthStencilBufferView();
+	/*InitDepthStencilBuffer();
+	InitDepthStencilBufferView();*/
 
-	_pCommandList->ResourceBarrier(
+	/*_pCommandList->ResourceBarrier(
 		1,
 		&CD3DX12_RESOURCE_BARRIER::Transition(_pDepthStencil.Get(),
 			D3D12_RESOURCE_STATE_COMMON,
 			D3D12_RESOURCE_STATE_DEPTH_WRITE
 		)
-	);
+	);*/
 
 	MCThrowIfFailed(_pCommandList->Close());
 
@@ -1318,7 +1313,7 @@ void MCD3D::Resize() {
 	int newWidth, newHeight;
 	MCREGlobals::pMCDXGI->GetFrameBufferSize(&newWidth, &newHeight);
 
-	_viewPort = {};
+	/*_viewPort = {};
 	_viewPort.TopLeftX = 0.0f;
 	_viewPort.TopLeftY = 0.0f;
 	_viewPort.Width = static_cast<float>(newWidth);
@@ -1329,7 +1324,7 @@ void MCD3D::Resize() {
 	_scissorRect.top = 0;
 	_scissorRect.left = 0;
 	_scissorRect.right = newWidth;
-	_scissorRect.bottom = newHeight;
+	_scissorRect.bottom = newHeight;*/
 }
 
 #pragma endregion

@@ -1,14 +1,14 @@
 #include "MCFrameRenderer3D.h"
 #include "../../../../../Common/MCCommon/src/Data/MCThreads.h"
 #include "../../../../../Common/MCLog/src/Headers/MCLog.h"
-#include "../../Core/MCREGlobals.h";
+#include "../../Core/MCREGlobals.h"
 
 namespace MC {
 
 #pragma region ctor
 
-	MCFrameRenderer3D::MCFrameRenderer3D(const std::string& name, unsigned int frameIndex) 
-		: MCFrameRenderer(name, frameIndex) {
+	MCFrameRenderer3D::MCFrameRenderer3D(const std::string& name) 
+		: MCFrameRenderer(name) {
 		InitializeRenderer3D();
 	}
 

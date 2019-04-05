@@ -1,17 +1,16 @@
 #include "MCThreads.h"
 #include "assert.h"
+#include "../../../MCLog/src/Headers/MCLog.h"
 namespace MC {
 
 	std::map<std::thread::id, std::tuple<std::string, MC_THREAD_CLASS>> MCThreads::_threadMap;
 
 	void MCThreads::RegisterCurrentThread(const std::string& name, MC_THREAD_CLASS threadClass) {
-		static_assert(sizeof(std::thread::id) == sizeof(uint32_t), "this function only works if size of thead::id is equal to the size of uint_64");
-		
+		static_assert(sizeof(std::thread::id) == sizeof(uint32_t), "this function only works if size of thread::id is equal to the size of uint_64");		
+		INIT_TRACE("--Registering thread {0}--", name);
 
 		auto thisThreadId = std::this_thread::get_id();
-
-		auto current = _threadMap.find(thisThreadId);
-
+		auto current      = _threadMap.find(thisThreadId);
 		assert(current == _threadMap.end());
 
 		_threadMap[thisThreadId] = { name, threadClass };

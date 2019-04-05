@@ -18,7 +18,7 @@ namespace MC {
 
 	class MCFrameRendererExecuter {
 	public: /* ctor */
-		MCFrameRendererExecuter();
+		MCFrameRendererExecuter(const std::string& name);
 		~MCFrameRendererExecuter();
 
 		MCFrameRendererExecuter(MCFrameRendererExecuter&)			  = delete;
@@ -27,7 +27,7 @@ namespace MC {
 		MCFrameRendererExecuter& operator=(MCFrameRendererExecuter&&) = delete;
 
 	public: /* Render control */
-		MC_RESULT QueueNextFrame(void *pNextFrame, const MCFrameRendererTargetInfo& targetInfo);
+		MC_RESULT QueueNextFrame(MCFrame *pNextFrame, const MCFrameRendererTargetInfo& targetInfo);
 		void NotifyFramePresented();
 
 		void KillRenderer();
@@ -41,6 +41,8 @@ namespace MC {
 		bool QueryReadyForNextFrame() const { return _readyForNextFrame.load(); }
 
 	private:
+		std::string                         _name;
+
 		std::atomic<bool>					_readyForNextFrame;
 		std::atomic<unsigned int>           _executionStage;
 		bool                                _exitFlag;
@@ -49,7 +51,7 @@ namespace MC {
 		std::unique_ptr<std::thread>       _pThread;
 		std::unique_ptr<MCFrameRenderer>   _pRenderer;
 
-		std::unique_ptr<void>   	       _pNextFrame;
+		std::unique_ptr<MCFrame>   	       _pNextFrame;
 		MCFrameRendererTargetInfo          _nextTargetInfo;
 	};
 

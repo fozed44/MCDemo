@@ -6,13 +6,14 @@
 #include "MCRenderWindow.h"
 #include "../Render/MCRenderer.h"
 #include "../../../../Common/MCCommon/src/Data/MCObjects.h"
+#include "../../../../Common/MCCommon/src/Data/MCFrame.h"
 
 namespace MC {
 
 	class MCD3D12RenderEngine {
 	public:
 		MCD3D12RenderEngine(const RENDER_CONFIG *pRenderConfig);
-		~MCD3D12RenderEngine() {}
+		~MCD3D12RenderEngine();
 		MCD3D12RenderEngine(MCD3D12RenderEngine&)             = delete;
 		MCD3D12RenderEngine(MCD3D12RenderEngine&&)            = delete;
 		MCD3D12RenderEngine& operator=(MCD3D12RenderEngine&)  = delete;
@@ -31,10 +32,10 @@ namespace MC {
 		/* Queue a frame to the render engine.
 
 			Note:
-				If the result of QueueFrame is MC_RESULT_OK then the render engine has taken
+				If the result of ScheduleFrame is MC_RESULT_OK then the render engine has taken
 				control of the memory for the frame. If the result is a fail result, then the
 				caller is still responsible for the memory. */
-		MC_RESULT QueueFrame(void *pFrame);
+		MC_RESULT ScheduleFrame(MCFrame *pFrame);
 	private: /* Private Members */
 		std::unique_ptr<MCRenderer>                   _pRenderer;
 	private: /* Instances that will be copied to MCREGlobals */

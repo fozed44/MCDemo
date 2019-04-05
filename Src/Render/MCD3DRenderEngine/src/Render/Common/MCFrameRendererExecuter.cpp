@@ -7,8 +7,9 @@ namespace MC {
 
 	std::atomic_uint s_nextThreadID{ 0 };
 
-	MCFrameRendererExecuter::MCFrameRendererExecuter()
-		: _readyForNextFrame{ true },
+	MCFrameRendererExecuter::MCFrameRendererExecuter(const std::string& name)
+		: _name{ name },
+		  _readyForNextFrame{ true },
 		  _exitFlag{ false },
 		  _executionStage   { MCFRAME_RENDERER_EXECUTION_STAGE_IDLE } {
 
@@ -25,7 +26,7 @@ namespace MC {
 		KillRenderer();
 	}
 
-	MC_RESULT MCFrameRendererExecuter::QueueNextFrame(void *pFrame, const MCFrameRendererTargetInfo& targetInfo) {
+	MC_RESULT MCFrameRendererExecuter::QueueNextFrame(MCFrame *pFrame, const MCFrameRendererTargetInfo& targetInfo) {
 
 		if (!_readyForNextFrame.load())
 			return MC_RESULT_FAIL_NOT_READY;
@@ -58,13 +59,13 @@ namespace MC {
 #endif __MC_THREAD_EXCEPTION_REPORTING__
 
 		MCThreads::RegisterCurrentThread(
-			std::string("MCFrameRendererExecuter3D (") + _pRenderer->Name() + std::string(")"),
+			std::string(_name),
 			MC_THREAD_CLASS_FRAME_RENDERER_EXECUTER
 		);
 
 		while (!_exitFlag) {
 			if (!_readyForNextFrame.load() && _executionStage.load() == MCFRAME_RENDERER_EXECUTION_STAGE_IDLE) {
-				std::unique_ptr<void> _pCurrentFrame = std::move(_pNextFrame);
+				std::unique_ptr<MCFrame> _pCurrentFrame = std::move(_pNextFrame);
 				_readyForNextFrame.store(true);
 				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_CPU_RENDERING);
 				auto fenceValue = _pRenderer->RenderFrame(_pCurrentFrame.release(), _nextTargetInfo);

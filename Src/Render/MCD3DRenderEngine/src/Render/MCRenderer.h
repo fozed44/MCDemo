@@ -35,11 +35,11 @@ namespace MC {
 
 			NOTE:
 
-			If QueueFrame returns MC_RESULT_OK then the renderer has taken ownership of the frame memory.
-			If, however, QueueFrame3d returns an fail result such as MC_RESULT_FAIL_NOT_READY then the caller
+			If ScheduleFrame returns MC_RESULT_OK then the renderer has taken ownership of the frame memory.
+			If, however, ScheduleFrame returns an fail result such as MC_RESULT_FAIL_NOT_READY then the caller
 			is still responsible for the frame memory.
 		*/
-		MC_RESULT QueueFrame(void *pFrame);
+		MC_RESULT ScheduleFrame(MCFrame *pFrame);
 
 	private:
 		MC_RENDERER_STATE                   _state;

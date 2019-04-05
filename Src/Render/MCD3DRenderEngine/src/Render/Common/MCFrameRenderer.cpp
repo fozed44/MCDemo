@@ -12,9 +12,8 @@ namespace MC {
 
 #pragma endregion
 
-	MCFrameRenderer::MCFrameRenderer(const std::string& name, unsigned int frameIndex) 
-		: _name{ name },
-		  _frameIndex{ frameIndex } {
+	MCFrameRenderer::MCFrameRenderer(const std::string& name) 
+		: _name{ name }{
 
 		// A Frame renderer should only be constructed on the main thread.
 		MCThreads::Assert(MC_THREAD_CLASS_MAIN);

@@ -4,12 +4,14 @@
 
 namespace MC {
 
-	MCRenderer::MCRenderer() : _state{ MC_RENDERER_STATE_OFF } { }
+	MCRenderer::MCRenderer() : _state{ MC_RENDERER_STATE_OFF } {
+		_pScheduler = std::make_unique<MCFrameScheduler>();
+	}
 
 	MCRenderer::~MCRenderer() { }
 
 	void MCRenderer::Update() {
-		_pScheduler->Update();
+		_pScheduler->UpdateSchedule();
 	}
 
 	void MCRenderer::SetState(MC_RENDERER_STATE state) {
@@ -26,18 +28,19 @@ namespace MC {
 		MCFrameRenderer *pRenderers[FRAME_BUFFER_COUNT - 1];
 		if (state == MC_RENDERER_STATE_SPACE) {
 			for (int x = 0; x < FRAME_BUFFER_COUNT - 1; ++x)
-				pRenderers[x] = new MCSpaceRenderer;
-			_pScheduler->SetRenderers()
+				pRenderers[x] = new MCSpaceRenderer(std::string("MCSpaceRenderer ") + std::to_string(x));
+			_pScheduler->SetRenderers(pRenderers, _countof(pRenderers));
+			_state = state;
+			return;
 		}
+		MCTHROW("unknown MC_RENDERER_STATE");
 	}
 
-	MC_RESULT MCRenderer::QueueFrame(void *pFrame) {
+	MC_RESULT MCRenderer::ScheduleFrame(MCFrame *pFrame) {
 		if (_state == MC_RENDERER_STATE_OFF)
 			return MC_RESULT_FAIL_OFF;
-		if (_state == MC_RENDERER_STATE_SPACE) {
-			return _scheduler->QueueFrame(ptr);
-		}
-		return MC_RESULT_ERROR;
+
+		return _pScheduler->ScheduleFrame(pFrame);
 	}
 
 }

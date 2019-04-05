@@ -13,6 +13,8 @@
 #include "../../../Render/MCD3DRenderEngine/src/Configuration/RenderConfig.h"
 #include "../../../Render/MCD3DRenderEngine/src/Core/MCD3D12RenderEngine.h"
 #include "../../../Render/MCD3DRenderEngine/src/Core/MCREGlobals.h"
+#include "../../../Common/MCCommon/src/Data/MCFrame.h"
+#include "../../../Common/MCCommon/src/Data/MCResult.h"
 #include <iostream>
 #include <thread>
 #include <atomic>
@@ -50,17 +52,6 @@ int Sandbox() {
 
 	auto t = std::make_unique<MC::MCD3D12RenderEngine>(&renderConfig);
 
-	/*auto pRenderWindow = std::make_shared<MC::MCRenderWindow>(renderConfig);
-
-	pRenderWindow->Init();
-
-	MC::MCDXGI::Instance()->Initialize(&renderConfig, pRenderWindow);
-
-	MC::MCD3D::Instance()->Initialize(renderConfig);*/
-
-	//MC::MCResourceManager::Instance()->Initialize();
-
-
 	MC::MCREGlobals::pRenderWindow->RegisterResizeCallback(
 		[]() {
 			MC::MCREGlobals::pMCDXGI->QueueResize();
@@ -77,6 +68,7 @@ int Sandbox() {
 	
 	const __int64 frameCountBufferSize = 50;
 	float frameCountBuffer[frameCountBufferSize];
+	MC::MCSpaceFrame *pNextFrame = new MC::MCSpaceFrame();
 	while (msg.message != WM_QUIT)
 	{
 		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
@@ -92,7 +84,11 @@ int Sandbox() {
 			frame.Camera.Position.y = MC::MCREGlobals::pRenderWindow->GetRadius()*cosf(MC::MCREGlobals::pRenderWindow->GetPhi());
 			frame.Time = masterTimer->TotalTime();
 
-			MC::MCREGlobals::pMCD3D->RenderFrame(&frame);
+			//MC::MCREGlobals::pMCD3D->RenderFrame(&frame);
+			if (MC::MC_RESULT_OK == MC::MCREGlobals::pRenderEngine->ScheduleFrame(pNextFrame))
+				pNextFrame = new MC::MCSpaceFrame();
+
+			MC::MCREGlobals::pRenderEngine->Update();
 
 			frameCount++;
 

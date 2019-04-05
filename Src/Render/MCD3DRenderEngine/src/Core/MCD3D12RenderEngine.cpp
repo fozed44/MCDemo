@@ -1,6 +1,14 @@
 #include "MCD3D12RenderEngine.h"
 #include "MCREGlobals.h"
 #include "../../../../Common/MCCommon/src/Data/MCThreads.h"
+#include "../RootSignature/MCRootSignatureManager.h"
+#include "../PipelineStateObject/MCPipelineStateObjectManager.h"
+#include "../Shader/MCShaderManager.h"
+#include "../Memory/MCResourceManager.h"
+#include "MCD3D.h"
+#include "MCDXGI.h"
+#include "MCRenderWindow.h"
+
 
 namespace MC {
 
@@ -32,17 +40,23 @@ namespace MC {
 	  _pRSManager = std::make_unique<MCRootSignatureManager>();
 	  MCREGlobals::pRSManager = _pRSManager.get();
 
+	  /******************************************************************/
+
+	  _pRenderer = std::make_unique<MCRenderer>();
+
 	  MCREGlobals::pRenderEngine = this;
   }
+
+  MCD3D12RenderEngine::~MCD3D12RenderEngine() {}
 
 #pragma region Public API
 
   void MCD3D12RenderEngine::Update() {
-
+	  _pRenderer->Update();
   }
 
-  MC_RESULT MCD3D12RenderEngine::QueueFrame(void *pFrame) {
-
+  MC_RESULT MCD3D12RenderEngine::ScheduleFrame(MCFrame *pFrame) {
+	  return _pRenderer->ScheduleFrame(pFrame);
   }
 
 #pragma endregion

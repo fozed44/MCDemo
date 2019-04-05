@@ -22,8 +22,8 @@ namespace MC {
 				Visibility: Usually MC_MESSAGE_VISIBILITY_RENDER
 				Flags: not used.
 				Param: The target render state. The renderer will throw if Param !(MC_RENDERER_STATE). */
-		MC_MESSAGE_QUEUE_FRAME_128
-			/* Queue a new frame to the renderer.
+		MC_MESSAGE_SCHEDULE_FRAME_128
+			/* Schedule a new frame on the renderer.
 
 			*/
 

@@ -21,7 +21,7 @@ namespace MC {
 
 	class MCFrameRenderer {
 	public: /* ctor / dtor / assignment*/
-		MCFrameRenderer(const std::string& name, unsigned int frameIndex);
+		MCFrameRenderer(const std::string& name);
 		virtual ~MCFrameRenderer();
 		MCFrameRenderer(MCFrameRenderer&)              = delete;
 		MCFrameRenderer(MCFrameRenderer&&)             = delete;
@@ -34,7 +34,7 @@ namespace MC {
 		      std::string& Name()       { return _name; }
 
 	public: /* RenderFrame */
-		virtual unsigned __int64 RenderFrame(void *pVframe, const MCFrameRendererTargetInfo& frameTarget) = 0;
+		virtual unsigned __int64 RenderFrame(MCFrame *pVframe, const MCFrameRendererTargetInfo& frameTarget) = 0;
 
 	protected: /* D3D12 Objects */
 
@@ -67,10 +67,6 @@ namespace MC {
 
 		/* Identifies this renderer. This is the value passed to the name parameter of the constructor. */
 		std::string _name;
-
-		/* Associates this renderer with an index into the MCD3D._ppRenderTargets array. Assigned once
-		   and only once during construction. */
-		const unsigned int _frameIndex;
 	};
 
 }

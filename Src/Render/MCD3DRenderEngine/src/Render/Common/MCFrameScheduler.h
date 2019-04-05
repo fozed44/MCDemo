@@ -33,10 +33,15 @@ namespace MC {
 			If ScheduleFrame returns MC_RESULT_OK then the scheduler has taken ownership of the frame memory.
 			If, however, ScheduleFrame returns a fail result, such as MC_RESULT_FAIL_NOT_READY, then the caller
 			is still responsible for the frame memory. */
-		MC_RESULT ScheduleFrame(void *pFrame);
+		MC_RESULT ScheduleFrame(MCFrame *pFrame);
 
 		/*	Per-Game-Loop scheduler processing. Should be called by the engine once per game loop iteration. */
 		void UpdateSchedule();
+
+		/* Set the renderers used by the executers. */
+		void SetRenderers(MCFrameRenderer **pRenderers, unsigned int numRenderers);
+
+		void Kill();
 
 	private: /* Queue and Present. */
 		/*	The Queue and Present methods are called by (directly or indirectly) by UpdateSchedule. These are
@@ -46,7 +51,7 @@ namespace MC {
 		
 		void TryQueueNextFrame();
 
-		void QueueFrame(void *pFrame, unsigned int executerIndex);
+		void QueueFrame(MCFrame *pFrame, unsigned int executerIndex);
 
 		void TryPresentNext();
 
@@ -59,7 +64,7 @@ namespace MC {
 	private: /* Private instance data. */
 		std::unique_ptr<MCFrameRendererExecuter> _ppExecuters[EXECUTER_COUNT];
 		std::queue<unsigned int>                 _presentQueue;
-		std::queue<std::unique_ptr<void>>        _frameQueue;
+		std::queue<std::unique_ptr<MCFrame>>     _frameQueue;
 		unsigned int                             _nextRenderTargetIndex;
 		unsigned int                             _nextDepthBufferIndex;
 		

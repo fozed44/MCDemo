@@ -48,6 +48,7 @@ namespace MC {
 		of all frame structures. This is why all structures contain this property as the first field.
 	*/
 	struct MCFrame {
+		virtual ~MCFrame() {}
 		/* The frame type. */
 		MC_FRAME_TYPE FrameType;
 		/* The current frame time. */
@@ -57,11 +58,16 @@ namespace MC {
 	};
 
 	struct MCFrame3D : public MCFrame {
+		virtual ~MCFrame3D() {}
 		std::vector<MCFrameRenderItem3D> RenderItems;
 	};
 
-	struct MCSpaceFrame : public MCFrame3D {};
+	struct MCSpaceFrame : public MCFrame3D {
+		virtual ~MCSpaceFrame() {}
+	};
 
-	struct MCFrame2D : public MCFrame { };
+	struct MCFrame2D : public MCFrame { 
+		virtual ~MCFrame2D() {}
+	};
 
 }

@@ -9,8 +9,8 @@ namespace MC {
 	MCFrameScheduler::MCFrameScheduler() 
 		: _nextRenderTargetIndex{ 0 },
 		  _nextDepthBufferIndex{ 0 } {
-		for (unsigned int x = 0; x < FRAME_BUFFER_COUNT; ++x)
-			_ppExecuters[x] = std::make_unique<MCFrameRendererExecuter>();
+		for (unsigned int x = 0; x < EXECUTER_COUNT; ++x)
+			_ppExecuters[x] = std::make_unique<MCFrameRendererExecuter>(std::string("Frame Executer (" + std::to_string(x) + std::string(")")));
 		MCCriticalSection::InitializeLock(&_lock);
 	}
 
@@ -20,20 +20,30 @@ namespace MC {
 
 #pragma region Public
 
-	MC_RESULT MCFrameScheduler::ScheduleFrame(void *pFrame) {
+	MC_RESULT MCFrameScheduler::ScheduleFrame(MCFrame *pFrame) {
 		if (_frameQueue.size() >= FRAME_QUEUE_SIZE)
 			return MC_RESULT_FAIL_NOT_READY;
 
 		ENTER_CRITICAL_SECTION(MCFrameScheduler_PresentNext, &_lock);
 			if (_frameQueue.size() >= FRAME_QUEUE_SIZE)
 				return MC_RESULT_FAIL_NOT_READY;
-			_frameQueue.push(std::make_unique<void>(pFrame));
+			_frameQueue.push(std::unique_ptr<MCFrame>(pFrame));
 		EXIT_CRITICAL_SECTION
+
+		return MC_RESULT_OK;
 	}
 
 	void MCFrameScheduler::UpdateSchedule() {
 		TryPresentNext();
 		TryQueueNextFrame();
+	}
+
+	void MCFrameScheduler::SetRenderers(MCFrameRenderer **pRenderers, unsigned int numRenderers) {
+
+	}
+
+	void MCFrameScheduler::Kill() {
+
 	}
 
 #pragma endregion
@@ -48,18 +58,19 @@ namespace MC {
 		if ((readyExecuterIndex = GetReadyExecuterIndex()) == -1)
 			return;
 
-		std::unique_ptr<void> nextFramePtr;
-
+		std::unique_ptr<MCFrame> nextFramePtr;
 
 		ENTER_CRITICAL_SECTION(MCFrameScheduler_UpdateSchedule, &_lock);
 			if (_frameQueue.empty())
 				return;
-			nextFramePtr = std::move(_frameQueue.front);
+			nextFramePtr = std::move(_frameQueue.front());
 			_frameQueue.pop();
 		EXIT_CRITICAL_SECTION
+
+		QueueFrame(nextFramePtr.release(), readyExecuterIndex);
 	}
 
-	void MCFrameScheduler::QueueFrame(void *pFrame, unsigned int executerIndex) {
+	void MCFrameScheduler::QueueFrame(MCFrame *pFrame, unsigned int executerIndex) {
 		// This method is not thread safe. It can only be called from the main
 		// thread.
 		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
@@ -109,4 +120,5 @@ namespace MC {
 			_presentQueue.pop();
 		}
 	}
+	
 }

@@ -8,7 +8,7 @@ namespace MC {
 
 	class MCSpaceRenderer : public MCFrameRenderer3D {
 	public: /* ctor */
-		MCSpaceRenderer(const std::string& name, unsigned int frameIndex);
+		MCSpaceRenderer(const std::string& name);
 		virtual ~MCSpaceRenderer();
 		MCSpaceRenderer(MCSpaceRenderer&)              = delete;
 		MCSpaceRenderer(MCSpaceRenderer&&)             = delete;
@@ -16,7 +16,7 @@ namespace MC {
 		MCSpaceRenderer& operator= (MCSpaceRenderer&&) = delete;
 
 	public: /* Render Frame */
-		unsigned __int64 RenderFrame(void *pVframe, const MCFrameRendererTargetInfo& targetInfo) override;
+		unsigned __int64 RenderFrame(MCFrame *pVframe, const MCFrameRendererTargetInfo& targetInfo) override;
 
 	public: /* Render options. */
 

@@ -9,8 +9,8 @@ namespace MC {
 
 #pragma region Ctor
 
-	MCSpaceRenderer::MCSpaceRenderer(const std::string& name, unsigned int frameIndex) 
-		: MCFrameRenderer3D(name, frameIndex) {
+	MCSpaceRenderer::MCSpaceRenderer(const std::string& name) 
+		: MCFrameRenderer3D(name) {
 		InitializeSpaceRenderer();
 	}
 
@@ -61,7 +61,7 @@ namespace MC {
 #pragma region Draw
 
 	unsigned __int64 MCSpaceRenderer::RenderFrame(
-		void *pVframe,
+		MCFrame *pVframe,
 		const MCFrameRendererTargetInfo& targetInfo
 	) {
 		// Render should only be called by a render executer, on an executer thread.
