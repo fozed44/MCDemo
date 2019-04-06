@@ -38,12 +38,20 @@ namespace MC {
 		TryQueueNextFrame();
 	}
 
-	void MCFrameScheduler::SetRenderers(MCFrameRenderer **pRenderers, unsigned int numRenderers) {
+	void MCFrameScheduler::SetRenderers(MCFrameRenderer **ppRenderers, unsigned int numRenderers) {
+		assert(numRenderers == 0 || numRenderers == EXECUTER_COUNT);
 
-	}
-
-	void MCFrameScheduler::Kill() {
-
+		if (nullptr == ppRenderers) {
+			SafeReleaseCurrentRenderers();
+		}
+		else {
+			for (unsigned int x = 0; x < EXECUTER_COUNT; ++x) {
+				// If this assertion fires, make sure that the executers have had their renderers released.
+				// This can be accomplished by calling this method with ppRenderers == nullptr.
+				assert(_ppExecuters[x]->QueryExecutionStage() == MCFRAME_RENDERER_EXECUTION_STAGE_NO_THREAD);
+				_ppExecuters[x]->SetFrameRenderer(std::unique_ptr<MCFrameRenderer>(ppRenderers[x]));
+			}
+		}
 	}
 
 #pragma endregion
@@ -74,13 +82,13 @@ namespace MC {
 		// This method is not thread safe. It can only be called from the main
 		// thread.
 		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
-
-		IncrementCounters();
-
+		
 		MCFrameRendererTargetInfo targetInfo;
 		GetRenderTargetInfo(&targetInfo);
 
 		auto queryFrameResult = _ppExecuters[executerIndex]->QueueNextFrame(pFrame, targetInfo);
+
+		IncrementCounters();
 		_presentQueue.push(executerIndex);
 		assert(queryFrameResult == MC_RESULT_OK);
 	}
@@ -98,6 +106,7 @@ namespace MC {
 	}
 
 	void MCFrameScheduler::GetRenderTargetInfo(MCFrameRendererTargetInfo *pInfo) {
+		auto currentBackBuffer = MCREGlobals::pMCDXGI->GetCurrentBackBufferIndex();
 		pInfo->pRenderTarget    = MCREGlobals::pMCD3D->GetRenderTarget         (_nextRenderTargetIndex);
 		pInfo->hCPURenderTarget = MCREGlobals::pMCD3D->GetRenderTargetCPUHandle(_nextRenderTargetIndex);
 		pInfo->hGPURenderTarget = MCREGlobals::pMCD3D->GetRenderTargetGPUHandle(_nextRenderTargetIndex);
@@ -121,4 +130,8 @@ namespace MC {
 		}
 	}
 	
+	void MCFrameScheduler::SafeReleaseCurrentRenderers() {
+		for (unsigned int x = 0; x < EXECUTER_COUNT; ++x)
+			_ppExecuters[x]->DestroyCurrentRenderer();
+	}
 }

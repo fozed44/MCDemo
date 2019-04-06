@@ -26,6 +26,7 @@ namespace MC {
 		MCHANDLE LoadMesh(MCMESH_DESC desc);
 
 		MCHANDLE LoadSprite(MCSPRITE_DESC desc);
+
 		/* Call update once per game loop iteration.*/
 		void      Update();
 
@@ -36,6 +37,9 @@ namespace MC {
 				control of the memory for the frame. If the result is a fail result, then the
 				caller is still responsible for the memory. */
 		MC_RESULT ScheduleFrame(MCFrame *pFrame);
+
+		/* Set the render state. */
+		void SetRenderState(MC_RENDER_STATE renderState);
 	private: /* Private Members */
 		std::unique_ptr<MCRenderer>                   _pRenderer;
 	private: /* Instances that will be copied to MCREGlobals */

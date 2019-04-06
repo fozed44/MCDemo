@@ -7,11 +7,11 @@
 
 namespace MC {
 
-	typedef enum MC_RENDERER_STATE {
-		MC_RENDERER_STATE_OFF   = 0,
-		MC_RENDERER_STATE_SPACE = 1,
-		MC_RENDERER_STATE_2D    = 2
-	} MC_RENDERER_STATE;
+	typedef enum MC_RENDER_STATE {
+		MC_RENDER_STATE_OFF   = 0,
+		MC_RENDER_STATE_SPACE = 1,
+		MC_RENDER_STATE_2D    = 2
+	} MC_RENDER_STATE;
 
 	class MCRenderer
 	{
@@ -24,8 +24,8 @@ namespace MC {
 		MCRenderer& operator= (MCRenderer&&) = delete;
 
 	public:
-		inline MC_RENDERER_STATE GetState() const { return _state; }
-		inline void SetState(MC_RENDERER_STATE state);
+		inline MC_RENDER_STATE GetState() const { return _state; }
+		void SetState(MC_RENDER_STATE state);
 
 		/* Call Update once per game loop iteration. */
 		void Update();
@@ -42,7 +42,7 @@ namespace MC {
 		MC_RESULT ScheduleFrame(MCFrame *pFrame);
 
 	private:
-		MC_RENDERER_STATE                   _state;
+		MC_RENDER_STATE                     _state;
 		std::unique_ptr<MCFrameScheduler>   _pScheduler;
 	};
 

@@ -4,9 +4,10 @@
 #include "spdlog/spdlog.h"
 #include "../../../MCCommon/src/Headers/GlobalSwitches.h"
 
-#define DEFAULT_CORE_LOGGER_NAME "CORE"
-#define DEFAULT_INIT_LOGGER_NAME "INIT"
-#define DEFAULT_XML_LOGGER_NAME "XML"
+#define DEFAULT_CORE_LOGGER_NAME   "CORE"
+#define DEFAULT_INIT_LOGGER_NAME   "INIT"
+#define DEFAULT_XML_LOGGER_NAME    "XML"
+#define DEFAULT_RENDER_LOGGER_NAME "RENDER"
 
 namespace MC {
 
@@ -18,9 +19,10 @@ namespace MC {
 			return instance;
 		}
 
-		inline std::shared_ptr<spdlog::logger> GetCore() { return _pCoreLogger; }
-		inline std::shared_ptr<spdlog::logger> GetXml()  { return _pXMLLogger; }
-		inline std::shared_ptr<spdlog::logger> GetInit() { return _pInitLogger; }
+		inline std::shared_ptr<spdlog::logger> GetCore()   { return _pCoreLogger; }
+		inline std::shared_ptr<spdlog::logger> GetXml()    { return _pXMLLogger; }
+		inline std::shared_ptr<spdlog::logger> GetInit()   { return _pInitLogger; }
+		inline std::shared_ptr<spdlog::logger> GetRender() { return _pRenderLogger; }
 
 		~MCLog();
 	private:
@@ -30,6 +32,7 @@ namespace MC {
 		static std::shared_ptr<spdlog::logger> _pCoreLogger;
 		static std::shared_ptr<spdlog::logger> _pXMLLogger;
 		static std::shared_ptr<spdlog::logger> _pInitLogger;
+		static std::shared_ptr<spdlog::logger> _pRenderLogger;
 	public:
 		MCLog(MCLog const&)          = delete;
 		void operator=(MCLog const&) = delete;
@@ -41,9 +44,10 @@ namespace MC {
 	class MCLogHelper
 	{
 	public:
-		static void SetCoreLogger(std::shared_ptr<spdlog::logger> pLogger);
-		static void SetXMLLogger(std::shared_ptr<spdlog::logger> pLogger);
-		static void SetInitLogger(std::shared_ptr<spdlog::logger> pLogger);
+		static void SetCoreLogger  (std::shared_ptr<spdlog::logger> pLogger);
+		static void SetXMLLogger   (std::shared_ptr<spdlog::logger> pLogger);
+		static void SetInitLogger  (std::shared_ptr<spdlog::logger> pLogger);
+		static void SetRenderLogger(std::shared_ptr<spdlog::logger> pLogger);
 
 		static void SetDefaultLoggers();
 		static void SetNullLoggers();
@@ -144,4 +148,31 @@ namespace MC {
 #define INIT_TRACE(...) MC::MCLog::GetInstance().GetInit()->trace(__VA_ARGS__)
 #else
 #define INIT_TRACE(...)
+#endif // __ENABLE_XML_TRACE
+
+//////////////////////////////////////////////////////////////////////////////
+// RENDER LOGGER
+
+#ifndef __DISABLE_RENDER_ERROR
+#define RENDER_ERROR(...) MC::MCLog::GetInstance().GetRender()->error(__VA_ARGS__)
+#else
+#define RENDER_ERROR(...)
+#endif // !__DISABLE_INIT_ERROR
+
+#ifndef __DISABLE_RENDER_WARNING
+#define RENDER_WARN(...) MC::MCLog::GetInstance().GetRender()->warn(__VA_ARGS__)
+#else
+#define RENDER_WARN(...)
+#endif // !__DISABLE_XML_WARNING
+
+#ifndef __DISABLE_RENDER_INFO
+#define RENDER_INFO(...) MC::MCLog::GetInstance().GetRender()->info(__VA_ARGS__)
+#else
+#define RENDER_INFO(...)
+#endif // !__DISABLE_XML_INFO
+
+#ifdef __ENABLE_RENDER_TRACE
+#define RENDER_TRACE(...) MC::MCLog::GetInstance().GetRender()->trace(__VA_ARGS__)
+#else
+#define RENDER_TRACE(...)
 #endif // __ENABLE_XML_TRACE

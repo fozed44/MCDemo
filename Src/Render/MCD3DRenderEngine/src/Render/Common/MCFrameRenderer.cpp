@@ -2,7 +2,7 @@
 
 #include "../../../../../Common/MCCommon/src/Data/MCThreads.h"
 #include "../../../../../Common/MCLog/src/Headers/MCLog.h"
-#include "../../Core/MCREGlobals.h";
+#include "../../Core/MCREGlobals.h"
 
 namespace MC {
 
@@ -62,6 +62,9 @@ namespace MC {
 				&_pCommandList
 			)
 		);
+
+		_pCommandList->Close();
+
 		INIT_TRACE("Initialization complete.");
 	}
 

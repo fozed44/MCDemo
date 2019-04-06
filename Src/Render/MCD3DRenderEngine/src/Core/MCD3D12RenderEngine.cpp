@@ -59,6 +59,10 @@ namespace MC {
 	  return _pRenderer->ScheduleFrame(pFrame);
   }
 
+  void MCD3D12RenderEngine::SetRenderState(MC_RENDER_STATE renderState) {
+	  _pRenderer->SetState(renderState);
+  }
+
 #pragma endregion
 
 }

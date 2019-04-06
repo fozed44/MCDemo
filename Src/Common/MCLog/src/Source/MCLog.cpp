@@ -8,6 +8,7 @@ namespace MC {
 	std::shared_ptr<spdlog::logger> MCLog::_pCoreLogger(nullptr);
 	std::shared_ptr<spdlog::logger> MCLog::_pInitLogger(nullptr);
 	std::shared_ptr<spdlog::logger> MCLog::_pXMLLogger(nullptr);
+	std::shared_ptr<spdlog::logger> MCLog::_pRenderLogger(nullptr);
 
 	MCLog::MCLog() {
 		if (!_pCoreLogger)
@@ -16,6 +17,8 @@ namespace MC {
 			throw std::exception("Init logger is not initialized.");
 		if (!_pXMLLogger)
 			throw std::exception("XML logger is not initialized.");
+		if (!_pRenderLogger)
+			throw std::exception("Render logger is not initialized.");
 	}
 
 	MCLog::~MCLog() { }

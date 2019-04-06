@@ -7,6 +7,7 @@
 #define __ENABLE_XML_TRACE
 #define __ENABLE_MC_TRACE
 #define __ENABLE_INIT_TRACE
+#define __ENABLE_RENDER_TRACE
 
 /*
 	Defining __DEBUG_MCCRITICAL_SECTION will cause the critical section tracker to be included. This tracker

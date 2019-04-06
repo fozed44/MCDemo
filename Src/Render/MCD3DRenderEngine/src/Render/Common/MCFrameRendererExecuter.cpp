@@ -1,42 +1,53 @@
 #include "MCFrameRendererExecuter.h"
 #include "../../../../../Common/MCCommon/src/Data/MCThreads.h"
 #include "../../../../../Common/MCCommon/src/Headers/GlobalSwitches.h"
+#include "../../../../../Common/MCLog/src/Headers/MCLog.h"
 
 
 namespace MC {
-
+	
 	std::atomic_uint s_nextThreadID{ 0 };
+
+#pragma region ctor
 
 	MCFrameRendererExecuter::MCFrameRendererExecuter(const std::string& name)
 		: _name{ name },
 		  _readyForNextFrame{ true },
+		  _executionStage{ MCFRAME_RENDERER_EXECUTION_STAGE_NO_THREAD },
 		  _exitFlag{ false },
-		  _executionStage   { MCFRAME_RENDERER_EXECUTION_STAGE_IDLE } {
+		  _pThread{nullptr},
+		  _pRenderer{nullptr},
+		  _pNextFrame{ nullptr },
+		  _nextTargetInfo{ 0 } {
 
 		// An executer should only be created on the main thread.
-		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
-
-		_pThread = std::make_unique<std::thread>(&MCFrameRendererExecuter::RenderLoop, this);
+		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);		
 	}
 
 	MCFrameRendererExecuter::~MCFrameRendererExecuter() {
 		// An executer should only be destroyed on the main thread.
 		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
 
-		KillRenderer();
+		if (_pRenderer && _pThread)
+			DestroyCurrentRenderer();
 	}
+
+#pragma endregion
+
+#pragma region Render Control
 
 	MC_RESULT MCFrameRendererExecuter::QueueNextFrame(MCFrame *pFrame, const MCFrameRendererTargetInfo& targetInfo) {
 
 		if (!_readyForNextFrame.load())
 			return MC_RESULT_FAIL_NOT_READY;
 
+		assert(pFrame);
 		assert(!_pNextFrame);
-
-		_readyForNextFrame.store(false);
 
 		_pNextFrame.reset(pFrame);
 		_nextTargetInfo = targetInfo;
+
+		_readyForNextFrame.store(false);
 
 		return MC_RESULT_OK;
 	}
@@ -46,11 +57,51 @@ namespace MC {
 		_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_IDLE);
 	}
 
-	void MCFrameRendererExecuter::KillRenderer() {
-		_exitFlag = true;
-		if(_pThread && _pThread->joinable())
-			_pThread->join();
+	void MCFrameRendererExecuter::DestroyCurrentRenderer() {
+		StopRenderThread();
+
+		if (_pRenderer)
+			_pRenderer = nullptr;
 	}
+
+	void MCFrameRendererExecuter::SetFrameRenderer(std::unique_ptr<MCFrameRenderer> pRenderer) {
+		assert(!_pRenderer);
+		assert(!_pThread);
+
+		_pRenderer = std::move(pRenderer);
+
+		StartRenderThread();
+	}
+
+#pragma region Thread Control
+
+	void MCFrameRendererExecuter::StartRenderThread() {
+		assert(_pRenderer);
+		assert(!_pThread);
+
+		RENDER_TRACE("Render Executer {0} is starting thread for renderer {1}", _name, _pRenderer->Name());
+
+		_exitFlag = false;
+		_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_IDLE);
+		_pThread = std::make_unique<std::thread>(&MCFrameRendererExecuter::RenderLoop, this);
+	}
+
+	void MCFrameRendererExecuter::StopRenderThread() {
+		assert(_pThread);
+
+		RENDER_TRACE("Renderer Executer {0} is stopping thread for renderer {1}", _name, (_pRenderer ? _pRenderer->Name() : std::string("nullptr")));
+		_exitFlag = true;
+		_pThread->join();
+
+		// We should always exit the render thread with the next frame having been destroyed.
+		assert(!_pNextFrame);
+
+		_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_NO_THREAD);
+	}
+
+#pragma endregion
+
+#pragma region Render Loop
 
 	void MCFrameRendererExecuter::RenderLoop() {
 
@@ -65,7 +116,9 @@ namespace MC {
 
 		while (!_exitFlag) {
 			if (!_readyForNextFrame.load() && _executionStage.load() == MCFRAME_RENDERER_EXECUTION_STAGE_IDLE) {
+				
 				std::unique_ptr<MCFrame> _pCurrentFrame = std::move(_pNextFrame);
+				assert(_pCurrentFrame);
 				_readyForNextFrame.store(true);
 				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_CPU_RENDERING);
 				auto fenceValue = _pRenderer->RenderFrame(_pCurrentFrame.release(), _nextTargetInfo);
@@ -74,6 +127,8 @@ namespace MC {
 				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_WAITING_TO_PRESENT);
 			}
 		}
+
+		RENDER_INFO("Exiting thread for Render Executer {0}", _name);
 
 #ifdef __MC_THREAD_EXCEPTION_REPORTING__
 		}
@@ -85,4 +140,6 @@ namespace MC {
 		}
 #endif __MC_THREAD_EXCEPTION_REPORTING__
 	}
+
+#pragma endregion
 }

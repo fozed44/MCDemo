@@ -38,10 +38,10 @@ namespace MC {
 		/*	Per-Game-Loop scheduler processing. Should be called by the engine once per game loop iteration. */
 		void UpdateSchedule();
 
-		/* Set the renderers used by the executers. */
-		void SetRenderers(MCFrameRenderer **pRenderers, unsigned int numRenderers);
-
-		void Kill();
+		/* Set the renderers used by the executers. 
+			NOTE:
+				SetRenderers can be called with nullptr, 0 as parameters to safely shut down the current executers. */
+		void SetRenderers(MCFrameRenderer **ppRenderers, unsigned int numRenderers);
 
 	private: /* Queue and Present. */
 		/*	The Queue and Present methods are called by (directly or indirectly) by UpdateSchedule. These are
@@ -60,6 +60,8 @@ namespace MC {
 		int GetReadyExecuterIndex();
 
 		void GetRenderTargetInfo(MCFrameRendererTargetInfo *pInfo);
+
+		void SafeReleaseCurrentRenderers();
 
 	private: /* Private instance data. */
 		std::unique_ptr<MCFrameRendererExecuter> _ppExecuters[EXECUTER_COUNT];

@@ -18,6 +18,10 @@ namespace MC {
 		MCLog::_pXMLLogger = pLogger;
 	}
 
+	void MCLogHelper::SetRenderLogger(std::shared_ptr<spdlog::logger> pLogger) {
+		MCLog::_pRenderLogger = pLogger;
+	}
+
 	const char *MCLogHelper::GetDefaultConsolePattern() {
 		return "%^[%T] %n: %v%$";
 	}
@@ -80,6 +84,7 @@ namespace MC {
 		SetCoreLogger(CreateStdLoggerMT (DEFAULT_CORE_LOGGER_NAME));
 		SetXMLLogger (CreateStdLoggerMT (DEFAULT_XML_LOGGER_NAME));
 		SetInitLogger(CreateDualLoggerMT(DEFAULT_INIT_LOGGER_NAME, Paths::InitLogFilename()));
+		SetRenderLogger(CreateStdLoggerMT(DEFAULT_RENDER_LOGGER_NAME));
 	}
 
 	void MCLogHelper::SetNullLoggers() {
@@ -88,6 +93,7 @@ namespace MC {
 		SetCoreLogger(nullLogger);
 		SetXMLLogger (nullLogger);
 		SetInitLogger(nullLogger);
+		SetRenderLogger(nullLogger);
 	}
 
 	void MCLogHelper::SetGlobalPattern(const char *pattern) {

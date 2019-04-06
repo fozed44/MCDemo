@@ -46,11 +46,11 @@ int Sandbox() {
 	masterTimer->Reset();
 
 	MC::RENDER_CONFIG renderConfig;
-	MC::LoadRenderConfig(&renderConfig);
+	MC::LoadRenderConfig(&renderConfig);	
 
-	//MC::MCD3D12RenderEngine::Initialize(&renderConfig);
+	auto pRenderEngine = std::make_unique<MC::MCD3D12RenderEngine>(&renderConfig);
 
-	auto t = std::make_unique<MC::MCD3D12RenderEngine>(&renderConfig);
+	pRenderEngine->SetRenderState(MC::MC_RENDER_STATE_SPACE);
 
 	MC::MCREGlobals::pRenderWindow->RegisterResizeCallback(
 		[]() {
@@ -69,6 +69,7 @@ int Sandbox() {
 	const __int64 frameCountBufferSize = 50;
 	float frameCountBuffer[frameCountBufferSize];
 	MC::MCSpaceFrame *pNextFrame = new MC::MCSpaceFrame();
+	pNextFrame->FrameType = MC::MC_FRAME_TYPE_MCFRAME_SPACE;
 	while (msg.message != WM_QUIT)
 	{
 		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
@@ -85,8 +86,10 @@ int Sandbox() {
 			frame.Time = masterTimer->TotalTime();
 
 			//MC::MCREGlobals::pMCD3D->RenderFrame(&frame);
-			if (MC::MC_RESULT_OK == MC::MCREGlobals::pRenderEngine->ScheduleFrame(pNextFrame))
+			if (MC::MC_RESULT_OK == MC::MCREGlobals::pRenderEngine->ScheduleFrame(pNextFrame)) {
 				pNextFrame = new MC::MCSpaceFrame();
+				pNextFrame->FrameType = MC::MC_FRAME_TYPE_MCFRAME_SPACE;
+			}
 
 			MC::MCREGlobals::pRenderEngine->Update();
 
@@ -100,6 +103,8 @@ int Sandbox() {
 			std::string t = std::string("MCDemo Frame(") + std::to_string(frameCount) + std::string(") fps: ") + std::to_string(fps);
 
 			SetWindowTextA(MC::MCREGlobals::pRenderWindow->hWnd(), t.c_str());
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(3));
 
 		}
 	}
