@@ -54,11 +54,9 @@ namespace MC {
 
 		template<typename T>
 		static T Abs(const T& a) {
-			if (a > 0)
+			if (a >= 0)
 				return a;
-			if (a < 0)
-				return -a;
-			return 0;
+			return -a;
 		}
 
 	};

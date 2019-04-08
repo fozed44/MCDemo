@@ -63,6 +63,9 @@ namespace MC {
 		*/
 		unsigned int GetCurrentBackBufferIndex();
 
+		/*	Return the index of the current buffer that is being presented to the screen. */
+		unsigned int GetCurrentPresentedBufferIndex();
+
 		/*
 			Return the swap chain buffer at position pos.
 		*/

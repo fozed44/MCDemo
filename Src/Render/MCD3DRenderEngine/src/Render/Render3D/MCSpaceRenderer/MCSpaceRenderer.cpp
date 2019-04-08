@@ -70,6 +70,8 @@ namespace MC {
 		std::unique_ptr<MCSpaceFrame> pFrame(static_cast<MCSpaceFrame*>(pVframe));
 		assert(pFrame->FrameType == MC_FRAME_TYPE_MCFRAME_SPACE);
 
+		assert(targetInfo.FrameIndex != MCREGlobals::pMCDXGI->GetCurrentPresentedBufferIndex());
+
 		MCThrowIfFailed(_pCommandAllocator->Reset());
 		MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));
 

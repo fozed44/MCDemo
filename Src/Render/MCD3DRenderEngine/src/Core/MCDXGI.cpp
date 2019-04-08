@@ -295,6 +295,12 @@ namespace MC {
 		return _pSwapChain->GetCurrentBackBufferIndex();
 	}
 
+	unsigned int MCDXGI::GetCurrentPresentedBufferIndex() {
+		assert(_pSwapChain);
+		auto currentBackBuffer = GetCurrentBackBufferIndex();
+		return (FRAME_BUFFER_COUNT + currentBackBuffer - 1) % FRAME_BUFFER_COUNT;
+	}
+
 	void MCDXGI::GetFrameBuffer(UINT pos, const IID &riid, void **ppSurface) {
 		MCThrowIfFailed(_pSwapChain->GetBuffer(pos, riid, ppSurface));
 	}

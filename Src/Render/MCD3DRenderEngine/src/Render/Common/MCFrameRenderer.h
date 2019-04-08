@@ -10,6 +10,7 @@ using Microsoft::WRL::ComPtr;
 namespace MC {
 
 	struct MCFrameRendererTargetInfo {
+		unsigned int FrameIndex;
 		ID3D12Resource *pRenderTarget;
 		D3D12_CPU_DESCRIPTOR_HANDLE hCPURenderTarget;
 		D3D12_GPU_DESCRIPTOR_HANDLE hGPURenderTarget;
