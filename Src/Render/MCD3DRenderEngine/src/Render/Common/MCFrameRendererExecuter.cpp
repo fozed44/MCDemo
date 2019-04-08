@@ -116,12 +116,10 @@ namespace MC {
 		while (!_exitFlag) {
 			if (_executionStage.load() == MCFRAME_RENDERER_EXECUTION_STAGE_FRAME_ACCEPTED) {
 				
-				std::unique_ptr<MCFrame> _pCurrentFrame = std::move(_pNextFrame);
+				auto _pCurrentFrame = std::move(_pNextFrame);
 				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_CPU_RENDERING);
-				auto fenceValue = _pRenderer->RenderFrame(_pCurrentFrame.release(), _nextTargetInfo);
-				std::this_thread::sleep_for(std::chrono::milliseconds(MCMath::Rand(1, 15)));
-				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_GPU_RENDERING);
-				std::this_thread::sleep_for(std::chrono::milliseconds(MCMath::Rand(1, 15)));
+				auto fenceValue = _pRenderer->RenderFrame(_pCurrentFrame.release(), _nextTargetInfo);				
+				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_GPU_RENDERING);				
 				MCREGlobals::pMCD3D->WaitForFenceValue(fenceValue);
 				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_WAITING_TO_PRESENT);
 			}
