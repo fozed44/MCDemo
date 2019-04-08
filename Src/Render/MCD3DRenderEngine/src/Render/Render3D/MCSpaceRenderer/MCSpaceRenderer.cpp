@@ -68,8 +68,15 @@ namespace MC {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS_FRAME_RENDERER_EXECUTER);
 
 		std::unique_ptr<MCSpaceFrame> pFrame(static_cast<MCSpaceFrame*>(pVframe));
+		auto firstPresentingBuff = MCREGlobals::pMCDXGI->GetCurrentPresentedBufferIndex();
+		RENDER_TRACE("Render thread {0}, firstPresentingBuff {1:d}", Name(), firstPresentingBuff);
 		assert(pFrame->FrameType == MC_FRAME_TYPE_MCFRAME_SPACE);
-
+		for (unsigned int x = 0; x < 1000000000; x++) {
+			if (MCREGlobals::pMCDXGI->GetCurrentPresentedBufferIndex() != targetInfo.FrameIndex)
+				break;
+		}
+		auto secondPresentingBuff = MCREGlobals::pMCDXGI->GetCurrentPresentedBufferIndex();
+		RENDER_TRACE("Render thread {0}, secondPresentingBuff {1:d}", Name(), secondPresentingBuff);
 		assert(targetInfo.FrameIndex != MCREGlobals::pMCDXGI->GetCurrentPresentedBufferIndex());
 
 		MCThrowIfFailed(_pCommandAllocator->Reset());
@@ -97,7 +104,7 @@ namespace MC {
 		);		
 
 		_pCommandList->ClearDepthStencilView(
-			targetInfo.hCPUDepthStencil,
+			MCREGlobals::pMCD3D->GetDepthStencilCPUHandle(),
 			D3D12_CLEAR_FLAG_DEPTH,
 			1.0f,
 			0,

@@ -12,6 +12,7 @@ namespace MC {
 	typedef enum MCFRAME_RENDERER_EXECUTION_STAGE {
 		MCFRAME_RENDERER_EXECUTION_STAGE_NO_THREAD,
 		MCFRAME_RENDERER_EXECUTION_STAGE_IDLE,
+		MCFRAME_RENDERER_EXECUTION_STAGE_FRAME_ACCEPTED,
 		MCFRAME_RENDERER_EXECUTION_STAGE_CPU_RENDERING,
 		MCFRAME_RENDERER_EXECUTION_STAGE_GPU_RENDERING,
 		MCFRAME_RENDERER_EXECUTION_STAGE_WAITING_TO_PRESENT
@@ -51,8 +52,6 @@ namespace MC {
 			return (MCFRAME_RENDERER_EXECUTION_STAGE)_executionStage.load();
 		}
 
-		bool QueryReadyForNextFrame() const { return _readyForNextFrame.load(); }
-
 	private: /* Thread control */
 
 		/* Start the render thread. _pRenderer must be valid and _pThread must be null. */
@@ -68,7 +67,6 @@ namespace MC {
 	private:
 		std::string                         _name;
 
-		std::atomic<bool>					_readyForNextFrame;
 		std::atomic<unsigned int>           _executionStage;
 		bool                                _exitFlag;
 

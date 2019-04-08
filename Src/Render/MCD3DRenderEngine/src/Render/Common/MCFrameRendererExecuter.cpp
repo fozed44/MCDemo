@@ -12,7 +12,6 @@ namespace MC {
 
 	MCFrameRendererExecuter::MCFrameRendererExecuter(const std::string& name)
 		: _name{ name },
-		  _readyForNextFrame{ true },
 		  _executionStage{ MCFRAME_RENDERER_EXECUTION_STAGE_NO_THREAD },
 		  _exitFlag{ false },
 		  _pThread{nullptr},
@@ -38,7 +37,7 @@ namespace MC {
 
 	MC_RESULT MCFrameRendererExecuter::QueueNextFrame(MCFrame *pFrame, const MCFrameRendererTargetInfo& targetInfo) {
 
-		if (!_readyForNextFrame.load())
+		if (_executionStage.load() != MCFRAME_RENDERER_EXECUTION_STAGE_IDLE)
 			return MC_RESULT_FAIL_NOT_READY;
 
 		assert(pFrame);
@@ -47,7 +46,7 @@ namespace MC {
 		_pNextFrame.reset(pFrame);
 		_nextTargetInfo = targetInfo;
 
-		_readyForNextFrame.store(false);
+		_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_FRAME_ACCEPTED);
 
 		return MC_RESULT_OK;
 	}
@@ -115,10 +114,9 @@ namespace MC {
 		);
 
 		while (!_exitFlag) {
-			if (!_readyForNextFrame.load() && _executionStage.load() == MCFRAME_RENDERER_EXECUTION_STAGE_IDLE) {
+			if (_executionStage.load() == MCFRAME_RENDERER_EXECUTION_STAGE_FRAME_ACCEPTED) {
 				
 				std::unique_ptr<MCFrame> _pCurrentFrame = std::move(_pNextFrame);
-				_readyForNextFrame.store(true);
 				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_CPU_RENDERING);
 				auto fenceValue = _pRenderer->RenderFrame(_pCurrentFrame.release(), _nextTargetInfo);
 				std::this_thread::sleep_for(std::chrono::milliseconds(MCMath::Rand(1, 15)));

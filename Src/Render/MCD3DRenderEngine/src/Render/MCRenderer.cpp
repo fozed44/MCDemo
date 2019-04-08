@@ -11,7 +11,7 @@ namespace MC {
 	MCRenderer::~MCRenderer() { }
 
 	void MCRenderer::Update() {
-		_pScheduler->UpdateSchedule();
+		_pScheduler->UpdateScheduler();
 	}
 
 	void MCRenderer::SetState(MC_RENDER_STATE state) {
@@ -22,18 +22,15 @@ namespace MC {
 		// If state == MC_RENDER_STATE_OFF shut down the scheduler by
 		// removing the renderers.
 		if (state == MC_RENDER_STATE_OFF) {
-			_pScheduler->SetRenderers(nullptr, 0);
+			_pScheduler->SetRenderer(nullptr);
 			_state = state;
 			return;
 		}
 
-		// Give new renderers to the scheduler, which in turn, will pass them
+		// Give a new renderer to the scheduler, which in turn, will pass it
 		// to the executer.
-		MCFrameRenderer *pRenderers[FRAME_BUFFER_COUNT - 1];
 		if (state == MC_RENDER_STATE_SPACE) {
-			for (int x = 0; x < FRAME_BUFFER_COUNT - 1; ++x)
-				pRenderers[x] = new MCSpaceRenderer(std::string("MCSpaceRenderer ") + std::to_string(x));
-			_pScheduler->SetRenderers(pRenderers, _countof(pRenderers));
+			_pScheduler->SetRenderer(new MCSpaceRenderer("Space Renderer"));
 			_state = state;
 			return;
 		}

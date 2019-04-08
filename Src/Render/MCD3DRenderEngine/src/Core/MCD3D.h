@@ -213,12 +213,12 @@ namespace MC {
 		D3D12_CPU_DESCRIPTOR_HANDLE GetRenderTargetCPUHandle(unsigned int index);
 		D3D12_GPU_DESCRIPTOR_HANDLE GetRenderTargetGPUHandle(unsigned int index);
 
-		/* Get a pointer to a specific depth stencil. There will be one less DS than RT. */
-		ID3D12Resource* GetDepthStencil(unsigned int index);
+		/* Get a pointer to the depth stencil. */
+		ID3D12Resource* GetDepthStencil();
 
-		/* Get a CPU descriptor to a specific depth stencil. */
-		D3D12_CPU_DESCRIPTOR_HANDLE GetDepthStencilCPUHandle(unsigned int index);
-		D3D12_GPU_DESCRIPTOR_HANDLE GetDepthStencilGPUHandle(unsigned int index);
+		/* Get a CPU descriptor to the depth stencil. */
+		D3D12_CPU_DESCRIPTOR_HANDLE GetDepthStencilCPUHandle();
+		D3D12_GPU_DESCRIPTOR_HANDLE GetDepthStencilGPUHandle();
 
 	private:
 
@@ -238,11 +238,11 @@ namespace MC {
 		UINT                              _DSVDescriptorSize;
 
 		// Render Targets
+		static_assert(FRAME_BUFFER_COUNT == 2, "This engine must have 2 buffers, a front buffer and a back buffer.");
 		ComPtr<ID3D12Resource>            _ppRenderTargets[FRAME_BUFFER_COUNT];
 
-		// Depth Stencils
-		static_assert(FRAME_BUFFER_COUNT > 1, "FRAME_BUFFER_COUNT must be at least 2.");
-		ComPtr<ID3D12Resource>            _ppDepthStencils[DEPTH_BUFFER_COUNT];
+		// Depth Stencil
+		ComPtr<ID3D12Resource>            _pDepthStencil;
 
 	private:
 		void Init3DDevice();

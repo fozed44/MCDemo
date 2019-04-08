@@ -13,8 +13,6 @@
 #define MAX_VALID_WINDOW_HEIGHT 10000
 
 // Number of frames used in the swap chain
-const int FRAME_BUFFER_COUNT = 3;
-const int DEPTH_BUFFER_COUNT = FRAME_BUFFER_COUNT - 1; // One less descriptor than there are frame buffers
-									                   // (we don't need a ds for the frame that is currently displayed.)
+const int FRAME_BUFFER_COUNT = 2; // MUST be 2. 1 Front buffer and 1 Back buffer.
 
 #define BACK_BUFFER_FORMAT DXGI_FORMAT_R8G8B8A8_UNORM

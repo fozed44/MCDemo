@@ -10,7 +10,6 @@
 
 namespace MC {
 
-	const unsigned int EXECUTER_COUNT = FRAME_BUFFER_COUNT - 1;
 	const unsigned int FRAME_QUEUE_SIZE = 2;
 
 	class MCFrameScheduler
@@ -36,12 +35,12 @@ namespace MC {
 		MC_RESULT ScheduleFrame(MCFrame *pFrame);
 
 		/*	Per-Game-Loop scheduler processing. Should be called by the engine once per game loop iteration. */
-		void UpdateSchedule();
+		void UpdateScheduler();
 
 		/* Set the renderers used by the executers. 
 			NOTE:
-				SetRenderers can be called with nullptr, 0 as parameters to safely shut down the current executers. */
-		void SetRenderers(MCFrameRenderer **ppRenderers, unsigned int numRenderers);
+				SetRenderer can be called with nullptr as the parameters to safely shut down the current executer. */
+		void SetRenderer(MCFrameRenderer *pRenderer);
 
 	private: /* Queue and Present. */
 		/*	The Queue and Present methods are called by (directly or indirectly) by UpdateSchedule. These are
@@ -51,24 +50,20 @@ namespace MC {
 		
 		void TryQueueNextFrame();
 
-		void QueueFrame(MCFrame *pFrame, unsigned int executerIndex);
+		void QueueFrame(MCFrame *pFrame);
 
-		void TryPresentNext();
+		void TryPresent();
 
-		void IncrementCounters();
-
-		int GetReadyExecuterIndex();
+		void IncrementRenderTargetIndex();
 
 		void GetRenderTargetInfo(MCFrameRendererTargetInfo *pInfo);
 
-		void SafeReleaseCurrentRenderers();
+		void SafeReleaseCurrentRenderer();
 
 	private: /* Private instance data. */
-		std::unique_ptr<MCFrameRendererExecuter> _ppExecuters[EXECUTER_COUNT];
-		std::queue<unsigned int>                 _presentQueue;
+		std::unique_ptr<MCFrameRendererExecuter> _pExecuter;
 		std::queue<std::unique_ptr<MCFrame>>     _frameQueue;
 		unsigned int                             _nextRenderTargetIndex;
-		unsigned int                             _nextDepthBufferIndex;
 		
 		MCCriticalSectionLock                    _lock;
 
