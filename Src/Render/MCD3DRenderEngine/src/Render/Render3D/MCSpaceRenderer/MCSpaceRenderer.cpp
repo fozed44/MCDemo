@@ -60,7 +60,7 @@ namespace MC {
 
 #pragma region Draw
 
-	unsigned __int64 MCSpaceRenderer::RenderFrame(
+	void MCSpaceRenderer::PrepareCommandLists(
 		MCFrame *pVframe,
 		const MCFrameRendererTargetInfo& targetInfo
 	) {
@@ -113,7 +113,9 @@ namespace MC {
 		);
 
 		_pCommandList->Close();
+	}
 
+	unsigned __int64 MCSpaceRenderer::ExecuteCommandLists() {
 		MCREGlobals::pMCD3D->ExecuteCommandList(_pCommandList.Get());
 
 		return MCREGlobals::pMCD3D->GetNewFenceValue();

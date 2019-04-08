@@ -21,9 +21,15 @@
     <ClInclude Include="src\Core\MCMessage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\MCRouter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\MCMessageHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\MCRouter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

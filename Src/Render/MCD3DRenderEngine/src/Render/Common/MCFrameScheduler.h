@@ -52,7 +52,7 @@ namespace MC {
 
 		void QueueFrame(MCFrame *pFrame);
 
-		void TryPresent();
+		/*void TryPresent();*/
 
 		void IncrementRenderTargetIndex();
 

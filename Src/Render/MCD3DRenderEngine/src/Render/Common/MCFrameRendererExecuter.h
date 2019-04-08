@@ -34,9 +34,9 @@ namespace MC {
 		ownership of pNextFrame will be passed to the renderer, which will destroy the memory. */
 		MC_RESULT QueueNextFrame(MCFrame *pNextFrame, const MCFrameRendererTargetInfo& targetInfo);
 
-		/*	Notify the executer that its current frame has been presented to the screen. This will allow the
-		executer from change states from WAITING_TO_PRESENT to IDLE. */
-		void NotifyFramePresented();
+		///*	Notify the executer that its current frame has been presented to the screen. This will allow the
+		//executer from change states from WAITING_TO_PRESENT to IDLE. */
+		//void NotifyFramePresented();
 
 		/*	Destroy the current renderer. The current render thread will be stopped. This method must be called before
 		setting a new renderer. */
@@ -75,6 +75,8 @@ namespace MC {
 
 		std::unique_ptr<MCFrame>   	       _pNextFrame;
 		MCFrameRendererTargetInfo          _nextTargetInfo;
+
+		unsigned __int64                   _previousFrameFenceValue;
 	};
 
 }

@@ -36,7 +36,7 @@ namespace MC {
 
 	void MCFrameScheduler::UpdateScheduler() {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
-		TryPresent();
+		//TryPresent();
 		TryQueueNextFrame();
 	}
 
@@ -99,7 +99,7 @@ namespace MC {
 		pInfo->hGPURenderTarget = MCREGlobals::pMCD3D->GetRenderTargetGPUHandle(_nextRenderTargetIndex);
 	}
 
-	void MCFrameScheduler::TryPresent() {
+	/*void MCFrameScheduler::TryPresent() {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
 
 		if (_pExecuter->QueryExecutionStage() != MCFRAME_RENDERER_EXECUTION_STAGE_WAITING_TO_PRESENT)
@@ -107,7 +107,7 @@ namespace MC {
 
 		MCREGlobals::pMCDXGI->Present();
 		_pExecuter->NotifyFramePresented();		
-	}
+	}*/
 	
 	void MCFrameScheduler::SafeReleaseCurrentRenderer() {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);

@@ -27,7 +27,7 @@ namespace MC {
 
 			*/
 
-	} MC_MESSAGE_IND;
+	} MC_MESSAGE;
 
 #pragma pack(push, 1)
 	struct alignas(4) MC_MESSAGE32 {

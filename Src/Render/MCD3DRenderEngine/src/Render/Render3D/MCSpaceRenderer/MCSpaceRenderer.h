@@ -16,7 +16,8 @@ namespace MC {
 		MCSpaceRenderer& operator= (MCSpaceRenderer&&) = delete;
 
 	public: /* Render Frame */
-		unsigned __int64 RenderFrame(MCFrame *pVframe, const MCFrameRendererTargetInfo& targetInfo) override;
+		void PrepareCommandLists(MCFrame *pVframe, const MCFrameRendererTargetInfo& targetInfo) override;
+		unsigned __int64 ExecuteCommandLists() override;
 
 	public: /* Render options. */
 

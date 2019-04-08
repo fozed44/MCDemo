@@ -130,10 +130,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\MCRouter.h" />
     <ClInclude Include="src\Core\MCMessage.h" />
     <ClInclude Include="src\Core\MCMessageHandler.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\MCRouter.cpp" />
     <ClCompile Include="src\Core\MCMessageHandler.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

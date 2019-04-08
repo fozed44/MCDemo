@@ -7,6 +7,41 @@
 
 namespace MC {
 
+	/*
+
+		 The rendering sub-system is divided into four main areas, each implemented by its own class or classes.
+
+		1) MCRenderer:
+			MCRenderer is the facade that is provided to MCD3DRenderEngine that enables actual rendering.
+
+		2) MCFrameScheduler:
+			Manages a queue of MCFrameData and the timing needed to transfer that data to the Executer.
+
+		3) MCFrameRendererExecuter:
+			Manages the thread running the current frame renderer.
+
+		4) MCFrameRenderer:
+			One of several implementations of the MCFrameRenderer base class.
+
+			    *----------*
+			    | Renderer |
+			    *----------*
+					 |
+					 +
+			 *----------------*
+			 | FrameScheduler |
+			 *----------------*
+					 |
+					 +
+		 *-----------------------*
+		 | FrameRendererExecuter |
+		 *-----------------------*
+					 |
+					 +
+		    *------------------*
+		    |   FrameRenderer  |
+		    *------------------*
+	*/
 	typedef enum MC_RENDER_STATE {
 		MC_RENDER_STATE_OFF   = 0,
 		MC_RENDER_STATE_SPACE = 1,
@@ -15,7 +50,7 @@ namespace MC {
 
 	class MCRenderer
 	{
-	public:
+	public: /* ctor */
 		MCRenderer();
 		~MCRenderer();
 		MCRenderer(MCRenderer&)              = delete;

@@ -17,6 +17,7 @@ namespace MC {
 		  _pThread{nullptr},
 		  _pRenderer{nullptr},
 		  _pNextFrame{ nullptr },
+		  _previousFrameFenceValue{ 0 },
 		  _nextTargetInfo{ 0 } {
 
 		// An executer should only be created on the main thread.
@@ -51,10 +52,10 @@ namespace MC {
 		return MC_RESULT_OK;
 	}
 
-	void MCFrameRendererExecuter::NotifyFramePresented() {
+	/*void MCFrameRendererExecuter::NotifyFramePresented() {
 		assert(_executionStage.load() == MCFRAME_RENDERER_EXECUTION_STAGE_WAITING_TO_PRESENT);
 		_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_IDLE);
-	}
+	}*/
 
 	void MCFrameRendererExecuter::DestroyCurrentRenderer() {
 		StopRenderThread();
@@ -113,15 +114,20 @@ namespace MC {
 			MC_THREAD_CLASS_FRAME_RENDERER_EXECUTER
 		);
 
+		unsigned __int64 cl = 0;
+
 		while (!_exitFlag) {
 			if (_executionStage.load() == MCFRAME_RENDERER_EXECUTION_STAGE_FRAME_ACCEPTED) {
 				
 				auto _pCurrentFrame = std::move(_pNextFrame);
 				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_CPU_RENDERING);
-				auto fenceValue = _pRenderer->RenderFrame(_pCurrentFrame.release(), _nextTargetInfo);				
-				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_GPU_RENDERING);				
-				MCREGlobals::pMCD3D->WaitForFenceValue(fenceValue);
-				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_WAITING_TO_PRESENT);
+				MCREGlobals::pMCD3D->WaitForFenceValue(_previousFrameFenceValue);
+				_pRenderer->PrepareCommandLists(_pCurrentFrame.release(), _nextTargetInfo);
+				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_IDLE);
+				//_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_GPU_RENDERING);
+				_pRenderer->ExecuteCommandLists();
+				MCREGlobals::pMCDXGI->Present();
+				_previousFrameFenceValue = MCREGlobals::pMCD3D->GetNewFenceValue();
 			}
 		}
 

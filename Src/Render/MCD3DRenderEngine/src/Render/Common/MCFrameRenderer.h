@@ -31,7 +31,8 @@ namespace MC {
 		      std::string& Name()       { return _name; }
 
 	public: /* RenderFrame */
-		virtual unsigned __int64 RenderFrame(MCFrame *pVframe, const MCFrameRendererTargetInfo& frameTarget) = 0;
+		virtual void PrepareCommandLists(MCFrame *pVframe, const MCFrameRendererTargetInfo& frameTarget) = 0;
+		virtual unsigned __int64 ExecuteCommandLists() = 0;
 
 	protected: /* D3D12 Objects */
 
