@@ -9,8 +9,8 @@ namespace MC {
 
 #pragma region Ctor
 
-	MCSpaceRenderer::MCSpaceRenderer(const std::string& name) 
-		: MCFrameRenderer3D(name) {
+	MCSpaceRenderer::MCSpaceRenderer(const std::string& name, unsigned int frameIndex) 
+		: MCFrameRenderer3D(name, frameIndex) {
 		InitializeSpaceRenderer();
 	}
 
@@ -60,10 +60,7 @@ namespace MC {
 
 #pragma region Draw
 
-	void MCSpaceRenderer::PrepareCommandLists(
-		MCFrame *pVframe,
-		const MCFrameRendererTargetInfo& targetInfo
-	) {
+	void MCSpaceRenderer::PrepareCommandLists(MCFrame *pVframe) {
 		// Render should only be called by a render executer, on an executer thread.
 		MCTHREAD_ASSERT(MC_THREAD_CLASS_FRAME_RENDERER_EXECUTER);
 
@@ -79,7 +76,7 @@ namespace MC {
 		_pCommandList->ResourceBarrier(
 			1,
 			&CD3DX12_RESOURCE_BARRIER::Transition(
-				targetInfo.pRenderTarget,
+				_pRenderTarget,
 				D3D12_RESOURCE_STATE_PRESENT,
 				D3D12_RESOURCE_STATE_RENDER_TARGET
 			)
@@ -88,14 +85,14 @@ namespace MC {
 		FLOAT colorBlack[4]{ 0.0f, 0.0f, 0.0f, 0.0f };
 
 		_pCommandList->ClearRenderTargetView(
-			targetInfo.hCPURenderTarget,
+			_hCPURenderTarget,
 			colorBlack,
 			0,
 			nullptr
 		);		
 
 		_pCommandList->ClearDepthStencilView(
-			MCREGlobals::pMCD3D->GetDepthStencilCPUHandle(),
+			_hCPUDepthStencil,
 			D3D12_CLEAR_FLAG_DEPTH,
 			1.0f,
 			0,
@@ -106,7 +103,7 @@ namespace MC {
 		_pCommandList->ResourceBarrier(
 			1,
 			&CD3DX12_RESOURCE_BARRIER::Transition(
-				targetInfo.pRenderTarget,
+				_pRenderTarget,
 				D3D12_RESOURCE_STATE_RENDER_TARGET,
 				D3D12_RESOURCE_STATE_PRESENT
 			)

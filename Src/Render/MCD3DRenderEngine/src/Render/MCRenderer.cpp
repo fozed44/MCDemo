@@ -22,7 +22,7 @@ namespace MC {
 		// If state == MC_RENDER_STATE_OFF shut down the scheduler by
 		// removing the renderers.
 		if (state == MC_RENDER_STATE_OFF) {
-			_pScheduler->SetRenderer(nullptr);
+			_pScheduler->SetRenderers(nullptr,0);
 			_state = state;
 			return;
 		}
@@ -30,7 +30,13 @@ namespace MC {
 		// Give a new renderer to the scheduler, which in turn, will pass it
 		// to the executer.
 		if (state == MC_RENDER_STATE_SPACE) {
-			_pScheduler->SetRenderer(new MCSpaceRenderer("Space Renderer"));
+			static_assert(FRAME_BUFFER_COUNT == 2, "Code is dependent on FRAME_BUFFER_COUNT == 2");
+
+			MCFrameRenderer *ppRenderers[FRAME_BUFFER_COUNT];
+			ppRenderers[0] = new MCSpaceRenderer("MCSpaceRenderer 0", 0);
+			ppRenderers[1] = new MCSpaceRenderer("MCSpaceRenderer 1", 1);
+
+			_pScheduler->SetRenderers(ppRenderers, _countof(ppRenderers));
 			_state = state;
 			return;
 		}

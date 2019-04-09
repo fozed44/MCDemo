@@ -40,7 +40,7 @@ namespace MC {
 		/* Set the renderers used by the executers. 
 			NOTE:
 				SetRenderer can be called with nullptr as the parameters to safely shut down the current executer. */
-		void SetRenderer(MCFrameRenderer *pRenderer);
+		void SetRenderers(MCFrameRenderer **ppRenderers, unsigned int count);
 
 	private: /* Queue and Present. */
 		/*	The Queue and Present methods are called by (directly or indirectly) by UpdateSchedule. These are
@@ -56,14 +56,15 @@ namespace MC {
 
 		void IncrementRenderTargetIndex();
 
-		void GetRenderTargetInfo(MCFrameRendererTargetInfo *pInfo);
+		//void GetRenderTargetInfo(MCFrameRendererTargetInfo *pInfo);
 
-		void SafeReleaseCurrentRenderer();
+		void SafeReleaseCurrentRenderers();
 
 	private: /* Private instance data. */
-		std::unique_ptr<MCFrameRendererExecuter> _pExecuter;
+		std::unique_ptr<MCFrameRendererExecuter> _ppExecuters[FRAME_BUFFER_COUNT];
 		std::queue<std::unique_ptr<MCFrame>>     _frameQueue;
-		unsigned int                             _nextRenderTargetIndex;
+
+		unsigned int                             _nextExecuterIndex;
 		
 		MCCriticalSectionLock                    _lock;
 

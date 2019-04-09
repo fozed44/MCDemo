@@ -10,12 +10,11 @@
 namespace MC {
 
 	typedef enum MCFRAME_RENDERER_EXECUTION_STAGE {
-		MCFRAME_RENDERER_EXECUTION_STAGE_NO_THREAD,
-		MCFRAME_RENDERER_EXECUTION_STAGE_IDLE,
-		MCFRAME_RENDERER_EXECUTION_STAGE_FRAME_ACCEPTED,
-		MCFRAME_RENDERER_EXECUTION_STAGE_CPU_RENDERING,
-		MCFRAME_RENDERER_EXECUTION_STAGE_GPU_RENDERING,
-		MCFRAME_RENDERER_EXECUTION_STAGE_WAITING_TO_PRESENT
+		MCFRAME_RENDERER_EXECUTION_STAGE_NO_THREAD      = 0,
+		MCFRAME_RENDERER_EXECUTION_STAGE_FRAME_ACCEPTED = 1,
+		MCFRAME_RENDERER_EXECUTION_STAGE_CPU_RENDERING  = 2,
+		MCFRAME_RENDERER_EXECUTION_STAGE_WAITING_ON_GPU = 3,
+		MCFRAME_RENDERER_EXECUTION_STAGE_IDLE           = 4,
 	} MCFRAME_RENDERER_EXECUTION_STAGE;
 
 	class MCFrameRendererExecuter {
@@ -32,7 +31,7 @@ namespace MC {
 		/*	Attempt to queue pNextFrame. Note that the scheduler *should* be using QueryReadyForNextFrame to
 		ensure that a call to QueueNextFrame does not fail. Also if QueueNextFrame does not fail (and it should not)
 		ownership of pNextFrame will be passed to the renderer, which will destroy the memory. */
-		MC_RESULT QueueNextFrame(MCFrame *pNextFrame, const MCFrameRendererTargetInfo& targetInfo);
+		MC_RESULT QueueNextFrame(MCFrame *pNextFrame);
 
 		///*	Notify the executer that its current frame has been presented to the screen. This will allow the
 		//executer from change states from WAITING_TO_PRESENT to IDLE. */
@@ -74,7 +73,6 @@ namespace MC {
 		std::unique_ptr<MCFrameRenderer>   _pRenderer;
 
 		std::unique_ptr<MCFrame>   	       _pNextFrame;
-		MCFrameRendererTargetInfo          _nextTargetInfo;
 
 		unsigned __int64                   _previousFrameFenceValue;
 	};

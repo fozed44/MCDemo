@@ -9,10 +9,11 @@ namespace MC {
 #pragma region ctor
 
 	MCFrameScheduler::MCFrameScheduler() 
-		: _nextRenderTargetIndex{ 0 } {
+		: _nextExecuterIndex{ 0 } {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
 
-		_pExecuter = std::make_unique<MCFrameRendererExecuter>("Frame executer");
+		for(unsigned int x = 0; x < FRAME_BUFFER_COUNT; ++x)
+			_ppExecuters[x] = std::make_unique<MCFrameRendererExecuter>(std::string("Frame executer (") + std::to_string(x) + std::string(")"));
 		MCCriticalSection::InitializeLock(&_lock);
 	}
 
@@ -40,17 +41,19 @@ namespace MC {
 		TryQueueNextFrame();
 	}
 
-	void MCFrameScheduler::SetRenderer(MCFrameRenderer *pRenderer) {
+	void MCFrameScheduler::SetRenderers(MCFrameRenderer **ppRenderers, unsigned int count) {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
 
-		if (nullptr == pRenderer) {
-			SafeReleaseCurrentRenderer();
+		if (nullptr == ppRenderers) {
+			SafeReleaseCurrentRenderers();
 		}
 		else {
-			// If this assertion fires, make sure that the executer has had its renderer released.
-			// This can be accomplished by calling this method with pRenderer == nullptr.
-			assert(_pExecuter->QueryExecutionStage() == MCFRAME_RENDERER_EXECUTION_STAGE_NO_THREAD);
-			_pExecuter->SetFrameRenderer(std::unique_ptr<MCFrameRenderer>(pRenderer));
+			for (unsigned int x = 0; x < FRAME_BUFFER_COUNT; ++x) {
+				// If this assertion fires, make sure that the executer has had its renderers released.
+				// This can be accomplished by calling this method with pRenderer == nullptr.
+				assert(_ppExecuters[x]->QueryExecutionStage() == MCFRAME_RENDERER_EXECUTION_STAGE_NO_THREAD);
+				_ppExecuters[x]->SetFrameRenderer(std::unique_ptr<MCFrameRenderer>(ppRenderers[x]));
+			}
 		}
 	}
 
@@ -61,7 +64,7 @@ namespace MC {
 	void MCFrameScheduler::TryQueueNextFrame() {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
 		
-		if (_pExecuter->QueryExecutionStage() != MCFRAME_RENDERER_EXECUTION_STAGE_IDLE
+		if (_ppExecuters[_nextExecuterIndex]->QueryExecutionStage() != MCFRAME_RENDERER_EXECUTION_STAGE_IDLE
 	     || _frameQueue.empty())
 			return;
 		
@@ -76,10 +79,10 @@ namespace MC {
 		// thread.
 		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
 
-		MCFrameRendererTargetInfo targetInfo;
-		GetRenderTargetInfo(&targetInfo);
+		/*MCFrameRendererTargetInfo targetInfo;
+		GetRenderTargetInfo(&targetInfo);*/
 
-		auto queryFrameResult = _pExecuter->QueueNextFrame(pFrame, targetInfo);
+		auto queryFrameResult = _ppExecuters[_nextExecuterIndex]->QueueNextFrame(pFrame);
 		assert(queryFrameResult == MC_RESULT_OK);
 
 		IncrementRenderTargetIndex();
@@ -87,17 +90,17 @@ namespace MC {
 
 	void MCFrameScheduler::IncrementRenderTargetIndex() {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
-		_nextRenderTargetIndex = ++_nextRenderTargetIndex % FRAME_BUFFER_COUNT;
+		_nextExecuterIndex = ++_nextExecuterIndex % FRAME_BUFFER_COUNT;
 	}
 
-	void MCFrameScheduler::GetRenderTargetInfo(MCFrameRendererTargetInfo *pInfo) {
+	/*void MCFrameScheduler::GetRenderTargetInfo(MCFrameRendererTargetInfo *pInfo) {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
 
 		pInfo->FrameIndex       = _nextRenderTargetIndex;
 		pInfo->pRenderTarget    = MCREGlobals::pMCD3D->GetRenderTarget         (_nextRenderTargetIndex);
 		pInfo->hCPURenderTarget = MCREGlobals::pMCD3D->GetRenderTargetCPUHandle(_nextRenderTargetIndex);
 		pInfo->hGPURenderTarget = MCREGlobals::pMCD3D->GetRenderTargetGPUHandle(_nextRenderTargetIndex);
-	}
+	}*/
 
 	/*void MCFrameScheduler::TryPresent() {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
@@ -109,8 +112,9 @@ namespace MC {
 		_pExecuter->NotifyFramePresented();		
 	}*/
 	
-	void MCFrameScheduler::SafeReleaseCurrentRenderer() {
+	void MCFrameScheduler::SafeReleaseCurrentRenderers() {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
-		_pExecuter->DestroyCurrentRenderer();
+		for(unsigned int x = 0; x < FRAME_BUFFER_COUNT; ++x)
+			_ppExecuters[x]->DestroyCurrentRenderer();
 	}
 }

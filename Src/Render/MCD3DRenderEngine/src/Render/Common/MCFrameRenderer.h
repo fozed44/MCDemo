@@ -9,16 +9,9 @@ using Microsoft::WRL::ComPtr;
 
 namespace MC {
 
-	struct MCFrameRendererTargetInfo {
-		unsigned int FrameIndex;
-		ID3D12Resource *pRenderTarget;
-		D3D12_CPU_DESCRIPTOR_HANDLE hCPURenderTarget;
-		D3D12_GPU_DESCRIPTOR_HANDLE hGPURenderTarget;
-	};
-
 	class MCFrameRenderer {
 	public: /* ctor / dtor / assignment*/
-		MCFrameRenderer(const std::string& name);
+		MCFrameRenderer(const std::string& name, unsigned int frameIndex);
 		virtual ~MCFrameRenderer();
 		MCFrameRenderer(MCFrameRenderer&)              = delete;
 		MCFrameRenderer(MCFrameRenderer&&)             = delete;
@@ -31,10 +24,22 @@ namespace MC {
 		      std::string& Name()       { return _name; }
 
 	public: /* RenderFrame */
-		virtual void PrepareCommandLists(MCFrame *pVframe, const MCFrameRendererTargetInfo& frameTarget) = 0;
-		virtual unsigned __int64 ExecuteCommandLists() = 0;
+		virtual void PrepareCommandLists(MCFrame *pVframe) = 0;
+		virtual unsigned __int64 ExecuteCommandLists()     = 0;
+
+		/* Use the value of _frameIndex (set during construction) to acquire the render target from MCDXGI */
+		void AcquireRenderTargetInfo();
 
 	protected: /* D3D12 Objects */
+		unsigned int					  _frameIndex;
+		ID3D12Resource*					  _pRenderTarget;
+		ID3D12Resource*                   _pDepthStencil;
+
+		D3D12_CPU_DESCRIPTOR_HANDLE		  _hCPURenderTarget;
+		D3D12_GPU_DESCRIPTOR_HANDLE	      _hGPURenderTarget;
+
+		D3D12_CPU_DESCRIPTOR_HANDLE		  _hCPUDepthStencil;
+		D3D12_GPU_DESCRIPTOR_HANDLE		  _hGPUDepthStencil;
 
 		ComPtr<ID3D12GraphicsCommandList> _pCommandList;
 		ComPtr<ID3D12CommandAllocator>    _pCommandAllocator;

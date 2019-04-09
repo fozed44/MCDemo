@@ -12,19 +12,21 @@ namespace MC {
 
 #pragma endregion
 
-	MCFrameRenderer::MCFrameRenderer(const std::string& name) 
-		: _name{ name }{
+	MCFrameRenderer::MCFrameRenderer(const std::string& name, unsigned int frameIndex) 
+		: _name{ name },
+		  _frameIndex{ frameIndex } {
 
 		// A Frame renderer should only be constructed on the main thread.
 		MCThreads::Assert(MC_THREAD_CLASS_MAIN);
 
 		InitializeBase();
+		AcquireRenderTargetInfo();
 	}
 
 
 	MCFrameRenderer::~MCFrameRenderer() { 
 		// A Frame renderer should only be destructed on the main thread.
-		MCThreads::Assert(MC_THREAD_CLASS_MAIN);
+		MCThreads::Assert(MC_THREAD_CLASS_MAIN);		
 	}
 
 #pragma region Initialization
@@ -88,6 +90,21 @@ namespace MC {
 		_scissorRect.bottom = height;
 
 		INIT_TRACE("End view port.");
+	}
+
+#pragma endregion
+
+#pragma region RenderTarget acquizition
+
+	void MCFrameRenderer::AcquireRenderTargetInfo() {
+		MCREGlobals::pMCDXGI->GetFrameBuffer(_frameIndex, __uuidof(_pRenderTarget), (void**)&_pRenderTarget);
+		_pDepthStencil = MCREGlobals::pMCD3D->GetDepthStencil();
+
+		_hCPURenderTarget = MCREGlobals::pMCD3D->GetRenderTargetCPUHandle(_frameIndex);
+		_hGPURenderTarget = MCREGlobals::pMCD3D->GetRenderTargetGPUHandle(_frameIndex);
+
+		_hCPUDepthStencil = MCREGlobals::pMCD3D->GetDepthStencilCPUHandle();
+		_hGPUDepthStencil = MCREGlobals::pMCD3D->GetDepthStencilGPUHandle();
 	}
 
 #pragma endregion

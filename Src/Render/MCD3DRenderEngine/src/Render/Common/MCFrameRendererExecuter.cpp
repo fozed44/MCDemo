@@ -17,8 +17,7 @@ namespace MC {
 		  _pThread{nullptr},
 		  _pRenderer{nullptr},
 		  _pNextFrame{ nullptr },
-		  _previousFrameFenceValue{ 0 },
-		  _nextTargetInfo{ 0 } {
+		  _previousFrameFenceValue{ 0 } {
 
 		// An executer should only be created on the main thread.
 		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);		
@@ -36,7 +35,7 @@ namespace MC {
 
 #pragma region Render Control
 
-	MC_RESULT MCFrameRendererExecuter::QueueNextFrame(MCFrame *pFrame, const MCFrameRendererTargetInfo& targetInfo) {
+	MC_RESULT MCFrameRendererExecuter::QueueNextFrame(MCFrame *pFrame) {
 
 		if (_executionStage.load() != MCFRAME_RENDERER_EXECUTION_STAGE_IDLE)
 			return MC_RESULT_FAIL_NOT_READY;
@@ -45,18 +44,12 @@ namespace MC {
 		assert(!_pNextFrame);
 
 		_pNextFrame.reset(pFrame);
-		_nextTargetInfo = targetInfo;
 
 		_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_FRAME_ACCEPTED);
 
 		return MC_RESULT_OK;
 	}
-
-	/*void MCFrameRendererExecuter::NotifyFramePresented() {
-		assert(_executionStage.load() == MCFRAME_RENDERER_EXECUTION_STAGE_WAITING_TO_PRESENT);
-		_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_IDLE);
-	}*/
-
+	
 	void MCFrameRendererExecuter::DestroyCurrentRenderer() {
 		StopRenderThread();
 
@@ -121,13 +114,13 @@ namespace MC {
 				
 				auto _pCurrentFrame = std::move(_pNextFrame);
 				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_CPU_RENDERING);
+				_pRenderer->PrepareCommandLists(_pCurrentFrame.release());
+				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_WAITING_ON_GPU);
 				MCREGlobals::pMCD3D->WaitForFenceValue(_previousFrameFenceValue);
-				_pRenderer->PrepareCommandLists(_pCurrentFrame.release(), _nextTargetInfo);
-				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_IDLE);
-				//_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_GPU_RENDERING);
 				_pRenderer->ExecuteCommandLists();
 				MCREGlobals::pMCDXGI->Present();
 				_previousFrameFenceValue = MCREGlobals::pMCD3D->GetNewFenceValue();
+				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_IDLE);
 			}
 		}
 
