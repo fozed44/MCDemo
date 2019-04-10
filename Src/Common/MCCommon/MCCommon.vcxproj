@@ -135,6 +135,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Data\MCLinearBuffer.h" />
+    <ClInclude Include="src\Data\MCLinearFIFO.h" />
+    <ClInclude Include="src\Data\MCMessageQueue.h" />
     <ClInclude Include="src\Data\MCObjects.h" />
     <ClInclude Include="src\Data\MCPrimitives.h" />
     <ClInclude Include="src\Data\MCResult.h" />

@@ -57,6 +57,12 @@
     <ClInclude Include="src\Data\MCObjects.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Data\MCLinearFIFO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\MCMessageQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Source\Paths.cpp">

@@ -31,3 +31,14 @@
 	Without this #define, the MCTHREAD_ASSERT macro expands to nothing.
 */
 #define __ENABLE_THREAD_ASSERT__
+
+/*
+	Defining __DEBUG_MCLINEAR_FIFO__ will cause MCLinearFIFO to be compiled with assertions preventing data access
+	outside of the buffer and ensures that the output does not pass the input.
+*/
+#define __DEBUG_MCLINEAR_FIFO__
+
+/*
+	Defining __DEBUG_MCMESSAGE_QUEUE__ will cause MCMessageQueue to check for and throw on memory access violations.
+*/
+#define __DEBUG_MCMESSAGE_QUEUE__

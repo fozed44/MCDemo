@@ -22,7 +22,7 @@ namespace MC {
 		void Post(MC_MESSAGE64  message);
 		void Post(MC_MESSAGE128 message);
 
-		void Peek()
+		void Peek();
 
 	private:
 		void InitializeBuffer(size_t bytes);

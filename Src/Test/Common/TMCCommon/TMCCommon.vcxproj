@@ -163,6 +163,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="tMCLinearBuffer.cpp" />
+    <ClCompile Include="tMCLinearFIFO.cpp" />
     <ClCompile Include="tMCManagedHandle.cpp" />
     <ClCompile Include="tMCManagedKeyedHandle.cpp" />
   </ItemGroup>

@@ -72,3 +72,5 @@ public:
 }
 
 #define MCTHROW(x) throw MCException(x, __FILE__, __LINE__)
+
+#define MCASSERT(x) if(x) { } else { MCTHROW (#x); }

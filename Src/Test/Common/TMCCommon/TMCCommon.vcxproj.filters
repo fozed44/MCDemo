@@ -35,5 +35,8 @@
     <ClCompile Include="tMCLinearBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="tMCLinearFIFO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
