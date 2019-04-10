@@ -54,6 +54,8 @@ namespace MC {
 
 	} MC_MESSAGE;
 
+	typedef unsigned short MC_MESSAGE_ADDRESS;
+
 #pragma pack(push, 1)
 	struct alignas(4) MC_MESSAGE32 {
 		MC_MESSAGE            Message;
@@ -66,14 +68,17 @@ namespace MC {
 	static_assert(sizeof(MC_MESSAGE32) == 4, "sizeof(MC_MESSAGE32) should be 4 bytes!!!");
 
 	struct alignas(8) MC_MESSAGE64 {
-		MC_MESSAGE            Message;
-		MC_MESSAGE_VISIBILITY Visibility;
-		MC_MESSAGE_FLAGS      Flags;
+		MC_MESSAGE                     Message;
+		MC_MESSAGE_VISIBILITY          Visibility;
+		MC_MESSAGE_FLAGS               Flags;
 		union {
-			uint32_t		  LOParam32;
+			uint32_t		           LOParam32;
 			struct {
-				uint16_t      LOParam16LO;
-				uint16_t      LOParam16HI;
+				union {
+					MC_MESSAGE_ADDRESS Address;
+					uint16_t           LOParam16LO;
+				};
+				uint16_t               LOParam16HI;
 			};
 		};
 	};
@@ -81,21 +86,24 @@ namespace MC {
 	static_assert(sizeof(MC_MESSAGE64) == 8, "sizeof(MC_MESSAGE64) should be 8 bytes!!!");
 
 	struct alignas(16) MC_MESSAGE128 {		
-		MC_MESSAGE            Message;
-		MC_MESSAGE_VISIBILITY Visibility;
-		MC_MESSAGE_FLAGS      Flags;
+		MC_MESSAGE					   Message;
+		MC_MESSAGE_VISIBILITY		   Visibility;
+		MC_MESSAGE_FLAGS			   Flags;
 		union {
-			uint32_t		  LOParam32;
+			uint32_t		           LOParam32;
 			struct {
-				uint16_t      LOParam16LO;
-				uint16_t      LOParam16HI;
+				union {
+					MC_MESSAGE_ADDRESS Address;
+					uint16_t		   LOParam16LO;
+				};
+				uint16_t               LOParam16HI;
 			};
 		};
 		union {
-			uint64_t		  HIParam64;
+			uint64_t		           HIParam64;
 			struct {
-				uint32_t      HIParam32LO;
-				uint32_t      HIParam32HI;
+				uint32_t               HIParam32LO;
+				uint32_t               HIParam32HI;
 			};
 		};
 	};

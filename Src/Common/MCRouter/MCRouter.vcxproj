@@ -130,6 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\MCMessageQueue.h" />
     <ClInclude Include="src\Core\MCRouter.h" />
     <ClInclude Include="src\Core\MCMessage.h" />
     <ClInclude Include="src\Core\MCMessageHandler.h" />

@@ -166,6 +166,7 @@
     <ClCompile Include="tMCLinearFIFO.cpp" />
     <ClCompile Include="tMCManagedHandle.cpp" />
     <ClCompile Include="tMCManagedKeyedHandle.cpp" />
+    <ClCompile Include="tMCMessageQueue.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Common\MCCommon\MCCommon.vcxproj">

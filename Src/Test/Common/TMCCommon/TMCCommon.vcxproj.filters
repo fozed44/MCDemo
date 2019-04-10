@@ -38,5 +38,8 @@
     <ClCompile Include="tMCLinearFIFO.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="tMCMessageQueue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

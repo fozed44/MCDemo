@@ -24,6 +24,9 @@
     <ClInclude Include="src\Core\MCRouter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\MCMessageQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\MCMessageHandler.cpp">
