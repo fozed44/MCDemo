@@ -79,7 +79,7 @@ namespace MC {
 		void reset() {
 #ifdef __DEBUG_MCMESSAGE_QUEUE__
 			MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
-			assert(!_writeOnly);
+			assert(_writeOnly);
 #endif __DEBUG_MCMESSAGE_QUEUE__
 			_pNextPush.store(_pBuffer);
 		}
@@ -261,8 +261,8 @@ namespace MC {
 					_pCurrentReadBase  = _pFrontBuffer->get_buffer();
 					_pCurrentWriteBase = _pBackBuffer ->get_buffer();
 
-					_pFrontBuffer.reset();
-					_pFrontQueue.reset();
+					_pFrontBuffer->reset();
+					_pFrontQueue->reset();
 
 				EXIT_CRITICAL_SECTION;
 			}
