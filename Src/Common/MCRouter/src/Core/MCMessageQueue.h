@@ -47,7 +47,7 @@ namespace MC {
 		}
 
 		untyped_ptr push_to(unsigned short size) {
-			size = size / 4 * 4 + 4; // pad size to 32 bits.
+			size = size / 4 * 4 + 4; // pad size to 32 bits. 
 			char* ptr = _pNextPush.fetch_add(size);
 #ifdef __DEBUG_MCMESSAGE_QUEUE__
 			MCASSERT((ptr + size) < _pEnd);
