@@ -74,7 +74,7 @@ namespace TMCCommon
 			MCLinearFIFO<MC::MC_MESSAGE128, 3> test;
 			test.push({ MC_MESSAGE_INVALID, MC_MESSAGE_VISIBILITY_NONE, MC_MESSAGE_FLAGS_NONE, 0, 0 });
 			test.push({ MC_MESSAGE_INVALID, MC_MESSAGE_VISIBILITY_NONE, MC_MESSAGE_FLAGS_NONE, 0, 0 });
-			test.beginRead();
+			test.allow_write(false);
 			MC_MESSAGE128 result;
 			bool more;
 

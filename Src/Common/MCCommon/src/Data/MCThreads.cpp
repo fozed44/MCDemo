@@ -34,6 +34,23 @@ namespace MC {
 		assert(std::get<1>(current->second) == threadClass);
 	}
 
+	void MCThreads::AssertRegistered(std::thread::id id) {
+		auto searchResult = _threadMap.find(id);
+
+		assert(searchResult != _threadMap.end());
+	}
+
+	void MCThreads::AssertRegistered(const std::string& name) {
+		for (auto&& thread : _threadMap)
+			if (std::get<0>(thread.second) == name)
+				return;
+		assert(false);
+	}
+
+	void MCThreads::AssertRegistered() {
+		AssertRegistered(std::this_thread::get_id());
+	}
+
 	int MCThreads::ID() {
 		auto id = std::this_thread::get_id();
 		uint32_t* ptr = (uint32_t*)&id;

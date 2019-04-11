@@ -14,7 +14,7 @@ namespace MC {
 	class MCLinearFIFO {
 	public:
 		MCLinearFIFO() {
-			_pBuffer   = reinterpret_cast<unsigned char*>(malloc(sizeof(T)*N));
+			_pBuffer   = reinterpret_cast<char*>(malloc(sizeof(T)*N));
 			_pNextPop  = _pBuffer;
 			_pNextPush = _pBuffer;
 			_pEnd      = _pBuffer + sizeof(T) * N;
@@ -29,7 +29,7 @@ namespace MC {
 		MCLinearFIFO& operator= (MCLinearFIFO&&) = delete;
 	public:
 		void push(const T& t) {
-			unsigned char* ptr = _pNextPush.fetch_add(sizeof(T));
+			char* ptr = _pNextPush.fetch_add(sizeof(T));
 #ifdef __DEBUG_MCLINEAR_FIFO__
 			MCASSERT(ptr < _pEnd);
 			MCASSERT(_writeMode);
@@ -38,7 +38,7 @@ namespace MC {
 		}
 
 		T* push_to() {
-			unsigned char* ptr = _pNextPush.fetch_add(sizeof(T));
+			char* ptr = _pNextPush.fetch_add(sizeof(T));
 #ifdef __DEBUG_MCLINEAR_FIFO__
 			MCASSERT(ptr < _pEnd);
 			MCASSERT(ptr >= _pBuffer);
@@ -48,7 +48,7 @@ namespace MC {
 		}
 
 		bool pop(T* pT) {
-			unsigned char* ptr = _pNextPop.fetch_add(sizeof(T));
+			char* ptr = _pNextPop.fetch_add(sizeof(T));
 #ifdef __DEBUG_MCLINEAR_FIFO__
 			MCASSERT(ptr < _pNextPush.load());
 			MCASSERT(!_writeMode);
@@ -66,20 +66,24 @@ namespace MC {
 
 		void reset() {
 			_pNextPush = _pNextPop = _pBuffer - sizeof(T);
-			_writeMode = true;
+#ifdef __DEBUG_MCLINEAR_FIFO__
+			assert(_writeMode);
+#endif __DEBUG_MCLINEAR_FIFO__
 		}
 
-		void beginRead() {
-			_writeMode = false;
+#ifdef __DEBUG_MCLINEAR_FIFO__
+		void allow_write(bool allowWrite) {
+			_writeMode = allowWrite;
 		}
+#endif __DEBUG_MCLINEAR_FIFO__
 
 	private:
-		unsigned char* _pBuffer;
-		unsigned char* _pEnd;
-		std::atomic<unsigned char*> _pNextPush;
-		std::atomic<unsigned char*> _pNextPop;
+		char* _pBuffer;
+		char* _pEnd;
+		std::atomic<char*> _pNextPush;
+		std::atomic<char*> _pNextPop;
 #ifdef __DEBUG_MCLINEAR_FIFO__
-		bool						_writeMode;
+		bool _writeMode;
 #endif __DEBUG_MCLINEAR_FIFO__
 	};
 

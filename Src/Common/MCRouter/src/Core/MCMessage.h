@@ -45,12 +45,17 @@ namespace MC {
 				Param: The target render state. The renderer will throw if Param !(MC_RENDERER_STATE). */
 		MC_MESSAGE_INVALID_64  = 0x8000,
 			/* Marker for 64-bit messages. */
+
+		MC_MESSAGE_FRAME_READY_64 = 0x8001,
+			/* The game logic has a new frame. 
+				Visibility: MC_MESSAGE_VISIBILITY_RENDERER 
+				Flags: not used.
+				LOParam32: not used.
+				Address: The address of the frame.
+				LOParam16HI: not used. */
+
 		MC_MESSAGE_INVALID_128 = 0xC000,
 			/* Marker for 128-bit messages */
-		MC_MESSAGE_SCHEDULE_FRAME_128
-			/* Schedule a new frame on the renderer.
-
-			*/
 
 	} MC_MESSAGE;
 
