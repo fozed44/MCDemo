@@ -134,6 +134,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Console\MCConsole.h" />
     <ClInclude Include="src\Data\MCLinearBuffer.h" />
     <ClInclude Include="src\Data\MCLinearFIFO.h" />
     <ClInclude Include="src\Data\MCObjects.h" />
@@ -151,6 +152,7 @@
     <ClInclude Include="src\Headers\Utility.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Console\MCConsole.cpp" />
     <ClCompile Include="src\Data\MCResult.cpp" />
     <ClCompile Include="src\Data\MCThreads.cpp" />
     <ClCompile Include="src\Source\MasterTimer.cpp" />

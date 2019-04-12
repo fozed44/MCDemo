@@ -130,14 +130,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\MCMessageDispatcher.h" />
     <ClInclude Include="src\Core\MCMessageQueue.h" />
     <ClInclude Include="src\Core\MCRouter.h" />
     <ClInclude Include="src\Core\MCMessage.h" />
-    <ClInclude Include="src\Core\MCMessageHandler.h" />
+    <ClInclude Include="src\Core\MCMessageDispatchTarget.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\MCRouter.cpp" />
-    <ClCompile Include="src\Core\MCMessageHandler.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

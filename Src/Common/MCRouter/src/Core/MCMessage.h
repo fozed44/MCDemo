@@ -17,45 +17,46 @@ namespace MC {
 		MC_MESSAGE_FLAGS_NONE = 0x00
 	} MC_MESSAGE_FLAGS;
 
-	typedef enum MC_MESSAGE : uint16_t {
-		MC_MESSAGE_INVALID     = 0x0000,
+	typedef enum MC_MESSAGE_BIT_FLAGS : uint16_t {
+		MC_MESSAGE_BIT_FLAGS_NONE      = 0x0000,
+		MC_MESSAGE_BIT_FLAGS_32_BIT    = 0x1000,
+		MC_MESSAGE_BIT_FLAGS_64_BIT    = 0x2000,
+		MC_MESSAGE_BIT_FLAGS_128_BIT   = 0x4000,
+		MC_MESSAGE_BIT_FLAGS_ADDRESSED = 0x8000
+	};
+
+	typedef enum McMESSAGE : uint16_t {
+		MC_MESSAGE_INVALID                     = 0x0000,
 			/* Marker for 16-bit messages. */
-		MC_MESSAGE_INVALID_32  = 0x4000,
-			/* Marker for 32-bit messages. */
 
 			/* KEY BOARD MESSAGES ----------------------------------------------------------------------- */
 				
-		MC_MESSAGE_KEY_DOWN_32 = 0x4001,
+		MC_MESSAGE_KEY_DOWN_32                 = 0x0001 | MC_MESSAGE_BIT_FLAGS_32_BIT,
 			/* Key down message 
 				Visibility: MC_MESSAGE_VISIBILITY_GAME | MC_MESSAGE_VISIBILITY_CONSOLE 
 				Flags: Not used.
 				Param: Key Code of the pressed key.
 			*/
-		MC_MESSAGE_KEY_UP_32   = 0x4002,	
+		MC_MESSAGE_KEY_UP_32                   = 0x0002 | MC_MESSAGE_BIT_FLAGS_32_BIT,
 			/* Key up message
 				Visibility: MC_MESSAGE_VISIBILITY_GAME | MC_MESSAGE_VISIBILITY_CONSOLE
 				Flags: Not used.
 				Param: Key Code of the pressed key.
 			*/
 
-		MC_MESSAGE_SET_RENDERER_STATE_32, 
+		MC_MESSAGE_SET_RENDERER_STATE_32       = 0x0003 | MC_MESSAGE_BIT_FLAGS_32_BIT,
 			/* Set the renderer state.
 				Visibility: Usually MC_MESSAGE_VISIBILITY_RENDER
 				Flags: not used.
 				Param: The target render state. The renderer will throw if Param !(MC_RENDERER_STATE). */
-		MC_MESSAGE_INVALID_64  = 0x8000,
-			/* Marker for 64-bit messages. */
 
-		MC_MESSAGE_FRAME_READY_64 = 0x8001,
+		MC_MESSAGE_FRAME_READY_128             = 0x0001 | MC_MESSAGE_BIT_FLAGS_128_BIT | MC_MESSAGE_BIT_FLAGS_ADDRESSED
 			/* The game logic has a new frame. 
-				Visibility: MC_MESSAGE_VISIBILITY_RENDERER 
-				Flags: not used.
-				LOParam32: not used.
-				Address: The address of the frame.
+				Visibility:       MC_MESSAGE_VISIBILITY_RENDERER 
+				Flags:            not used.
+				LOParam32:    not used.
+				pAddress:      the address of the frame.
 				LOParam16HI: not used. */
-
-		MC_MESSAGE_INVALID_128 = 0xC000,
-			/* Marker for 128-bit messages */
 
 	} MC_MESSAGE;
 
@@ -73,17 +74,14 @@ namespace MC {
 	static_assert(sizeof(MC_MESSAGE32) == 4, "sizeof(MC_MESSAGE32) should be 4 bytes!!!");
 
 	struct alignas(8) MC_MESSAGE64 {
-		MC_MESSAGE                     Message;
-		MC_MESSAGE_VISIBILITY          Visibility;
-		MC_MESSAGE_FLAGS               Flags;
+		MC_MESSAGE            Message;
+		MC_MESSAGE_VISIBILITY Visibility;
+		MC_MESSAGE_FLAGS      Flags;
 		union {
-			uint32_t		           LOParam32;
+			uint32_t		  LOParam32;
 			struct {
-				union {
-					MC_MESSAGE_ADDRESS Address;
-					uint16_t           LOParam16LO;
-				};
-				uint16_t               LOParam16HI;
+				uint16_t      LOParam16LO;
+				uint16_t      LOParam16HI;
 			};
 		};
 	};
@@ -91,24 +89,24 @@ namespace MC {
 	static_assert(sizeof(MC_MESSAGE64) == 8, "sizeof(MC_MESSAGE64) should be 8 bytes!!!");
 
 	struct alignas(16) MC_MESSAGE128 {		
-		MC_MESSAGE					   Message;
-		MC_MESSAGE_VISIBILITY		   Visibility;
-		MC_MESSAGE_FLAGS			   Flags;
+		MC_MESSAGE			  Message;
+		MC_MESSAGE_VISIBILITY Visibility;
+		MC_MESSAGE_FLAGS	  Flags;
 		union {
-			uint32_t		           LOParam32;
+			uint32_t		  LOParam32;
 			struct {
 				union {
-					MC_MESSAGE_ADDRESS Address;
-					uint16_t		   LOParam16LO;
+					uint16_t  LOParam16LO;
 				};
-				uint16_t               LOParam16HI;
+				uint16_t      LOParam16HI;
 			};
 		};
 		union {
-			uint64_t		           HIParam64;
+			char*             pAddress;
+			uint64_t		  HIParam64;
 			struct {
-				uint32_t               HIParam32LO;
-				uint32_t               HIParam32HI;
+				uint32_t      HIParam32LO;
+				uint32_t      HIParam32HI;
 			};
 		};
 	};

@@ -121,6 +121,63 @@ namespace TMCCommon {
 			Assert::AreEqual(200, (int)queue.back_buffer_free());
 		}
 
+		TEST_METHOD(WritePastBufferEndThrowsA) {
+			MCThreads::RegisterCurrentThread("Unit test", MC_THREAD_CLASS_MAIN);
+
+			MCMessageQueue<MC_MESSAGE64, 5, 200> queue("test queue");
+
+			MC_MESSAGE64 msg;
+
+			msg.Message = MC_MESSAGE_FRAME_READY_64;
+
+			auto exceptionThrown = false;
+
+			queue.add_read_lock();
+			try {
+				char* ptr = queue.push_to(msg, 201);
+			} catch (...) {
+				exceptionThrown = true;
+			}
+
+			Assert::IsTrue(exceptionThrown);
+		}
+
+		TEST_METHOD(WritePastBufferEndThrowsB) {
+			MCThreads::RegisterCurrentThread("Unit test", MC_THREAD_CLASS_MAIN);
+
+			MCMessageQueue<MC_MESSAGE64, 202, 200> queue("test queue");
+
+			MC_MESSAGE64 msg;
+
+			msg.Message = MC_MESSAGE_FRAME_READY_64;
+
+			queue.add_read_lock();
+			for(int x = 0; x < 199; x++)
+				char* ptr = queue.push_to(msg,1);
+
+			bool exceptionThrown = false;
+
+			try {
+				char* ptr = queue.push_to(msg, 1);
+			}
+			catch (...) {
+				exceptionThrown = true;
+			}
+
+			Assert::IsTrue(exceptionThrown);
+		}
+
+		TEST_METHOD(WritePastQueueEndThrows) {
+
+		}
+
+		TEST_METHOD(ReadPastBufferEndThrows) {
+
+		}
+		TEST_METHOD(ReadPastQueueEndThrows) {
+
+		}
+
 	};
 
 }

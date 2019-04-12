@@ -84,6 +84,16 @@ namespace MC {
 			_pNextPush.store(_pBuffer);
 		}
 
+		char* allocate(unsigned short dataSize) {
+			dataSize = (dataSize - 1) / 4 * 4 + 4; // pad size to 32 bits. 
+			char* ptr = _pNextPush.fetch_add(dataSize);
+#ifdef __DEBUG_MCMESSAGE_QUEUE__
+			MCASSERT(_pNextPush <= _pBuffer);
+			MCASSERT(_writeOnly);
+#endif __DEBUG_MCMESSAGE_QUEUE__
+			return ptr;
+		}
+
 	private:
 		std::string        _name;
 		char*              _pBuffer;
@@ -129,33 +139,30 @@ namespace MC {
 
 			char* push_to(const tMessage& message, unsigned short dataSize) {
 				char*     ptr = _pFrontBuffer->push_to(dataSize);
-				tMessage* msg = _pFrontQueue->push_to();
+				tMessage* msg = _pFrontQueue ->push_to();
 				*msg = message;
-				msg->Address = static_cast<MC_MESSAGE_ADDRESS>(ptr - _pFrontBuffer->get_buffer());
+				msg->Address = ptr;
 				return ptr;
 			}
 
 			template<typename T>
 			T* push_to(const tMessage& t) {
 				char*     ptr = _pFrontBuffer->push_to(sizeof(T));
-				tMessage* msg = _pFrontQueue->push_to();
+				tMessage* msg = _pFrontQueue ->push_to();
 				*msg = t;
-				msg->Address = static_cast<MC_MESSAGE_ADDRESS>(ptr - _pFrontBuffer->get_buffer());
+				msg->Address = ptr;
 				return reinterpret_cast<T*>(ptr);
+			}
+
+		public: /* Arbitrary storage */
+
+			char* allocate(unsigned short dataSize) {
+				_pFrontBuffer->allocate(unsigned short dataSize);
 			}
 
 		public: /* pop, peek */
 			bool pop(tMessage* pMessage) {
 				return _pBackQueue->pop(pMessage);
-			}
-
-			char* translate_address(const tMessage& message) {
-				return _pBackBuffer->get_buffer() + message.Address;
-			}
-
-			template<typename T>
-			T* translate_address(const tMessage& message) {
-				return reinterpret_cast<T*>(_pBackBuffer->get_buffer() + message.Address);
 			}
 
 			const tMessage& peek() const {
@@ -262,7 +269,7 @@ namespace MC {
 					_pCurrentWriteBase = _pBackBuffer ->get_buffer();
 
 					_pFrontBuffer->reset();
-					_pFrontQueue->reset();
+					_pFrontQueue ->reset();
 
 				EXIT_CRITICAL_SECTION;
 			}
