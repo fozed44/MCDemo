@@ -20,9 +20,9 @@ namespace MC {
 
 			_pNextPush.store(_pBuffer);
 
-#ifdef __DEBUG_MCMESSAGE_QUEUE__
+#ifdef __DEBUG_ROUTING__
 			_writeOnly = true;
-#endif __DEBUG_MCMESSAGE_QUEUE__
+#endif __DEBUG_ROUTING__
 
 		}
 		~MCMessageQueueDataBuffer() {
@@ -38,20 +38,19 @@ namespace MC {
 		template<typename T>
 		T* push_to() {
 			char* ptr = _pNextPush.fetch_add(Pad32(sizeof(T)));
-#ifdef __DEBUG_MCMESSAGE_QUEUE__
+#ifdef __DEBUG_ROUTING__
 			MCASSERT((ptr + Pad32(sizeof(T)) < _pEnd));
 			MCASSERT(_writeOnly);
-#endif __DEBUG_MCMESSAGE_QUEUE__
+#endif __DEBUG_ROUTING__
 			return reinterpret_cast<T*>(ptr);
 		}
 
 		char* push_to(unsigned short size) {
-			size = (size-1) / 4 * 4 + 4; // pad size to 32 bits. 
-			char* ptr = _pNextPush.fetch_add(size);
-#ifdef __DEBUG_MCMESSAGE_QUEUE__
+			char* ptr = _pNextPush.fetch_add(Pad32(size));
+#ifdef __DEBUG_ROUTING__
 			MCASSERT((ptr + size) < _pEnd);
 			MCASSERT(_writeOnly);
-#endif __DEBUG_MCMESSAGE_QUEUE__
+#endif __DEBUG_ROUTING__
 			return ptr;
 		}
 
@@ -69,28 +68,27 @@ namespace MC {
 
 		inline const std::string& Name() const { return _name; }
 
-#ifdef __DEBUG_MCMESSAGE_QUEUE__
-		void AllowWrite(bool allowWrite) { 
+#ifdef __DEBUG_ROUTING__
+		void allow_write(bool allowWrite) { 
 			MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN); 
 			_writeOnly = allowWrite;
 		}
-#endif __DEBUG_MCMESSAGE_QUEUE__
+#endif __DEBUG_ROUTING__
 
 		void reset() {
-#ifdef __DEBUG_MCMESSAGE_QUEUE__
+#ifdef __DEBUG_ROUTING__
 			MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
 			assert(_writeOnly);
-#endif __DEBUG_MCMESSAGE_QUEUE__
+#endif __DEBUG_ROUTING__
 			_pNextPush.store(_pBuffer);
 		}
 
 		char* allocate(unsigned short dataSize) {
-			dataSize = (dataSize - 1) / 4 * 4 + 4; // pad size to 32 bits. 
-			char* ptr = _pNextPush.fetch_add(dataSize);
-#ifdef __DEBUG_MCMESSAGE_QUEUE__
+			char* ptr = _pNextPush.fetch_add(Pad32(dataSize));
+#ifdef __DEBUG_ROUTING__
 			MCASSERT(_pNextPush <= _pBuffer);
 			MCASSERT(_writeOnly);
-#endif __DEBUG_MCMESSAGE_QUEUE__
+#endif __DEBUG_ROUTING__
 			return ptr;
 		}
 
@@ -99,65 +97,39 @@ namespace MC {
 		char*              _pBuffer;
 		char*              _pEnd;
 		std::atomic<char*> _pNextPush;
-#ifdef __DEBUG_MCMESSAGE_QUEUE__
+#ifdef __DEBUG_ROUTING__
 		bool               _writeOnly;
-#endif __DEBUG_MCMESSAGE_QUEUE__
-	};
+#endif __DEBUG_ROUTING__
+	};	
 
 	/*******************************************************************************************/
 
 	template<
 		typename tMessage, /* The core type being queued. */
 		unsigned int N1,   /* The size of the queues. */
-		unsigned int N2	   /* The size of the memory buffers. */
 	>
 		class MCMessageQueue {
-		using queue_type  = MCLinearFIFO<tMessage, N1>;
+		using queue_type = MCLinearFIFO<tMessage, N1>;
 		public:
 			MCMessageQueue(const std::string& name) : _name{ name } {
-				MCCriticalSection::InitializeLock(&_lock);
 				_pFrontQueue = std::make_unique<queue_type>();
-				_pBackQueue  = std::make_unique<queue_type>();
+				_pBackQueue = std::make_unique<queue_type>();
 
 				_pFrontBuffer = std::make_unique<MCMessageQueueDataBuffer>(_name + std::string(" buffer a"), N2);
-				_pBackBuffer  = std::make_unique<MCMessageQueueDataBuffer>(_name + std::string(" buffer b"), N2);
+				_pBackBuffer = std::make_unique<MCMessageQueueDataBuffer>(_name + std::string(" buffer b"), N2);
 
-				_pCurrentReadBase  = _pFrontBuffer->get_buffer();
+				_pCurrentReadBase = _pFrontBuffer->get_buffer();
 				_pCurrentWriteBase = _pBackBuffer->get_buffer();
 			}
 			~MCMessageQueue() {}
-			MCMessageQueue(MCMessageQueue&)              = delete;
-			MCMessageQueue(MCMessageQueue&&)             = delete;
-			MCMessageQueue& operator= (MCMessageQueue&)  = delete;
+			MCMessageQueue(MCMessageQueue&) = delete;
+			MCMessageQueue(MCMessageQueue&&) = delete;
+			MCMessageQueue& operator= (MCMessageQueue&) = delete;
 			MCMessageQueue& operator= (MCMessageQueue&&) = delete;
 		public: /* push, push_to */
-
-			/*	Push a normal message. (A message that does not use an external Address) */
+			
 			void push(const tMessage& message) {
 				_pFrontQueue->push(message);
-			}
-
-			char* push_to(const tMessage& message, unsigned short dataSize) {
-				char*     ptr = _pFrontBuffer->push_to(dataSize);
-				tMessage* msg = _pFrontQueue ->push_to();
-				*msg = message;
-				msg->Address = ptr;
-				return ptr;
-			}
-
-			template<typename T>
-			T* push_to(const tMessage& t) {
-				char*     ptr = _pFrontBuffer->push_to(sizeof(T));
-				tMessage* msg = _pFrontQueue ->push_to();
-				*msg = t;
-				msg->Address = ptr;
-				return reinterpret_cast<T*>(ptr);
-			}
-
-		public: /* Arbitrary storage */
-
-			char* allocate(unsigned short dataSize) {
-				_pFrontBuffer->allocate(unsigned short dataSize);
 			}
 
 		public: /* pop, peek */
@@ -169,109 +141,126 @@ namespace MC {
 				return _pBackQueue->peek();
 			}
 
-#pragma region read/write locks
+#pragma region swap
 
-		public: /* concurrency management */
+			void swap() {
 
-			void add_read_lock() {
-#ifdef __DEBUG_MCMESSAGE_QUEUE__
-				MCThreads::AssertRegistered();
+#ifdef __DEBUG_ROUTING__
+				_pFrontQueue->allow_write(false);
+				_pBackQueue ->allow_write(true);
+#endif __DEBUG_ROUTING__
 
-				if (std::find(_readLocks.begin(), _readLocks.end(), std::this_thread::get_id()) != _readLocks.end()) {
-					MCTHROW("MCMessageQueue::add_read_lock->threadId already exists.");
-				}
-#endif __DEBUG_MCMESSAGE_QUEUE__
-				ENTER_CRITICAL_SECTION(MCMessageQueue_add_read_lock, &_lock);
-					_readLocks.push_back(std::this_thread::get_id());
-				EXIT_CRITICAL_SECTION;
-			}
-
-			void release_read_lock() {
-#ifdef __DEBUG_MCMESSAGE_QUEUE__
-				MCThreads::AssertRegistered();
-
-				if (std::find(_readLocks.begin(), _readLocks.end(), std::this_thread::get_id()) == _readLocks.end()) {
-					MCTHROW("MCMessageQueue::release_read_lock->threadId does not exist.");
-				}
-
-				size_t readLocksOldCount = _readLocks.size();
-
-#endif __DEBUG_MCMESSAGE_QUEUE__
-				ENTER_CRITICAL_SECTION(MCMessageQueue_release_read_lock, &_lock);
-					_readLocks.erase(std::remove(_readLocks.begin(), _readLocks.end(), std::this_thread::get_id()), _readLocks.end());
-				EXIT_CRITICAL_SECTION;
-
-#ifdef __DEBUG_MCMESSAGE_QUEUE__				
-				assert(readLocksOldCount - 1 == _readLocks.size());
-#endif __DEBUG_MCMESSAGE_QUEUE__
-			}
-
-			void add_write_lock() {
-#ifdef __DEBUG_MCMESSAGE_QUEUE__
-				MCThreads::AssertRegistered();
-
-				if (std::find(_writeLocks.begin(), _writeLocks.end(), std::this_thread::get_id()) != _writeLocks.end()) {
-					MCTHROW("MCMessageQueue::add_write_lock->threadId already exists.");
-				}
-#endif __DEBUG_MCMESSAGE_QUEUE__
-				ENTER_CRITICAL_SECTION(MCMessageQueue_add_read_lock, &_lock);
-				_writeLocks.push_back(std::this_thread::get_id());
-				EXIT_CRITICAL_SECTION;
-			}
-
-			void release_write_lock() {
-#ifdef __DEBUG_MCMESSAGE_QUEUE__
-				MCThreads::AssertRegistered();
-
-				if (std::find(_writeLocks.begin(), _writeLocks.end(), std::this_thread::get_id()) == _writeLocks.end()) {
-					MCTHROW("MCMessageQueue::release_write_lock->threadId does not exist.");
-				}
-
-				size_t readLocksOldCount = _writeLocks.size();
-
-#endif __DEBUG_MCMESSAGE_QUEUE__
-				ENTER_CRITICAL_SECTION(MCMessageQueue_release_read_lock, &_lock);
-				_writeLocks.erase(std::remove(_writeLocks.begin(), _writeLocks.end(), std::this_thread::get_id()), _writeLocks.end());
-				EXIT_CRITICAL_SECTION;
-
-#ifdef __DEBUG_MCMESSAGE_QUEUE__				
-				assert(readLocksOldCount - 1 == _writeLocks.size());
-#endif __DEBUG_MCMESSAGE_QUEUE__
+				_pFrontQueue.swap(_pBackQueue);
+				_pFrontQueue->reset();
 			}
 
 #pragma endregion
 
+#pragma region memory reporting
+
+			size_t front_queue_size() const { return _pFrontQueue->buffer_size(); }
+			size_t front_queue_free() const { return _pFrontQueue->free(); }
+
+			size_t back_queue_size() const { return _pBackQueue->buffer_size(); }
+			size_t back_queue_free() const { return _pBackQueue->free(); }
+
+#pragma endregion
+
+			const std::string& Name() const { return _name; }
+
+		private:
+
+			std::string                  _name;
+
+			std::unique_ptr<queue_type>  _pFrontQueue;
+			std::unique_ptr<queue_type>  _pBackQueue;
+
+	};
+
+	/*******************************************************************************************/
+
+	template<
+		typename tMessage, /* The core type being queued. */
+		unsigned int N1,   /* The size of the queues. */
+		unsigned int N2	   /* The size of the memory buffers. */
+	>
+		class MCMessageQueueWithMemoryBuffer {
+		using queue_type = MCLinearFIFO<tMessage, N1>;
+		public:
+			MCMessageQueueWithMemoryBuffer(const std::string& name) : _name{ name } {
+				_pFrontQueue = std::make_unique<queue_type>();
+				_pBackQueue  = std::make_unique<queue_type>();
+
+				_pFrontBuffer = std::make_unique<MCMessageQueueDataBuffer>(_name + std::string(" buffer a"), N2);
+				_pBackBuffer  = std::make_unique<MCMessageQueueDataBuffer>(_name + std::string(" buffer b"), N2);
+
+				_pCurrentReadBase  = _pFrontBuffer->get_buffer();
+				_pCurrentWriteBase = _pBackBuffer->get_buffer();
+			}
+			~MCMessageQueueWithMemoryBuffer() {}
+			MCMessageQueueWithMemoryBuffer(MCMessageQueueWithMemoryBuffer&)              = delete;
+			MCMessageQueueWithMemoryBuffer(MCMessageQueueWithMemoryBuffer&&)             = delete;
+			MCMessageQueueWithMemoryBuffer& operator= (MCMessageQueueWithMemoryBuffer&)  = delete;
+			MCMessageQueueWithMemoryBuffer& operator= (MCMessageQueueWithMemoryBuffer&&) = delete;
+		public: /* push, push_to */
+
+				/*	Push a normal message. (A message that does not use an external Address) */
+			void push(const tMessage& message) {
+				_pFrontQueue->push(message);
+			}
+
+			char* push_to(const tMessage& message, unsigned short dataSize) {
+				char*     ptr = _pFrontBuffer->push_to(dataSize);
+				tMessage* msg = _pFrontQueue->push_to();
+				*msg = message;
+				msg->Address = ptr;
+				return ptr;
+			}
+
+			template<typename T>
+			T* push_to(const tMessage& t) {
+				char*     ptr = _pFrontBuffer->push_to(sizeof(T));
+				tMessage* msg = _pFrontQueue->push_to();
+				*msg = t;
+				msg->Address = ptr;
+				return reinterpret_cast<T*>(ptr);
+			}
+
+		public: /* Arbitrary storage */
+
+			char* allocate(unsigned short size) {
+				_pFrontBuffer->allocate(unsigned short size);
+			}
+
+		public: /* pop, peek */
+			bool pop(tMessage* pMessage) {
+				return _pBackQueue->pop(pMessage);
+			}
+
+			const tMessage& peek() const {
+				return _pBackQueue->peek();
+			}
+
 #pragma region swap
 
-			MC_RESULT swap() {
-				MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
+			void swap() {
 
-					if (_readLocks.size() || _writeLocks.size())
-						return MC_RESULT_FAIL_RESOURCE_LOCKED;
+#ifdef __DEBUG_ROUTING__
+				_pFrontBuffer->AllowWrite (false);
+				_pFrontQueue ->allow_write(false);
 
-				ENTER_CRITICAL_SECTION(MCMessageQueue_swap, &_lock);
+				_pBackBuffer->AllowWrite (true);
+				_pBackQueue ->allow_write(true);
+#endif __DEBUG_ROUTING__
 
-					if (_readLocks.size() || _writeLocks.size())
-						return MC_RESULT_FAIL_RESOURCE_LOCKED;
+				_pFrontBuffer.swap(_pBackBuffer);
+				_pFrontQueue .swap(_pBackQueue);
 
-#ifdef __DEBUG_MCMESSAGE_QUEUE__
-					_pFrontBuffer->AllowWrite (false);
-					_pFrontQueue ->allow_write(false);
+				_pCurrentReadBase  = _pFrontBuffer->get_buffer();
+				_pCurrentWriteBase = _pBackBuffer ->get_buffer();
 
-					_pBackBuffer->AllowWrite (true);
-					_pBackQueue ->allow_write(true);
-#endif __DEBUG_MCMESSAGE_QUEUE__
-
-					_pFrontBuffer.swap(_pBackBuffer);
-					_pFrontQueue .swap(_pBackQueue);
-
-					_pCurrentReadBase  = _pFrontBuffer->get_buffer();
-					_pCurrentWriteBase = _pBackBuffer ->get_buffer();
-
-					_pFrontBuffer->reset();
-					_pFrontQueue ->reset();
-
-				EXIT_CRITICAL_SECTION;
+				_pFrontBuffer->reset();
+				_pFrontQueue ->reset();
 			}
 
 #pragma endregion
@@ -283,6 +272,12 @@ namespace MC {
 
 			unsigned short back_buffer_size() const { return _pBackBuffer->buffer_size(); }
 			unsigned short back_buffer_free() const { return _pBackBuffer->free(); }
+
+			size_t front_queue_size() const { return _pFrontQueue->buffer_size(); }
+			size_t front_queue_free() const { return _pFrontQueue->free(); }
+
+			size_t back_queue_size() const { return _pBackQueue->buffer_size(); }
+			size_t back_queue_free() const { return _pBackQueue->free(); }
 
 #pragma endregion
 
@@ -298,12 +293,7 @@ namespace MC {
 			std::unique_ptr<MCMessageQueueDataBuffer> _pFrontBuffer;
 			std::unique_ptr<MCMessageQueueDataBuffer> _pBackBuffer;
 
-			char*                        _pCurrentReadBase;
-			char*                        _pCurrentWriteBase;
-
-			MCCriticalSectionLock        _lock;
-			std::vector<std::thread::id> _writeLocks;
-			std::vector<std::thread::id> _readLocks;
+			char* _pCurrentReadBase;
+			char* _pCurrentWriteBase;
 	};
-
 }

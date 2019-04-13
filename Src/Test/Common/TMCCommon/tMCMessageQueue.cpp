@@ -7,8 +7,8 @@
 // Ensure that _DEBUG_MCLINEAR_FIFO__ is defined event if it is missing from GlobalSwitches.h
 #define __DEBUG_MCLINEAR_FIFO__
 
-// Ensure that __DEBUG_MCMESSAGE_QUEUE__ is defined even if it is missing from GlobalSwitches.h
-#define __DEBUG_MCMESSAGE_QUEUE__
+// Ensure that __DEBUG_ROUTING__ is defined even if it is missing from GlobalSwitches.h
+#define __DEBUG_ROUTING__
 
 #include "../../../Common/MCRouter/src/Core/MCMessageQueue.h"
 #include "../../../../Src/Common/MCRouter/src/Core/MCMessage.h"

@@ -5,9 +5,12 @@ namespace MC {
 #pragma region ctor
 
 	MCRouter::MCRouter(){
-		_pMessageQueue32  = std::make_unique<MCMessageQueue<MC_MESSAGE32,  ROUTER_QUEUE_SIZE, ROUTER_BUFFER_SIZE>>("Message Queue 32");
-		_pMessageQueue64  = std::make_unique<MCMessageQueue<MC_MESSAGE64,  ROUTER_QUEUE_SIZE, ROUTER_BUFFER_SIZE>>("Message Queue 64");
-		_pMessageQueue128 = std::make_unique<MCMessageQueue<MC_MESSAGE128, ROUTER_QUEUE_SIZE, ROUTER_BUFFER_SIZE>>("Message Queue 128");
+
+		MCCriticalSection::InitializeLock(&_lock);
+
+		_pMessageQueue32  = std::make_unique<MCMessageQueue<MC_MESSAGE32,  ROUTER_QUEUE_SIZE>>("Message Queue 32");
+		_pMessageQueue64  = std::make_unique<MCMessageQueue<MC_MESSAGE64,  ROUTER_QUEUE_SIZE>>("Message Queue 64");
+		_pMessageQueue128 = std::make_unique<MCMessageQueueWithMemoryBuffer<MC_MESSAGE128, ROUTER_QUEUE_SIZE, ROUTER_BUFFER_SIZE>>("Message Queue 128");
 	}
 
 
@@ -86,39 +89,86 @@ namespace MC {
 #pragma endregion
 
 #pragma region Read Write Locks
-	
+
+
 	void MCRouter::AddReadLock() {
-		_pMessageQueue32-> add_read_lock();
-		_pMessageQueue64-> add_read_lock();
-		_pMessageQueue128->add_read_lock();
+		ENTER_CRITICAL_SECTION(MCMessageQueue_add_read_lock, &_lock);
+
+#ifdef __DEBUG_ROUTING__
+			MCThreads::AssertRegistered();
+
+			if (std::find(_readLocks.begin(), _readLocks.end(), std::this_thread::get_id()) != _readLocks.end()) {
+				MCTHROW("MCMessageQueue::add_read_lock->threadId already exists.");
+			}
+#endif __DEBUG_ROUTING__
+
+			_readLocks.push_back(std::this_thread::get_id());
+		EXIT_CRITICAL_SECTION;
 	}
 
 	void MCRouter::ReleaseReadLock() {
-		_pMessageQueue32-> release_read_lock();
-		_pMessageQueue64-> release_read_lock();
-		_pMessageQueue128->release_read_lock();
+		ENTER_CRITICAL_SECTION(MCMessageQueue_release_read_lock, &_lock);
+
+#ifdef __DEBUG_ROUTING__
+			MCThreads::AssertRegistered();
+
+			if (std::find(_readLocks.begin(), _readLocks.end(), std::this_thread::get_id()) == _readLocks.end()) {
+				MCTHROW("MCMessageQueue::release_read_lock->threadId does not exist.");
+			}
+#endif __DEBUG_ROUTING__
+
+			_readLocks.erase(std::remove(_readLocks.begin(), _readLocks.end(), std::this_thread::get_id()), _readLocks.end());
+		EXIT_CRITICAL_SECTION;
 	}
 
 	void MCRouter::AddWriteLock() {
-		_pMessageQueue32-> add_write_lock();
-		_pMessageQueue64-> add_write_lock();
-		_pMessageQueue128->add_write_lock();
+		ENTER_CRITICAL_SECTION(MCMessageQueue_add_read_lock, &_lock);
+
+#ifdef __DEBUG_ROUTING__
+			MCThreads::AssertRegistered();
+
+			if (std::find(_writeLocks.begin(), _writeLocks.end(), std::this_thread::get_id()) != _writeLocks.end()) {
+				MCTHROW("MCMessageQueue::add_write_lock->threadId already exists.");
+			}
+#endif __DEBUG_ROUTING__
+
+			_writeLocks.push_back(std::this_thread::get_id());
+		EXIT_CRITICAL_SECTION;
 	}
 
 	void MCRouter::ReleaseWriteLock() {
-		_pMessageQueue32-> release_write_lock();
-		_pMessageQueue64-> release_write_lock();
-		_pMessageQueue128->release_write_lock();
+		ENTER_CRITICAL_SECTION(MCMessageQueue_release_read_lock, &_lock);
+
+#ifdef __DEBUG_ROUTING__
+			MCThreads::AssertRegistered();
+
+			if (std::find(_writeLocks.begin(), _writeLocks.end(), std::this_thread::get_id()) == _writeLocks.end()) {
+				MCTHROW("MCMessageQueue::release_write_lock->threadId does not exist.");
+			}
+#endif __DEBUG_ROUTING__
+
+			_writeLocks.erase(std::remove(_writeLocks.begin(), _writeLocks.end(), std::this_thread::get_id()), _writeLocks.end());
+		EXIT_CRITICAL_SECTION;
 	}
+
 
 #pragma endregion
 
 #pragma region Swap / Dispatch
 
-	void MCRouter::Swap() {
-		_pMessageQueue32->swap();
-		_pMessageQueue64->swap();
-		_pMessageQueue128->swap();
+	MC_RESULT MCRouter::Swap() {
+		ENTER_CRITICAL_SECTION(MCMessageQueue_Swap, &_lock);
+			size_t writeLocks = _writeLocks.size(); size_t readLocks = _readLocks.size();
+
+			if (writeLocks || readLocks) {
+				MC_WARN("MCRouter: can't swap, ({0:d}) write locks, ({1:d}) read locks.", writeLocks, readLocks);
+				return MC_RESULT_FAIL_NOT_READY;
+			}
+			
+			_pMessageQueue32->swap();
+			_pMessageQueue64->swap();
+			_pMessageQueue128->swap();
+		EXIT_CRITICAL_SECTION;
 	}
 
 	void MCRouter::Dispatch() {

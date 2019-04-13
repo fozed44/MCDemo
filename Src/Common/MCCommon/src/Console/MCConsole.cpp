@@ -13,22 +13,67 @@ namespace MC {
 
 	MCConsoleCommandParser::~MCConsoleCommandParser() {}
 
-	MCConsoleCommandParser::Parse(char *pBuffer, unsigned int bufferSize) {
+	MC_RESULT MCConsoleCommandParser::Parse(char *pBuffer, size_t bufferSize, MC_CONSOLE_COMMAND* pCommand) {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
+		std::vector<std::string> commandStrings;
+		auto result = ParseStrings(pBuffer, bufferSize, &commandStrings);
 
-		std::vector<std::string> parsedElements;
-		unsigned int elementStart{ 0 }, elementEnd{ 0 };
-		std::string currentElement;
-		for (unsigned int x = 0; x < CONSOLE_KEY_BUFFER_SIZE; x++) {
-			char nextChar = _pKeyBuffer[x];
+		if (result != MC_RESULT_OK)
+			return result;
 
-			currentElement += nextChar;
+		pCommand->Command = TranslateCommand(commandStrings[0]);
 
-			if ('-' == nextChar)
+		if (pCommand->Command == MC_CONSOLE_COMMAND_CMD_INVALID)
+			return MC_RESULT_FAIL_INVALID_DATA;
 
-				if (!nextChar)
-					break;
+		pCommand->ParameterCount = commandStrings.size() - 1;
+
+		if (pCommand->ParameterCount == 0) {
+			pCommand->pParameterData = nullptr;
+			return MC_RESULT_OK;
 		}
+
+		commandStrings.erase(commandStrings.begin());
+
+		pCommand->pParameterData =  AllocateParameterData(commandStrings);
+
+		return MC_RESULT_OK;
+	}
+
+	MC_RESULT MCConsoleCommandParser::ParseStrings(char *pBuffer, size_t bufferSize, std::vector<std::string>* pResult) {
+		char *elementStart{ pBuffer }, *elementEnd{ pBuffer };
+		for (unsigned int x = 0; x < bufferSize; x++) {
+			elementEnd++;
+
+			if ('\0' == *elementEnd) {
+				pResult->push_back(std::string(elementStart, elementEnd) + std::string("\n"));
+				return MC_RESULT_OK;
+			}
+
+			if (' ' == *elementEnd) {
+				pResult->push_back(std::string(elementStart, elementEnd) + std::string("\n"));
+				elementStart = elementEnd;
+			}
+		}
+		return MC_RESULT_FAIL_INVALID_DATA;
+	}
+
+	char** MCConsoleCommandParser::AllocateParameterData(const std::vector<std::string>& commandArgs) {
+		std::vector<char*> ptrs;
+		char** ptrArray = reinterpret_cast<char**>(_fpAllocator(sizeof(char*) * commandArgs.size()));
+		for (int x = 0; x < commandArgs.size(); ++x) {
+			char *pCommand = _fpAllocator(commandArgs[x].size() + 1);
+			strcpy(pCommand, commandArgs[x].c_str());
+			ptrArray[x] = pCommand;
+		}
+		return ptrArray;
+	}
+
+	MC_CONSOLE_COMMAND_CMD MCConsoleCommandParser::TranslateCommand(const std::string& command) {
+		auto commandMapElement = _commandMap.find(command);
+		if (commandMapElement == _commandMap.end())
+			return MC_CONSOLE_COMMAND_CMD_INVALID;
+		return commandMapElement->second;
 	}
 
 #pragma endregion

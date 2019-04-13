@@ -77,6 +77,11 @@ namespace MC {
 		}
 #endif __DEBUG_MCLINEAR_FIFO__
 
+
+		size_t buffer_size() const { return _pEnd - _pBuffer; }
+
+		size_t free()        const { return _pEnd - _pBuffer; }
+
 	private:
 		char* _pBuffer;
 		char* _pEnd;

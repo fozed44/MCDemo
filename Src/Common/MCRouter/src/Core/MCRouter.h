@@ -47,7 +47,7 @@ namespace MC {
 
 	public: /* Swap / Dispatch */
 
-		void Swap();
+		MC_RESULT Swap();
 		void Dispatch();
 
 	public: /* RegisterDispatchTargets */
@@ -60,13 +60,16 @@ namespace MC {
 		void DispatchMessages64();
 		void DispatchMessages128();
 
-		std::unique_ptr<MCMessageQueue<MC_MESSAGE32,  ROUTER_QUEUE_SIZE, 0>> _pMessageQueue32;
-		std::unique_ptr<MCMessageQueue<MC_MESSAGE64,  ROUTER_QUEUE_SIZE, 0>> _pMessageQueue64;
-		std::unique_ptr<MCMessageQueue<MC_MESSAGE128, ROUTER_QUEUE_SIZE, ROUTER_BUFFER_SIZE>> _pMessageQueue128;
+		std::unique_ptr<MCMessageQueue<MC_MESSAGE32,  ROUTER_QUEUE_SIZE>> _pMessageQueue32;
+		std::unique_ptr<MCMessageQueue<MC_MESSAGE64,  ROUTER_QUEUE_SIZE>> _pMessageQueue64;
+		std::unique_ptr<MCMessageQueueWithMemoryBuffer<MC_MESSAGE128, ROUTER_QUEUE_SIZE, ROUTER_BUFFER_SIZE>> _pMessageQueue128;
 
 		std::vector<MCMessageDispatchTarget*> _dispatchTargets;
 		std::vector<MC_MESSAGE_VISIBILITY>    _dispatchTargetVisibility;
 		
+		std::vector<std::thread::id> _writeLocks;
+		std::vector<std::thread::id> _readLocks;
+		MCCriticalSectionLock _lock;
 	};
 }
 

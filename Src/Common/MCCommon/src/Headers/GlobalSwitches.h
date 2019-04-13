@@ -39,6 +39,6 @@
 #define __DEBUG_MCLINEAR_FIFO__
 
 /*
-	Defining __DEBUG_MCMESSAGE_QUEUE__ will cause MCMessageQueue to check for and throw on memory access violations.
+	Defining __DEBUG_ROUTING__ will cause routing cods to check for and throw on memory access violations.
 */
-#define __DEBUG_MCMESSAGE_QUEUE__
+#define __DEBUG_ROUTING__
