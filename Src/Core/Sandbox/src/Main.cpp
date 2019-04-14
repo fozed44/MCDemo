@@ -18,12 +18,43 @@
 #include "../../../Common/MCCommon/src/Core/MCCommonCore.h"
 #include "../../../Common/MCCommon/src/Global/MCCOGlobals.h"
 #include "../../../Common/MCRouter/src/Core/MCMessage.h"
+#include "../../../Common/MCCommon/src/Console/MCConsole.h"
+#include "../../../Common/MCCommon/src/Console/MCConsoleOutputTarget.h"
+#include "../../../Common/MCCommon/src/Data/MCResult.h"
 #include <iostream>
 #include <thread>
 #include <atomic>
 #pragma comment (lib, "d3dcompiler.lib")
 #pragma comment (lib, "d3d12.lib")
 #pragma comment (lib, "dxgi.lib")
+
+class TempConsoleOutputTarget : public MC::MCConsoleOutputTarget {
+	MC::MC_RESULT WriteString(const char* pOutput) override {
+		std::cout << pOutput;
+		return MC::MC_RESULT_OK;
+	}
+	MC::MC_RESULT WriteChar(char output) override {
+		std::cout << output;
+		return MC::MC_RESULT_OK;
+	}
+	MC::MC_RESULT Backspace() override {
+		std::cout << "\b \b";
+		return MC::MC_RESULT_OK;
+	}
+	MC::MC_RESULT ClearCurrent() override {
+		std::cout << std::endl;
+		return MC::MC_RESULT_OK;
+	}
+	MC::MC_RESULT Prompt() override {
+		std::cout << "*->";
+		return MC::MC_RESULT_OK;
+	}
+	MC::MC_RESULT NewLine() override {
+		std::cout << std::endl;
+		return MC::MC_RESULT_OK;
+	}
+};
+
 
 int Sandbox() {
 	MC::MCLogHelper::SetDefaultLoggers();
@@ -74,6 +105,15 @@ int Sandbox() {
 		}
 	);
 
+	auto tempConsoleLogTarget = std::make_unique<TempConsoleOutputTarget>();
+
+	auto pConsole = std::make_unique<MC::MCConsole>(
+		[](size_t size) { return MC::MCCOGlobals::pRouter->AllocateMessageStorage(static_cast<unsigned short>(size)); },
+		tempConsoleLogTarget.get()
+	);
+
+	MC::MCCOGlobals::pRouter->RegisterDispatchTarget(pConsole.get(), MC::MC_MESSAGE_VISIBILITY_ALL);
+
 	MSG msg = {};
 	
 	__int64 frameCount = 1;
@@ -108,6 +148,7 @@ int Sandbox() {
 			}
 
 			MC::MCREGlobals::pRenderEngine->Update();
+			MC::MCCOGlobals::pRouter->Update();
 
 			frameCount++;
 

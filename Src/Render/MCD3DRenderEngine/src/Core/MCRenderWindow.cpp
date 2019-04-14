@@ -19,7 +19,7 @@ namespace MC {
 
 	POINT lastMousePos;
 
-	std::function<void()>     _resizeCallback  = nullptr;
+	std::function<void()>        _resizeCallback  = nullptr;
 	std::function<void(uint8_t)> _keydownCallback = nullptr;
 
 #pragma region window_proc
@@ -57,7 +57,6 @@ namespace MC {
 			PostQuitMessage(0);
 			return 0;
 		case WM_KEYDOWN:
-			MC_INFO("Key down");
 			if (_keydownCallback)
 				_keydownCallback(static_cast<uint8_t>(wParam));
 			break;
@@ -166,6 +165,10 @@ namespace MC {
 
 	void MCRenderWindow::RegisterResizeCallback(std::function<void()> callback) const {
 		_resizeCallback = callback;
+	}
+
+	void MCRenderWindow::RegisterKeyDownCallback(std::function<void(uint8_t)> callback) const {
+		_keydownCallback = callback;
 	}
 
 #pragma endregion

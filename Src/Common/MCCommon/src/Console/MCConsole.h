@@ -29,7 +29,7 @@ namespace MC {
 	private:
 		char  _pKeyBuffer[CONSOLE_KEY_BUFFER_SIZE];
 		char* _pNext;
-		char* _pEnd = &_pKeyBuffer[CONSOLE_KEY_BUFFER_SIZE];		
+		char* _pEnd;		
 
 		std::unique_ptr<MCConsoleCommandParser> _pCommandParser;
 

@@ -48,13 +48,14 @@ namespace MC {
 		}
 
 		bool pop(T* pT) {
+			if (_pNextPop.load() >= _pNextPush.load())
+				return false;
 			char* ptr = _pNextPop.fetch_add(sizeof(T));
 #ifdef __DEBUG_MCLINEAR_FIFO__
-			MCASSERT(ptr < _pNextPush.load());
 			MCASSERT(!_writeMode);
 #endif __DEBUG_MCLINEAR_FIFO__
 			*pT = *(reinterpret_cast<T*>(ptr));
-			return (_pNextPop.load() < _pNextPush.load());
+			return true;
 		}
 
 		const T& peek() const {
@@ -65,7 +66,7 @@ namespace MC {
 		}
 
 		void reset() {
-			_pNextPush = _pNextPop = _pBuffer - sizeof(T);
+			_pNextPush = _pNextPop = _pBuffer;
 #ifdef __DEBUG_MCLINEAR_FIFO__
 			assert(_writeMode);
 #endif __DEBUG_MCLINEAR_FIFO__
@@ -78,9 +79,9 @@ namespace MC {
 #endif __DEBUG_MCLINEAR_FIFO__
 
 
-		size_t buffer_size() const { return _pEnd - _pBuffer; }
+		size_t buffer_size() const noexcept { return _pEnd - _pBuffer; }
 
-		size_t free()        const { return _pEnd - _pBuffer; }
+		size_t free()        const noexcept { return _pEnd - _pBuffer; }
 
 	private:
 		char* _pBuffer;

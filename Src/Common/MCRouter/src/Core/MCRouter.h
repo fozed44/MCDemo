@@ -45,7 +45,11 @@ namespace MC {
 		void AddWriteLock();
 		void ReleaseWriteLock();
 
-	public: /* Swap / Dispatch */
+	public: /* Update */
+
+		void Update();
+
+	private: /* Swap / Dispatch */
 
 		MC_RESULT Swap();
 		void Dispatch();

@@ -155,6 +155,9 @@ copy $(SolutionDir)config\*.* $(SolutionDir)bin\Config\*.*</Command>
     <ProjectReference Include="..\..\Common\MCLog\MCLog.vcxproj">
       <Project>{0d33c258-4069-4642-b520-b66f3f30fc56}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\Common\MCRouter\MCRouter.vcxproj">
+      <Project>{2a54d643-48d2-40c4-b3fe-fa5d1451735c}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\Common\MCXML\MCXML.vcxproj">
       <Project>{8542da21-4af1-45fd-87d4-67cf08b0e012}</Project>
     </ProjectReference>

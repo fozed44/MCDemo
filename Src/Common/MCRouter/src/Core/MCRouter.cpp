@@ -153,6 +153,15 @@ namespace MC {
 
 #pragma endregion
 
+#pragma region Update
+
+	void MCRouter::Update() {
+		while (MC_RESULT_OK != Swap()) {}
+		Dispatch();
+	}
+
+#pragma endregion
+
 #pragma region Swap / Dispatch
 
 	MC_RESULT MCRouter::Swap() {
@@ -164,8 +173,8 @@ namespace MC {
 				return MC_RESULT_FAIL_NOT_READY;
 			}
 			
-			_pMessageQueue32->swap();
-			_pMessageQueue64->swap();
+			_pMessageQueue32 ->swap();
+			_pMessageQueue64 ->swap();
 			_pMessageQueue128->swap();
 
 			return MC_RESULT_OK;

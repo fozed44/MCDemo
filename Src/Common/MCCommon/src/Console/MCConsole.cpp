@@ -9,7 +9,11 @@ namespace MC {
 
 #pragma region ctor
 
-	MCConsole::MCConsole(tAllocator ptAllocator, MCConsoleOutputTarget* pOutputTarget) {
+	MCConsole::MCConsole(tAllocator ptAllocator, MCConsoleOutputTarget* pOutputTarget) 
+		: _pNext{_pKeyBuffer},
+		  _pEnd{&_pKeyBuffer[CONSOLE_KEY_BUFFER_SIZE]},
+		  _pOutputTarget{pOutputTarget}
+	{
 		_pCommandParser = std::make_unique<MCConsoleCommandParser>([](size_t size) {
 			return MCCOGlobals::pRouter->AllocateMessageStorage(static_cast<unsigned short>(size));
 		});
@@ -36,15 +40,23 @@ namespace MC {
 
 		if (_pNext == _pEnd)
 			return;
-		*_pNext = toascii(vkKey);
-		_pNext++;
-		
-		if (vkKey == VK_RETURN) {
+
+		if ((vkKey >= 0x30 && vkKey <= 0x39) || (vkKey >= 0x41 && vkKey <= 0x5A)) {
+			char ascii = toascii(vkKey);
+			*_pNext = ascii;
+			_pNext++;
+			_pOutputTarget->WriteChar(ascii);
+		} else if (vkKey == VK_RETURN) {
 			MC_CONSOLE_COMMAND cmd;
+
+			*_pNext = '\0';
+
 			auto parseResult = _pCommandParser->Parse(_pKeyBuffer, CONSOLE_KEY_BUFFER_SIZE, &cmd);
 
-			if (MC_RESULT_FAIL_INVALID_DATA == parseResult)
-				_pOutputTarget->DisplayConsoleOutput("Unrecognized Command.");
+			if (MC_RESULT_FAIL_INVALID_DATA == parseResult) {
+				_pOutputTarget->NewLine();
+				_pOutputTarget->WriteString("Unrecognized Command.");
+			}
 
 			if (MC_RESULT_OK == parseResult) {
 				MC_MESSAGE128 msg{};
@@ -56,7 +68,27 @@ namespace MC {
 
 			// Reset.
 			_pNext = _pKeyBuffer;
+
+			_pOutputTarget->NewLine();
+			_pOutputTarget->Prompt();
+		} else if (vkKey == VK_ESCAPE) {
+
+			_pNext = _pKeyBuffer;
+
+			_pOutputTarget->ClearCurrent();
+			_pOutputTarget->Prompt();
+
 		}
+		else if (vkKey == VK_BACK) {
+			if (_pNext > _pKeyBuffer) {
+				_pNext--;
+				_pOutputTarget->Backspace();
+			}
+
+		}
+
+		
+
 	}
 
 
