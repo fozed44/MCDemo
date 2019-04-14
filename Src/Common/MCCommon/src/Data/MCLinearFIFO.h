@@ -21,7 +21,7 @@ namespace MC {
 		}
 		~MCLinearFIFO() {
 			if (_pBuffer)
-				free(_pBuffer);
+				::free(_pBuffer);
 		}
 		MCLinearFIFO(MCLinearFIFO&)              = delete;
 		MCLinearFIFO(MCLinearFIFO&&)             = delete;

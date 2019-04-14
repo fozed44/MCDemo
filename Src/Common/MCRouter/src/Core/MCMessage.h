@@ -23,7 +23,7 @@ namespace MC {
 		MC_MESSAGE_BIT_FLAGS_64_BIT    = 0x2000,
 		MC_MESSAGE_BIT_FLAGS_128_BIT   = 0x4000,
 		MC_MESSAGE_BIT_FLAGS_ADDRESSED = 0x8000
-	};
+	} MC_MESSAGE_BIT_FLAGS;
 
 	typedef enum McMESSAGE : uint16_t {
 		MC_MESSAGE_INVALID                     = 0x0000,
@@ -50,13 +50,20 @@ namespace MC {
 				Flags: not used.
 				Param: The target render state. The renderer will throw if Param !(MC_RENDERER_STATE). */
 
-		MC_MESSAGE_FRAME_READY_128             = 0x0001 | MC_MESSAGE_BIT_FLAGS_128_BIT | MC_MESSAGE_BIT_FLAGS_ADDRESSED
+		MC_MESSAGE_FRAME_READY_128             = 0x0001 | MC_MESSAGE_BIT_FLAGS_128_BIT | MC_MESSAGE_BIT_FLAGS_ADDRESSED,
 			/* The game logic has a new frame. 
 				Visibility:       MC_MESSAGE_VISIBILITY_RENDERER 
 				Flags:            not used.
 				LOParam32:    not used.
 				pAddress:      the address of the frame.
 				LOParam16HI: not used. */
+		MC_MESSAGE_CONSOLE_COMMAND_128		   = 0x0002 | MC_MESSAGE_BIT_FLAGS_128_BIT | MC_MESSAGE_BIT_FLAGS_ADDRESSED
+			/* A console command emitted by MCConsole.
+				Visibility:	MC_MESSAGE_VISIBILITY_ALL
+				Flags:		  not used.
+				LOParam32:  The MC_CONSOLE_COMMAND_CMD
+				pAddress:    The Message address of the MC_COMMAND object
+			*/
 
 	} MC_MESSAGE;
 

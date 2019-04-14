@@ -134,7 +134,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Console\MCConsoleOutputTarget.h" />
+    <ClInclude Include="src\Core\MCCommonCore.h" />
+    <ClInclude Include="src\Global\MCCOGlobals.h" />
     <ClInclude Include="src\Console\MCConsole.h" />
+    <ClInclude Include="src\Console\MCConsoleCommand.h" />
+    <ClInclude Include="src\Console\MCConsoleCommandParser.h" />
     <ClInclude Include="src\Data\MCLinearBuffer.h" />
     <ClInclude Include="src\Data\MCLinearFIFO.h" />
     <ClInclude Include="src\Data\MCObjects.h" />
@@ -152,7 +157,10 @@
     <ClInclude Include="src\Headers\Utility.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\MCCommonCore.cpp" />
+    <ClCompile Include="src\Global\MCCOGlobals.cpp" />
     <ClCompile Include="src\Console\MCConsole.cpp" />
+    <ClCompile Include="src\Console\MCConsoleCommandParser.cpp" />
     <ClCompile Include="src\Data\MCResult.cpp" />
     <ClCompile Include="src\Data\MCThreads.cpp" />
     <ClCompile Include="src\Source\MasterTimer.cpp" />

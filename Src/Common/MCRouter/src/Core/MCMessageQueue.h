@@ -48,7 +48,7 @@ namespace MC {
 		char* push_to(unsigned short size) {
 			char* ptr = _pNextPush.fetch_add(Pad32(size));
 #ifdef __DEBUG_ROUTING__
-			MCASSERT((ptr + size) < _pEnd);
+			MCASSERT((ptr + Pad32(size)) < _pEnd);
 			MCASSERT(_writeOnly);
 #endif __DEBUG_ROUTING__
 			return ptr;
@@ -106,20 +106,14 @@ namespace MC {
 
 	template<
 		typename tMessage, /* The core type being queued. */
-		unsigned int N1,   /* The size of the queues. */
+		unsigned int N1    /* The size of the queues. */
 	>
 		class MCMessageQueue {
 		using queue_type = MCLinearFIFO<tMessage, N1>;
 		public:
 			MCMessageQueue(const std::string& name) : _name{ name } {
 				_pFrontQueue = std::make_unique<queue_type>();
-				_pBackQueue = std::make_unique<queue_type>();
-
-				_pFrontBuffer = std::make_unique<MCMessageQueueDataBuffer>(_name + std::string(" buffer a"), N2);
-				_pBackBuffer = std::make_unique<MCMessageQueueDataBuffer>(_name + std::string(" buffer b"), N2);
-
-				_pCurrentReadBase = _pFrontBuffer->get_buffer();
-				_pCurrentWriteBase = _pBackBuffer->get_buffer();
+				_pBackQueue  = std::make_unique<queue_type>();
 			}
 			~MCMessageQueue() {}
 			MCMessageQueue(MCMessageQueue&) = delete;
@@ -213,7 +207,7 @@ namespace MC {
 				char*     ptr = _pFrontBuffer->push_to(dataSize);
 				tMessage* msg = _pFrontQueue->push_to();
 				*msg = message;
-				msg->Address = ptr;
+				msg->pAddress = ptr;
 				return ptr;
 			}
 
@@ -222,14 +216,14 @@ namespace MC {
 				char*     ptr = _pFrontBuffer->push_to(sizeof(T));
 				tMessage* msg = _pFrontQueue->push_to();
 				*msg = t;
-				msg->Address = ptr;
+				msg->pAddress = ptr;
 				return reinterpret_cast<T*>(ptr);
 			}
 
 		public: /* Arbitrary storage */
 
 			char* allocate(unsigned short size) {
-				_pFrontBuffer->allocate(unsigned short size);
+				return _pFrontBuffer->allocate(size);
 			}
 
 		public: /* pop, peek */
@@ -246,10 +240,10 @@ namespace MC {
 			void swap() {
 
 #ifdef __DEBUG_ROUTING__
-				_pFrontBuffer->AllowWrite (false);
+				_pFrontBuffer->allow_write (false);
 				_pFrontQueue ->allow_write(false);
 
-				_pBackBuffer->AllowWrite (true);
+				_pBackBuffer->allow_write (true);
 				_pBackQueue ->allow_write(true);
 #endif __DEBUG_ROUTING__
 

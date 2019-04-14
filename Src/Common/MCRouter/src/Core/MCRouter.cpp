@@ -61,7 +61,6 @@ namespace MC {
 
 	void MCRouter::DispatchMessages64() {
 		MC_MESSAGE64 msg;
-		char*        pAddress;
 		while (_pMessageQueue64->pop(&msg)) {
 			for (unsigned int x = 0; x < _dispatchTargets.size(); ++x) {
 				if (msg.Visibility & _dispatchTargetVisibility[x])
@@ -168,6 +167,8 @@ namespace MC {
 			_pMessageQueue32->swap();
 			_pMessageQueue64->swap();
 			_pMessageQueue128->swap();
+
+			return MC_RESULT_OK;
 		EXIT_CRITICAL_SECTION;
 	}
 

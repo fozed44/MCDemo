@@ -33,7 +33,7 @@ namespace TMCCommon {
 		}
 
 		TEST_METHOD(Instantiate) {
-			MCMessageQueue<MC_MESSAGE128, 5, 200> queue("test queue");
+			MCMessageQueueWithMemoryBuffer<MC_MESSAGE128, 5, 200> queue("test queue");
 
 			Assert::AreEqual(200, (int)queue.front_buffer_size());
 			Assert::AreEqual(200, (int)queue.front_buffer_free());
@@ -44,61 +44,37 @@ namespace TMCCommon {
 		TEST_METHOD(StoreData) {
 			MCThreads::RegisterCurrentThread("Unit test", MC_THREAD_CLASS_MAIN);
 
-			MCMessageQueue<MC_MESSAGE64, 5, 200> queue("test queue");
+			MCMessageQueueWithMemoryBuffer<MC_MESSAGE128, 5, 200> queue("test queue");
 
-			MC_MESSAGE64 msg;
+			MC_MESSAGE128 msg;
 
-			msg.Message = MC_MESSAGE_FRAME_READY_64;
+			msg.Message = MC_MESSAGE_FRAME_READY_128;
 
-			queue.add_read_lock();
 			Person* ptr = queue.push_to<Person>(msg);
 			ptr->testProp1 = 1;
 			ptr->testProp2 = 2;
-			queue.release_read_lock();
 
 			msg = {}; ptr = nullptr;
 
 			queue.swap();
 
-			queue.add_write_lock();
 			bool valid = queue.pop(&msg);
-			ptr = queue.translate_address<Person>(msg);
-			queue.release_write_lock();
+			ptr = reinterpret_cast<Person*>(msg.pAddress);
 
 			Assert::AreEqual(1, ptr->testProp1);
 			Assert::AreEqual(2, ptr->testProp2);			
 		}
 
-		TEST_METHOD(SwapFailWhenLocked) {
-			MCThreads::RegisterCurrentThread("Unit test", MC_THREAD_CLASS_MAIN);
-
-			MCMessageQueue<MC_MESSAGE64, 5, 200> queue("test queue");
-
-			MC_MESSAGE64 msg;
-
-			msg.Message = MC_MESSAGE_FRAME_READY_64;
-
-			queue.add_read_lock();
-			Person* ptr = queue.push_to<Person>(msg);
-			
-			// Can't swap with a read lock active.
-			auto result = queue.swap();
-
-			Assert::AreEqual((int)MC_RESULT_FAIL_RESOURCE_LOCKED, (int)result);
-		}
-
 		TEST_METHOD(MemoryReleasedAfterSwap) {
 			MCThreads::RegisterCurrentThread("Unit test", MC_THREAD_CLASS_MAIN);
 
-			MCMessageQueue<MC_MESSAGE64, 5, 200> queue("test queue");
+			MCMessageQueueWithMemoryBuffer<MC_MESSAGE128, 5, 200> queue("test queue");
 
-			MC_MESSAGE64 msg;
+			MC_MESSAGE128 msg;
 
-			msg.Message = MC_MESSAGE_FRAME_READY_64;
+			msg.Message = MC_MESSAGE_FRAME_READY_128;
 
-			queue.add_read_lock();
 			Person* ptr = queue.push_to<Person>(msg);
-			queue.release_read_lock();
 
 			int t = sizeof(Person);
 			int x = (sizeof(Person) - 1) / 4 * 4 + 4;
@@ -124,15 +100,14 @@ namespace TMCCommon {
 		TEST_METHOD(WritePastBufferEndThrowsA) {
 			MCThreads::RegisterCurrentThread("Unit test", MC_THREAD_CLASS_MAIN);
 
-			MCMessageQueue<MC_MESSAGE64, 5, 200> queue("test queue");
+			MCMessageQueueWithMemoryBuffer<MC_MESSAGE128, 5, 200> queue("test queue");
 
-			MC_MESSAGE64 msg;
+			MC_MESSAGE128 msg;
 
-			msg.Message = MC_MESSAGE_FRAME_READY_64;
+			msg.Message = MC_MESSAGE_FRAME_READY_128;
 
 			auto exceptionThrown = false;
 
-			queue.add_read_lock();
 			try {
 				char* ptr = queue.push_to(msg, 201);
 			} catch (...) {
@@ -145,20 +120,18 @@ namespace TMCCommon {
 		TEST_METHOD(WritePastBufferEndThrowsB) {
 			MCThreads::RegisterCurrentThread("Unit test", MC_THREAD_CLASS_MAIN);
 
-			MCMessageQueue<MC_MESSAGE64, 202, 200> queue("test queue");
+			MCMessageQueueWithMemoryBuffer<MC_MESSAGE128, 202, 200> queue("test queue");
 
-			MC_MESSAGE64 msg;
+			MC_MESSAGE128 msg;
 
-			msg.Message = MC_MESSAGE_FRAME_READY_64;
+			msg.Message = MC_MESSAGE_FRAME_READY_128;
 
-			queue.add_read_lock();
-			for(int x = 0; x < 199; x++)
-				char* ptr = queue.push_to(msg,1);
 
 			bool exceptionThrown = false;
 
 			try {
-				char* ptr = queue.push_to(msg, 1);
+				for(int x = 0; x < 199; x++)
+					char* ptr = queue.push_to(msg,1);
 			}
 			catch (...) {
 				exceptionThrown = true;

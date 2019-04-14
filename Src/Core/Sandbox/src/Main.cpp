@@ -15,6 +15,9 @@
 #include "../../../Render/MCD3DRenderEngine/src/Core/MCREGlobals.h"
 #include "../../../Common/MCCommon/src/Data/MCFrame.h"
 #include "../../../Common/MCCommon/src/Data/MCResult.h"
+#include "../../../Common/MCCommon/src/Core/MCCommonCore.h"
+#include "../../../Common/MCCommon/src/Global/MCCOGlobals.h"
+#include "../../../Common/MCRouter/src/Core/MCMessage.h"
 #include <iostream>
 #include <thread>
 #include <atomic>
@@ -45,6 +48,8 @@ int Sandbox() {
 	auto masterTimer = std::make_unique<MC::MasterTimer>();
 	masterTimer->Reset();
 
+	auto pCommonCore = std::make_unique<MC::MCCommonCore>();
+
 	MC::RENDER_CONFIG renderConfig;
 	MC::LoadRenderConfig(&renderConfig);	
 
@@ -55,6 +60,17 @@ int Sandbox() {
 	MC::MCREGlobals::pRenderWindow->RegisterResizeCallback(
 		[]() {
 			MC::MCREGlobals::pMCDXGI->QueueResize();
+		}
+	);
+
+	MC::MCREGlobals::pRenderWindow->RegisterKeyDownCallback(
+		[](uint8_t vkCode) {
+			MC::MC_MESSAGE32 msg;
+			msg.Message    = MC::MC_MESSAGE_KEY_DOWN_32;
+			msg.Visibility = MC::MC_MESSAGE_VISIBILITY_ALL;
+			msg.Flags      = MC::MC_MESSAGE_FLAGS_NONE;
+			msg.Param      = vkCode;
+			MC::MCCOGlobals::pRouter->Push(msg);
 		}
 	);
 

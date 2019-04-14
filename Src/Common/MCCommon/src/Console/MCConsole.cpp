@@ -1,86 +1,20 @@
 #include "MCConsole.h"
 #include "../../../MCCommon/src/Data/MCThreads.h"
+#include "../Global/MCCOGlobals.h"
+#include "../../../MCRouter/src/Core/MCRouter.h"
 
 #include "windows.h"
 #include <vector>
 namespace MC {
 
-#pragma region MCConsoleCommandParser
-
-	MCConsoleCommandParser::MCConsoleCommandParser(tAllocator allocator) {
-		_fpAllocator = allocator;
-	}
-
-	MCConsoleCommandParser::~MCConsoleCommandParser() {}
-
-	MC_RESULT MCConsoleCommandParser::Parse(char *pBuffer, size_t bufferSize, MC_CONSOLE_COMMAND* pCommand) {
-		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
-		std::vector<std::string> commandStrings;
-		auto result = ParseStrings(pBuffer, bufferSize, &commandStrings);
-
-		if (result != MC_RESULT_OK)
-			return result;
-
-		pCommand->Command = TranslateCommand(commandStrings[0]);
-
-		if (pCommand->Command == MC_CONSOLE_COMMAND_CMD_INVALID)
-			return MC_RESULT_FAIL_INVALID_DATA;
-
-		pCommand->ParameterCount = commandStrings.size() - 1;
-
-		if (pCommand->ParameterCount == 0) {
-			pCommand->pParameterData = nullptr;
-			return MC_RESULT_OK;
-		}
-
-		commandStrings.erase(commandStrings.begin());
-
-		pCommand->pParameterData =  AllocateParameterData(commandStrings);
-
-		return MC_RESULT_OK;
-	}
-
-	MC_RESULT MCConsoleCommandParser::ParseStrings(char *pBuffer, size_t bufferSize, std::vector<std::string>* pResult) {
-		char *elementStart{ pBuffer }, *elementEnd{ pBuffer };
-		for (unsigned int x = 0; x < bufferSize; x++) {
-			elementEnd++;
-
-			if ('\0' == *elementEnd) {
-				pResult->push_back(std::string(elementStart, elementEnd) + std::string("\n"));
-				return MC_RESULT_OK;
-			}
-
-			if (' ' == *elementEnd) {
-				pResult->push_back(std::string(elementStart, elementEnd) + std::string("\n"));
-				elementStart = elementEnd;
-			}
-		}
-		return MC_RESULT_FAIL_INVALID_DATA;
-	}
-
-	char** MCConsoleCommandParser::AllocateParameterData(const std::vector<std::string>& commandArgs) {
-		std::vector<char*> ptrs;
-		char** ptrArray = reinterpret_cast<char**>(_fpAllocator(sizeof(char*) * commandArgs.size()));
-		for (int x = 0; x < commandArgs.size(); ++x) {
-			char *pCommand = _fpAllocator(commandArgs[x].size() + 1);
-			strcpy(pCommand, commandArgs[x].c_str());
-			ptrArray[x] = pCommand;
-		}
-		return ptrArray;
-	}
-
-	MC_CONSOLE_COMMAND_CMD MCConsoleCommandParser::TranslateCommand(const std::string& command) {
-		auto commandMapElement = _commandMap.find(command);
-		if (commandMapElement == _commandMap.end())
-			return MC_CONSOLE_COMMAND_CMD_INVALID;
-		return commandMapElement->second;
-	}
-
-#pragma endregion
-
 #pragma region ctor
 
-	MCConsole::MCConsole() {}
+	MCConsole::MCConsole(tAllocator ptAllocator, MCConsoleOutputTarget* pOutputTarget) {
+		_pCommandParser = std::make_unique<MCConsoleCommandParser>([](size_t size) {
+			return MCCOGlobals::pRouter->AllocateMessageStorage(static_cast<unsigned short>(size));
+		});
+		_pOutputTarget  = pOutputTarget;
+	}
 
 	MCConsole::~MCConsole() {}
 
@@ -106,7 +40,22 @@ namespace MC {
 		_pNext++;
 		
 		if (vkKey == VK_RETURN) {
-			auto command = _commandParser.Parse(_pKeyBuffer, CONSOLE_KEY_BUFFER_SIZE);
+			MC_CONSOLE_COMMAND cmd;
+			auto parseResult = _pCommandParser->Parse(_pKeyBuffer, CONSOLE_KEY_BUFFER_SIZE, &cmd);
+
+			if (MC_RESULT_FAIL_INVALID_DATA == parseResult)
+				_pOutputTarget->DisplayConsoleOutput("Unrecognized Command.");
+
+			if (MC_RESULT_OK == parseResult) {
+				MC_MESSAGE128 msg{};
+				msg.Message   = MC_MESSAGE_CONSOLE_COMMAND_128;
+				msg.LOParam32 = cmd.Command;
+				auto ptr = MCCOGlobals::pRouter->PushTo<MC_CONSOLE_COMMAND>(msg);
+				*ptr = cmd;
+			}
+
+			// Reset.
+			_pNext = _pKeyBuffer;
 		}
 	}
 

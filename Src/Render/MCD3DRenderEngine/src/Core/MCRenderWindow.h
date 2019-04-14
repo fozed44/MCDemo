@@ -18,6 +18,7 @@ namespace MC {
 		inline HWND hWnd() { return _hwnd; }
 
 		void RegisterResizeCallback(std::function<void()> callback) const;
+		void RegisterKeyDownCallback(std::function<void(uint8_t)> callback) const;
 
 		// Temp Methods that will be deleted
 		float GetPhi()    { return _phi; }

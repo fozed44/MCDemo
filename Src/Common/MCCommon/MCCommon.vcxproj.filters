@@ -63,6 +63,21 @@
     <ClInclude Include="src\Console\MCConsole.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Console\MCConsoleCommandParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Console\MCConsoleCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Global\MCCOGlobals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\MCCommonCore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Console\MCConsoleOutputTarget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Source\Paths.cpp">
@@ -81,6 +96,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Console\MCConsole.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Console\MCConsoleCommandParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Global\MCCOGlobals.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\MCCommonCore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
