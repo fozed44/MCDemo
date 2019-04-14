@@ -20,7 +20,9 @@ namespace MC {
 		  _previousFrameFenceValue{ 0 } {
 
 		// An executer should only be created on the main thread.
-		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);		
+		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
+
+		MCCriticalSection::InitializeLock(&_lock);
 	}
 
 	MCFrameRendererExecuter::~MCFrameRendererExecuter() {
@@ -117,8 +119,11 @@ namespace MC {
 				_pRenderer->PrepareCommandLists(_pCurrentFrame.release());
 				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_WAITING_ON_GPU);
 				MCREGlobals::pMCD3D->WaitForFenceValue(_previousFrameFenceValue);
-				_pRenderer->ExecuteCommandLists();
-				MCREGlobals::pMCDXGI->Present();
+				auto backBufferIndex = MCREGlobals::pMCDXGI->GetCurrentBackBufferIndex();
+				ENTER_CRITICAL_SECTION(MCFrameRendererExecuter_RenderLoop, &_lock);
+					_pRenderer->ExecuteCommandLists();
+					MCREGlobals::pMCDXGI->Present();
+				EXIT_CRITICAL_SECTION;
 				_previousFrameFenceValue = MCREGlobals::pMCD3D->GetNewFenceValue();
 				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_IDLE);
 			}

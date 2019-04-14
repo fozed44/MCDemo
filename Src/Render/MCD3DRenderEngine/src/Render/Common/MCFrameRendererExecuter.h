@@ -75,6 +75,8 @@ namespace MC {
 		std::unique_ptr<MCFrame>   	       _pNextFrame;
 
 		unsigned __int64                   _previousFrameFenceValue;
+
+		MCCriticalSectionLock              _lock;
 	};
 
 }

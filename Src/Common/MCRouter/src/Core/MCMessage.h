@@ -57,12 +57,19 @@ namespace MC {
 				LOParam32:    not used.
 				pAddress:      the address of the frame.
 				LOParam16HI: not used. */
-		MC_MESSAGE_CONSOLE_COMMAND_128		   = 0x0002 | MC_MESSAGE_BIT_FLAGS_128_BIT | MC_MESSAGE_BIT_FLAGS_ADDRESSED
+		MC_MESSAGE_CONSOLE_COMMAND_128		   = 0x0002 | MC_MESSAGE_BIT_FLAGS_128_BIT | MC_MESSAGE_BIT_FLAGS_ADDRESSED,
 			/* A console command emitted by MCConsole.
 				Visibility:	MC_MESSAGE_VISIBILITY_ALL
 				Flags:		  not used.
 				LOParam32:  The MC_CONSOLE_COMMAND_CMD
 				pAddress:    The Message address of the MC_COMMAND object
+			*/
+		MC_MESSAGE_CONSOLE_OUTPUT_128          = 0x0003 | MC_MESSAGE_BIT_FLAGS_128_BIT | MC_MESSAGE_BIT_FLAGS_ADDRESSED,
+			/* Indicates a message to be displayed in console output.
+				Visibility:	MC_MESSAGE_VISIBILITY_CONSOLE
+				Flags:       None.
+				pAddress    The message address of the null terminated string to be displayed in as
+							console output.
 			*/
 
 	} MC_MESSAGE;

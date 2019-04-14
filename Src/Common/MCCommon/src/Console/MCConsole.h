@@ -23,9 +23,11 @@ namespace MC {
 		MCConsole& operator= (MCConsole&)  = delete;
 		MCConsole& operator= (MCConsole&&) = delete;
 	public: /* MCMessageDispatchTarget */
-		virtual void ProcessMessage32(MC_MESSAGE32 message) override;
-	public:
-		void NewKey(unsigned char vkCode);
+		virtual void ProcessMessage32 (MC_MESSAGE32 message) override;
+		virtual void ProcessMessage128(const MC_MESSAGE128& message, const char* pData) override;
+	public: /* Router message handlers */
+		void NewKeyHandler(unsigned char vkCode);
+		void ConsoleOutputHandler(const char* pData);
 	private:
 		char  _pKeyBuffer[CONSOLE_KEY_BUFFER_SIZE];
 		char* _pNext;

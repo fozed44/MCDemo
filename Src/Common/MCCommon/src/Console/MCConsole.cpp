@@ -29,13 +29,24 @@ namespace MC {
 	void MCConsole::ProcessMessage32(MC_MESSAGE32 message) {
 		switch (message.Message) {
 		case MC_MESSAGE_KEY_DOWN_32:
-			NewKey(message.Param);
+			NewKeyHandler(message.Param);
+			break;
+		}
+	}
+
+	void MCConsole::ProcessMessage128(const MC_MESSAGE128& message, const char* pData) {
+		switch (message.Message) {
+		case MC_MESSAGE_CONSOLE_OUTPUT_128:
+			ConsoleOutputHandler(pData);
+			break;
 		}
 	}
 
 #pragma endregion
 
-	void MCConsole::NewKey(unsigned char vkKey) {
+#pragma region Message Handlers
+
+	void MCConsole::NewKeyHandler(unsigned char vkKey) {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
 
 		if (_pNext == _pEnd)
@@ -91,5 +102,8 @@ namespace MC {
 
 	}
 
-
+	void MCConsole::ConsoleOutputHandler(const char* pData) {
+		_pOutputTarget->WriteString(pData);
+		_pOutputTarget->NewLine();
+	}
 }

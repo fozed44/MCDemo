@@ -4,6 +4,9 @@
 #include "../Configuration/RenderConfig.h"
 #include "MCREGlobals.h"
 
+#include "../../../../Common/MCRouter/src/Core/MCRouter.h"
+#include "../../../../Common/MCCommon/src/Global/MCCOGlobals.h"
+
 #define MC_WINDOW_CLASS_NAME "MCWindow"
 #define MC_WINDOW_TITLE "MC Demo"
 
@@ -30,12 +33,20 @@ namespace MC {
 		switch (msg) {
 
 		case WM_LBUTTONDOWN:
-			MC_INFO("Mouse button down at {0:d}, {1:d}", LOWORD(lParam), HIWORD(lParam));
+		{
+			auto mouseButtonMessage     = std::string("Mouse button down at ") + std::to_string(LOWORD(lParam)) + std::string(", ") + std::to_string(HIWORD(lParam));
+			auto mouseButtonMessageSize = strlen(mouseButtonMessage.c_str()) + 1;
+			MC_MESSAGE128 msg;
+			msg.Message = MC_MESSAGE_CONSOLE_OUTPUT_128;
+			auto strAddress = MCCOGlobals::pRouter->PushTo(msg, mouseButtonMessageSize);
+			strcpy_s(strAddress, mouseButtonMessageSize, mouseButtonMessage.c_str());
+			//MC_INFO("Mouse button down at {0:d}, {1:d}", LOWORD(lParam), HIWORD(lParam));
 			lastMousePos.x = LOWORD(lParam);
 			lastMousePos.y = HIWORD(lParam);
 			SetCapture(hWnd);
+		}
 			break;
-		case WM_LBUTTONUP:
+		case WM_LBUTTONUP: 
 			ReleaseCapture();
 			break;
 		case WM_MOUSEMOVE:
