@@ -7,6 +7,64 @@
 
 #include <vector>
 
+/*
+
+	*----------------------------------------------------------------*
+	|                                       MCRouter                                      |
+	|----------------------------------------------------------------|
+	|  *--------------------------------------*                               |
+	|  | MCMessageQueue: _pMessageQueue32 |                               |
+	|  |  frontQueue                   backQueue    |                               |
+	|  *--------------------------------------*                               |
+	|  *--------------------------------------*                               |
+	|  | MCMessageQueue: _pMessageQueue64 |                               |
+	|  |  frontQueue                   backQueue    |                               |  
+	|  *--------------------------------------*                               |
+	|  *---------------------------------------------------------*    |
+	|  | MCMessageQueueWithMemoryBuffer: _pMessageQueue128 |     |
+	|  |  frontQueue                             backQueue                   |      |
+	|  |  frontBuffer                              backBuffer                    |     |
+	|  *---------------------------------------------------------*    |
+	|  *----------------*    *------------------*                             |
+	|  | DispatchTargets |    | read / write locks |                              |
+	|  *----------------*    *------------------*                             |
+	*----------------------------------------------------------------*
+
+	MCRouter:
+
+	Purpose:
+		The MCRouter is the backbone of the messaging system in this framework.
+		
+	Remarks:
+		The messaging system is built on three ideas / systems.
+
+		1) It provides a method for any thread to post a message.
+
+		2) It provides a method for any MessageDispatchTarget to register in order to be notified
+		   of messages.
+
+		3) Provides the update method which:
+			a) Flips the front and back queues, and in the case of the 128 bit message queue the buffer
+			   is also flipped, and then runs the dispatching code on the new back buffer.
+
+		Notes:
+
+		1) Writes are posted to front buffers.
+
+		2) Reads are read from back buffers.
+
+		3) Writes not made from the main thread should happen in a write lock.
+
+		4) Reads not made from the main thread should happen in a read lock.
+
+		5) Read / Write locks are used to synchronize the queue/buffer swaps.
+
+		6) Use message visibility flags to prevent irrelevant dispatch targets from having to
+		   needlessly processes worthless messages.
+
+
+*/
+
 namespace MC {
 
 	const int ROUTER_BUFFER_SIZE = 32*1024;
