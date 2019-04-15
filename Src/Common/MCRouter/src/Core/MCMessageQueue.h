@@ -86,7 +86,7 @@ namespace MC {
 		char* allocate(unsigned short dataSize) {
 			char* ptr = _pNextPush.fetch_add(Pad32(dataSize));
 #ifdef __DEBUG_ROUTING__
-			MCASSERT(_pNextPush <= _pBuffer);
+			MCASSERT(_pNextPush.load() <= _pEnd);
 			MCASSERT(_writeOnly);
 #endif __DEBUG_ROUTING__
 			return ptr;

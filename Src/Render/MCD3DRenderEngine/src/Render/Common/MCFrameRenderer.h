@@ -30,6 +30,9 @@ namespace MC {
 		/* Use the value of _frameIndex (set during construction) to acquire the render target from MCDXGI */
 		void AcquireRenderTargetInfo();
 
+		/* for debuging... delete later.*/
+		unsigned int FrameIndex() { return _frameIndex; }
+
 	protected: /* D3D12 Objects */
 		unsigned int					  _frameIndex;
 		ID3D12Resource*					  _pRenderTarget;

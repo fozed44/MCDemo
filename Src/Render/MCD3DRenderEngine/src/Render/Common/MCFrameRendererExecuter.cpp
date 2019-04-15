@@ -109,22 +109,24 @@ namespace MC {
 			MC_THREAD_CLASS_FRAME_RENDERER_EXECUTER
 		);
 
-		unsigned __int64 cl = 0;
-
 		while (!_exitFlag) {
 			if (_executionStage.load() == MCFRAME_RENDERER_EXECUTION_STAGE_FRAME_ACCEPTED) {
 				
-				auto _pCurrentFrame = std::move(_pNextFrame);
-				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_CPU_RENDERING);
-				_pRenderer->PrepareCommandLists(_pCurrentFrame.release());
 				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_WAITING_ON_GPU);
-				MCREGlobals::pMCD3D->WaitForFenceValue(_previousFrameFenceValue);
-				auto backBufferIndex = MCREGlobals::pMCDXGI->GetCurrentBackBufferIndex();
-				ENTER_CRITICAL_SECTION(MCFrameRendererExecuter_RenderLoop, &_lock);
+					MCREGlobals::pMCD3D->WaitForFenceValue(_previousFrameFenceValue);
+				
+				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_CPU_RENDERING);
+					auto _pCurrentFrame = std::move(_pNextFrame);
+					_pRenderer->PrepareCommandLists(_pCurrentFrame.release());
+
+					while (_pRenderer->FrameIndex() != MCREGlobals::pMCDXGI->GetCurrentBackBufferIndex())
+						std::this_thread::sleep_for(std::chrono::nanoseconds(300));
+
 					_pRenderer->ExecuteCommandLists();
 					MCREGlobals::pMCDXGI->Present();
-				EXIT_CRITICAL_SECTION;
-				_previousFrameFenceValue = MCREGlobals::pMCD3D->GetNewFenceValue();
+
+					_previousFrameFenceValue = MCREGlobals::pMCD3D->GetNewFenceValue();
+
 				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_IDLE);
 			}
 		}

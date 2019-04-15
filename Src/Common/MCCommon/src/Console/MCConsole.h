@@ -26,8 +26,9 @@ namespace MC {
 		virtual void ProcessMessage32 (MC_MESSAGE32 message) override;
 		virtual void ProcessMessage128(const MC_MESSAGE128& message, const char* pData) override;
 	public: /* Router message handlers */
-		void NewKeyHandler(unsigned char vkCode);
-		void ConsoleOutputHandler(const char* pData);
+		void NewKeyHandler        (unsigned char vkCode);
+		void ConsoleOutputHandler (const char* pData);
+		void ConsoleCommandHandler(const MC_CONSOLE_COMMAND* pCommand);
 	private:
 		char  _pKeyBuffer[CONSOLE_KEY_BUFFER_SIZE];
 		char* _pNext;

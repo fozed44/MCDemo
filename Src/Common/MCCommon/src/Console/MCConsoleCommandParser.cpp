@@ -6,8 +6,8 @@ namespace MC {
 	MCConsoleCommandParser::MCConsoleCommandParser(tAllocator allocator) {
 		_fpAllocator = allocator;
 		_commandMap = {
-			{ "report-router-memory", MC_CONSOLE_COMMAND_CMD_REPORT_ROUTER_MEMORY },
-			{ "wire-frame",           MC_CONSOLE_COMMAND_CMD_WIRE_FRAME }
+			{ "REPORTROUTERMEMORY", MC_CONSOLE_COMMAND_CMD_REPORT_ROUTER_MEMORY },
+			{ "WIREFRAME",            MC_CONSOLE_COMMAND_CMD_WIRE_FRAME }
 		};
 	}
 
