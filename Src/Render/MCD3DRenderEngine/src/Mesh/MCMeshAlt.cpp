@@ -43,10 +43,38 @@ namespace MC {
 		MCMesh& operator= (MCMesh&) = delete;
 		virtual ~MCMesh() {}
 	public:
-		virtual MC_RESULT LoadData(TVERTEX_TYPE *pVert, UINT vSize, INDEX_TYPE *pIndicies, UINT iSize) = 0;
-	public:
 		const std::string& Name() const noexcept { return _name; }
 	public:
+		MC_RESULT LoadData(TVERTEX_TYPE *pVert, UINT vSize, INDEX_TYPE *pIndicies, UINT iSize) {
+			// Store the meta information about this mesh.
+			_vertexByteStride     = sizeof(TVERTEX_TYPE);
+			_vertexBufferByteSize = vSize;
+			_indexBufferByteSize  = iSize;
+
+			if (auto result != CreateResources(pVert, vSize, pIndicies, iSize, &_hVertexBuffer, &_hIndexBuffer))
+				return result;			
+
+			auto vertexBufferResource = MCResourceManager::Instance()->GetResourceSync(_hVertexBuffer);
+			vertexBufferResource->SetName(s2ws(Name() + std::string(" gpu vertex buffer")).c_str());
+
+			auto indexBufferResource = MCResourceManager::Instance()->GetResourceSync(_hIndexBuffer);
+			indexBufferResource->SetName(s2ws(Name() + std::string(" gpu index buffer")).c_str());
+
+			// Next we add the entire mesh as a subMesh, allowing the client to call DrawSubMesh using the name of this mesh
+			// to draw the whole mesh.
+			AddSubMesh(Name().c_str(), iSize / sizeof(INDEX_TYPE), 0, 0);
+
+			_vertexBufferView.BufferLocation = vertexBufferResource->GetGPUVirtualAddress();
+			_vertexBufferView.StrideInBytes  = _vertexByteStride;
+			_vertexBufferView.SizeInBytes    = _vertexBufferByteSize;
+
+			_indexBufferView.BufferLocation = indexBufferResource->GetGPUVirtualAddress();
+			_indexBufferView.Format         = _indexFormat;
+			_indexBufferView.SizeInBytes    = _indexBufferByteSize;
+
+			return MC_RESULT_OK;
+		}
+
 		void AddSubMesh(const char *pMeshName, UINT indexCount, UINT startIndexLocation, UINT baseVertexLocation) {
 			MCSubMesh subMesh;
 			subMesh.IndexCount = indexCount;
@@ -83,6 +111,16 @@ namespace MC {
 		}
 	private:
 		std::string _name;
+
+	protected:
+		virtual MC_RESULT CreateResources(
+			TVERTEX_TYPE *pVert,
+			UINT vSize,
+			INDEX_TYPE *pIndicies,
+			UINT iSize,
+			MCResourceManager::HandleType* hVertexBuffer,
+			MCResourceManager::HandleType* hIndexBuffer
+		) = 0;
 	protected:
 		std::unordered_map<std::string, MCSubMesh> _subMeshes;
 
@@ -110,36 +148,18 @@ namespace MC {
 	public:
 		MCStaticMesh(std::string& name) : MCMesh(name) {}
 		~MCStaticMesh() {}
-	public:
-		MC_RESULT LoadData(TVERTEX_TYPE *pVert, UINT vSize, INDEX_TYPE *pIndicies, UINT iSize) override {
-			// Store the meta information about this mesh.
-			_vertexByteStride     = sizeof(TVERTEX_TYPE);
-			_vertexBufferByteSize = vSize;
-			_indexBufferByteSize  = iSize;
-
-			_hVertexBuffer = MCResourceManager::Instance()->CreateStaticBufferSync(pVert, vSize, true);
-			auto vertexBufferResource = MCResourceManager::Instance()->GetResourceSync(_hVertexBuffer);
-			vertexBufferResource->SetName(s2ws(Name() + std::string(" gpu vertex buffer")).c_str());
-
-			_hIndexBuffer = MCResourceManager::Instance()->CreateStaticBufferSync(pIndicies, iSize, true);
-			auto indexBufferResource = MCResourceManager::Instance()->GetResourceSync(_hIndexBuffer);
-			indexBufferResource->SetName(s2ws(Name() + std::string(" gpu index buffer")).c_str());
-
-			// Next we add the entire mesh as a subMesh, allowing the client to call DrawSubMesh using the name of this mesh
-			// to draw the whole mesh.
-			AddSubMesh(Name().c_str(), iSize / sizeof(INDEX_TYPE), 0, 0);
-
-			_vertexBufferView.BufferLocation = vertexBufferResource->GetGPUVirtualAddress();
-			_vertexBufferView.StrideInBytes  = _vertexByteStride;
-			_vertexBufferView.SizeInBytes    = _vertexBufferByteSize;
-
-			_indexBufferView.BufferLocation = indexBufferResource->GetGPUVirtualAddress();
-			_indexBufferView.Format         = _indexFormat;
-			_indexBufferView.SizeInBytes    = _indexBufferByteSize;
-
-			return MC_RESULT_OK;
+	protected:
+		virtual MC_RESULT MC_RESULT CreateResources(
+			TVERTEX_TYPE *pVert,
+			UINT vSize,
+			INDEX_TYPE *pIndicies,
+			UINT iSize,
+			MCResourceManager::HandleType* hVertexBuffer,
+			MCResourceManager::HandleType* hIndexBuffer
+		) {
+			*hVertexBuffer = std::move(MCResourceManager::Instance()->CreateStaticBufferSync(pVert, vSize, true));
+			*hIndexBuffer  = std::move(MCResourceManager::Instance()->CreateStaticBufferSync(pIndicies, iSize, true));
 		}
-
 	};
 
 }
