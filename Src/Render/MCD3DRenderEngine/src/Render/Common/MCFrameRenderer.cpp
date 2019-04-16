@@ -17,7 +17,7 @@ namespace MC {
 		  _frameIndex{ frameIndex } {
 
 		// A Frame renderer should only be constructed on the main thread.
-		MCThreads::Assert(MC_THREAD_CLASS_MAIN);
+		MCThreads::Assert(MC_THREAD_CLASS::MAIN);
 
 		InitializeBase();
 		AcquireRenderTargetInfo();
@@ -26,7 +26,7 @@ namespace MC {
 
 	MCFrameRenderer::~MCFrameRenderer() { 
 		// A Frame renderer should only be destructed on the main thread.
-		MCThreads::Assert(MC_THREAD_CLASS_MAIN);		
+		MCThreads::Assert(MC_THREAD_CLASS::MAIN);		
 	}
 
 #pragma region Initialization

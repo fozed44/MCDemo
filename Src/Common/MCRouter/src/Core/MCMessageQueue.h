@@ -70,14 +70,14 @@ namespace MC {
 
 #ifdef __DEBUG_ROUTING__
 		void allow_write(bool allowWrite) { 
-			MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN); 
+			MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN); 
 			_writeOnly = allowWrite;
 		}
 #endif __DEBUG_ROUTING__
 
 		void reset() {
 #ifdef __DEBUG_ROUTING__
-			MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
+			MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 			assert(_writeOnly);
 #endif __DEBUG_ROUTING__
 			_pNextPush.store(_pBuffer);

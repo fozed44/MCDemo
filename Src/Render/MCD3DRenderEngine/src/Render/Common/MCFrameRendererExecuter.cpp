@@ -20,14 +20,14 @@ namespace MC {
 		  _previousFrameFenceValue{ 0 } {
 
 		// An executer should only be created on the main thread.
-		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 
 		MCCriticalSection::InitializeLock(&_lock);
 	}
 
 	MCFrameRendererExecuter::~MCFrameRendererExecuter() {
 		// An executer should only be destroyed on the main thread.
-		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 
 		if (_pRenderer && _pThread)
 			DestroyCurrentRenderer();
@@ -106,7 +106,7 @@ namespace MC {
 
 		MCThreads::RegisterCurrentThread(
 			std::string(_name),
-			MC_THREAD_CLASS_FRAME_RENDERER_EXECUTER
+			MC_THREAD_CLASS::RENDERER_EXECUTER
 		);
 
 		while (!_exitFlag) {

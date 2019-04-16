@@ -15,7 +15,7 @@ namespace MC {
 
 	MCFrameRenderer3D::~MCFrameRenderer3D() {
 		// A frame renderer should only be DESTROYED on the main thread.
-		MCThreads::Assert(MC_THREAD_CLASS_MAIN);
+		MCThreads::Assert(MC_THREAD_CLASS::MAIN);
 	}	
 
 #pragma endregion

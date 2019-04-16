@@ -1,10 +1,12 @@
 #include "MCResourceManager.h"
 #include "../Core/MCD3D.h"
 #include "../Core/MCREGlobals.h"
+#include "../../../../Common/MCCommon/src/Data/MCThreads.h"
 
 namespace MC {
 
-	MCResourceManager::MCResourceManager() {
+	MCResourceManager::MCResourceManager() 
+		: _uploadBufferFence{ 0 } {
 		assert(MCREGlobals::pMCDXGI);
 
 		// Create a new allocator
@@ -31,14 +33,16 @@ namespace MC {
 		);
 
 		MCThrowIfFailed(_pCommandList->Close());
-
 	}
 
-	/*
-	Note:
-	'uploadBuffer' has to be kept alive until AFTER the command list is executed.
-	*/
-	MCResourceManager::HandleType MCResourceManager::CreateDefaultBuffer(void *pInitData, UINT64 sizeInBytes) {
+	
+	MC_RESULT MCResourceManager::CreateStaticBufferAsync(void *pInitData, size_t numBytes, HResource* pResult) {
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
+
+		// At this point we need to make sure that the GPU is done using the upload buffer
+		// from the last call to CreateStaticBufferAsync.
+		if (MCREGlobals::pMCD3D->GetCurrentFenceValue() <= _uploadBufferFence)
+			return MC_RESULT_FAIL_UPLOADING;
 
 		// the result.
 		ComPtr<ID3D12Resource> defaultBuffer;
@@ -49,7 +53,7 @@ namespace MC {
 		MCThrowIfFailed(MCREGlobals::pMCDXGI->Get3DDevice()->CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 			D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer(sizeInBytes),
+			&CD3DX12_RESOURCE_DESC::Buffer(numBytes),
 			D3D12_RESOURCE_STATE_COMMON,
 			nullptr,
 			__uuidof(defaultBuffer),
@@ -61,7 +65,7 @@ namespace MC {
 		MCThrowIfFailed(MCREGlobals::pMCDXGI->Get3DDevice()->CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 			D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer(sizeInBytes),
+			&CD3DX12_RESOURCE_DESC::Buffer(numBytes),
 			D3D12_RESOURCE_STATE_GENERIC_READ,
 			nullptr,
 			__uuidof(_pUploadBuffer),
@@ -70,7 +74,7 @@ namespace MC {
 
 		D3D12_SUBRESOURCE_DATA subResourceData = {};
 		subResourceData.pData      = pInitData;
-		subResourceData.RowPitch   = (LONG_PTR)sizeInBytes;
+		subResourceData.RowPitch   = static_cast<LONG_PTR>(numBytes);
 		subResourceData.SlicePitch = subResourceData.RowPitch;
 
 		_pCommandList->ResourceBarrier(
@@ -104,18 +108,54 @@ namespace MC {
 		MCThrowIfFailed(_pCommandList->Close());
 
 		MCREGlobals::pMCD3D->ExecuteCommandList(_pCommandList.Get());
+		
+		// _uploadBufferFence will be used to prevent this method from using
+		// the upload buffer before a previous call to this method has completed
+		// its use of the upload buffer.
+		_uploadBufferFence = MCREGlobals::pMCD3D->GetNewFenceValue();
 
-		auto nextFence = MCREGlobals::pMCD3D->GetNewFenceValue();
+		MCResourceHandle handle{
+			defaultBuffer.Get(),
+			_uploadBufferFence // Reuse the fence value loaded for the upload buffer as the
+							   // fence value that will be used to let us know when the static
+							   // buffer is ready.
+		};
 
-		MCResourceHandle newHandle{ defaultBuffer.Get(), nextFence };
 
-		return this->CreateRef(newHandle, defaultBuffer);
+		*pResult = std::move(this->CreateRef(
+			handle,
+			defaultBuffer
+		));
+
+		return MC_RESULT_OK;
 	}
 
-	MC_RESULT MCResourceManager::GetResource(const MCResourceManager::HandleType& handle, ID3D12Resource **ppResource) {
-		if (MCREGlobals::pMCD3D->GetCurrentFenceValue() < UnwrapHandle(handle).FenceValue)
-			return MC_RESULT_FAIL_UPLOADING;
-		*ppResource = UnwrapHandle(handle).pResource;
+	MCResourceManager::HandleType MCResourceManager::CreateStaticBufferSync(void *pInitData, size_t numBytes, bool syncLoad) {
+		HResource hResource;
+		while (CreateStaticBufferAsync(pInitData, numBytes, &hResource) != MC_RESULT_OK) {}
+
+		auto unwrappedHandle = UnwrapHandle(hResource);
+		MCREGlobals::pMCD3D->WaitForFenceValue(unwrappedHandle.FenceValue);
+
+		// Since we have already waited for the resource to load, set its fence value to 0.
+		unwrappedHandle.FenceValue = 0;
+
+		return std::move(hResource);
+	}
+
+	MC_RESULT MCResourceManager::GetResource(const HResource& handle, ID3D12Resource **ppResource) {
+		auto unwrappedHandle = UnwrapHandle(handle);
+
+		if (unwrappedHandle.FenceValue) {
+			if (MCREGlobals::pMCD3D->GetCurrentFenceValue() < unwrappedHandle.FenceValue)
+				return MC_RESULT_FAIL_UPLOADING;
+
+			// Once we know the fence value has been reached, we set FenceValue to zero. This allows
+			// us to check the loaded status of the resource via if(FenceValue) rather than having
+			// to compare an actual fence value to GetCurrentFenceValue();
+			const_cast<MCResourceHandle&>(unwrappedHandle).FenceValue = 0;
+		}
+		*ppResource = unwrappedHandle.pResource;
 		return MC_RESULT_OK;
 	}
 	MC_RESULT MCResourceManager::GetResourceSync(const MCResourceManager::HandleType& handle, ID3D12Resource **ppResource) {
@@ -125,7 +165,16 @@ namespace MC {
 
 	ID3D12Resource *MCResourceManager::GetResourceSync(const MCResourceManager::HandleType& handle) {
 		auto unwrappedHandle = UnwrapHandle(handle);
-		MCREGlobals::pMCD3D->WaitForFenceValue(unwrappedHandle.FenceValue);
+
+		if (unwrappedHandle.FenceValue) {
+			MCREGlobals::pMCD3D->WaitForFenceValue(unwrappedHandle.FenceValue);
+
+			// Once we know the fence value has been reached, we set FenceValue to zero. This allows
+			// us to check the loaded status of the resource via if(FenceValue) rather than having
+			// to compare an actual fence value to GetCurrentFenceValue();
+			const_cast<MCResourceHandle&>(unwrappedHandle).FenceValue = 0;
+		}
+
 		return unwrappedHandle.pResource;
 	}
 }

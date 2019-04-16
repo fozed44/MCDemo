@@ -16,7 +16,7 @@ namespace TMCCommon {
 
 		TEST_CLASS_INITIALIZE(UseNullLoggers) {
 			MCLogHelper::SetNullLoggers();
-			MCThreads::RegisterCurrentThread("unit test", MC_THREAD_CLASS_MAIN);
+			MCThreads::RegisterCurrentThread("unit test", MC_THREAD_CLASS::MAIN);
 		}
 
 		TEST_METHOD(TestSingleCommand) {

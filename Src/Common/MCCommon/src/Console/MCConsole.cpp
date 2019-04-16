@@ -50,7 +50,7 @@ namespace MC {
 #pragma region Message Handlers
 
 	void MCConsole::NewKeyHandler(unsigned char vkKey) {
-		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 
 		if (_pNext == _pEnd)
 			return;
@@ -124,7 +124,7 @@ namespace MC {
 		MC_MESSAGE128 msg{};
 		msg.Message = MC_MESSAGE_CONSOLE_OUTPUT_128;
 		msg.Visibility = MC_MESSAGE_VISIBILITY_CONSOLE;
-		auto ptr = MCCOGlobals::pRouter->PushTo(msg, output.size() + 1);
+		auto ptr = MCCOGlobals::pRouter->PushTo(msg, static_cast<unsigned short>(output.size() + 1));
 		strcpy_s(ptr, output.size() + 1, output.c_str());
 	}
 }

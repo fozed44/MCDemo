@@ -145,12 +145,11 @@ int Sandbox() {
 			if (MC::MC_RESULT_OK == MC::MCREGlobals::pRenderEngine->ScheduleFrame(pNextFrame)) {
 				pNextFrame = new MC::MCSpaceFrame();
 				pNextFrame->FrameType = MC::MC_FRAME_TYPE_MCFRAME_SPACE;
+				frameCount++;
 			}
 
 			MC::MCREGlobals::pRenderEngine->Update();
-			MC::MCCOGlobals::pRouter->Update();
-
-			frameCount++;
+			MC::MCCOGlobals::pRouter->Update();			
 
 			frameCountBuffer[frameCount % frameCountBufferSize] = masterTimer->TotalTime();
 

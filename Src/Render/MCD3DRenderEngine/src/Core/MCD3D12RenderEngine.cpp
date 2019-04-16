@@ -16,7 +16,7 @@ namespace MC {
 	  assert(!MCREGlobals::pRenderEngine);
 
 	  // Register the thread that is calling this thread as the main thread.
-	  MCThreads::RegisterCurrentThread("Main", MC_THREAD_CLASS_MAIN);
+	  MCThreads::RegisterCurrentThread("Main", MC_THREAD_CLASS::MAIN);
 
 	  MCREGlobals::InitialConfiguration = *pConfiguration;
 	  _pRenderWindow = std::make_unique<MCRenderWindow>();

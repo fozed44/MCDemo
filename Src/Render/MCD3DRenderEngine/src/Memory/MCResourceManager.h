@@ -19,6 +19,8 @@ namespace MC {
 
 	class MCResourceManager : public MCManagedKeyedHandleManager<MCResourceHandle, ID3D12Resource*, ComPtr<ID3D12Resource>, MCResourceManager> {
 	public:
+		using HResource = MCResourceManager::HandleType;
+	public:
 		MCResourceManager();
 		MCResourceManager(MCResourceManager&)              = delete;
 		MCResourceManager(MCResourceManager&&)             = delete;
@@ -37,18 +39,19 @@ namespace MC {
 
 		//MCResourceHandle CreateResource(MC_RESOURCE_MANAGER_RESOURCE_TYPE, size_t sizeInBytes);
 		
-		inline MCResourceManager::HandleType CreateDefaultBufferTemp(void *pInitData, unsigned __int64 sizeInBytes)
-		{
-			return CreateDefaultBuffer(pInitData, sizeInBytes);
-		}
+		inline MC_RESULT CreateStaticBufferAsync(void *pInitData, size_t numBytes, HResource* pResult);
+		HResource CreateStaticBufferSync (void *pInitData, size_t numBytes, bool syncLoad);
 
 	private:
-		MCResourceHandle CreateConstantBuffer(size_t sizeInBytes);
-		MCResourceManager::HandleType CreateDefaultBuffer(void *pInitData, unsigned __int64 sizeInBytes);
+		HResource CreateConstantBuffer(size_t sizeInBytes);
+		HResource CreateDefaultBuffer(void *pInitData, unsigned __int64 sizeInBytes);
 	private:
 		ComPtr<ID3D12CommandAllocator>     _pCommandAllocator;
 		ComPtr<ID3D12GraphicsCommandList>  _pCommandList;
+
 		ComPtr<ID3D12Resource>             _pUploadBuffer;
-		__int64 _lastFenceValue;
+		unsigned __int64                   _uploadBufferFence; // Used to prevent the upload buffer from
+		                                                       // being double accessed from two consecutive
+															   // CreateBuffer calls.
 	};
 }

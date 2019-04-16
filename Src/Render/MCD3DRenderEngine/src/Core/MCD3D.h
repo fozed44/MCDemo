@@ -7,7 +7,7 @@
 #include "MCMath.h"
 #include "../../../../Common/MCCommon/src/Data/MCFrame.h"
 
-#include "MCMesh.h"
+#include "../Mesh/MCMesh.h"
 
 #include "../Shader/MCShaderManager.h"
 #include <atomic>

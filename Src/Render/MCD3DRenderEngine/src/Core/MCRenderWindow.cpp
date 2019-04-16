@@ -38,7 +38,7 @@ namespace MC {
 			auto mouseButtonMessageSize = strlen(mouseButtonMessage.c_str()) + 1;
 			MC_MESSAGE128 msg;
 			msg.Message = MC_MESSAGE_CONSOLE_OUTPUT_128;
-			auto strAddress = MCCOGlobals::pRouter->PushTo(msg, mouseButtonMessageSize);
+			auto strAddress = MCCOGlobals::pRouter->PushTo(msg, static_cast<unsigned short>(mouseButtonMessageSize));
 			strcpy_s(strAddress, mouseButtonMessageSize, mouseButtonMessage.c_str());
 			//MC_INFO("Mouse button down at {0:d}, {1:d}", LOWORD(lParam), HIWORD(lParam));
 			lastMousePos.x = LOWORD(lParam);

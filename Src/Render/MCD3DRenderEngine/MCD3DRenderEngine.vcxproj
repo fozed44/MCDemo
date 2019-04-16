@@ -160,7 +160,7 @@
     <ClInclude Include="src\Core\MCREGlobals.h" />
     <ClInclude Include="src\Render\Common\MCFrameRendererExecuter.h" />
     <ClInclude Include="src\Render\Common\MCFrameScheduler.h" />
-    <ClInclude Include="src\Render\Render3D\MCRenderItem3D.h" />
+    <ClInclude Include="src\Render\Common\MCRenderItem.h" />
     <ClInclude Include="src\Memory\MCResourceManager.h" />
     <ClInclude Include="src\Core\MCD3D12RenderUtilities.h" />
     <ClInclude Include="src\Core\MCD3D.h" />
@@ -171,7 +171,7 @@
     <ClInclude Include="src\Font\MCFontLoader.h" />
     <ClInclude Include="src\Font\MCFontRenderer.h" />
     <ClInclude Include="src\Core\MCMath.h" />
-    <ClInclude Include="src\Core\MCMesh.h" />
+    <ClInclude Include="src\Mesh\MCMesh.h" />
     <ClInclude Include="src\Core\MCUploadBuffer.h" />
     <ClInclude Include="src\Configuration\RenderConfig.h" />
     <ClInclude Include="src\Core\TestFunctions.h" />
@@ -189,7 +189,7 @@
     <ClCompile Include="src\Core\MCREGlobals.cpp" />
     <ClCompile Include="src\Render\Common\MCFrameRendererExecuter.cpp" />
     <ClCompile Include="src\Render\Common\MCFrameScheduler.cpp" />
-    <ClCompile Include="src\Render\Render3D\MCRenderItem3D.cpp" />
+    <ClCompile Include="src\Render\Common\MCRenderItem.cpp" />
     <ClCompile Include="src\Memory\MCResourceManager.cpp" />
     <ClCompile Include="src\Render\Render3D\MCSpaceRenderer\MCSpaceRenderer.cpp" />
     <ClCompile Include="src\RootSignature\MCRootSignatureManager.cpp" />

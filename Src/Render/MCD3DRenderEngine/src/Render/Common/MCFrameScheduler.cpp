@@ -10,7 +10,7 @@ namespace MC {
 
 	MCFrameScheduler::MCFrameScheduler() 
 		: _nextExecuterIndex{ 0 } {
-		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 
 		for(unsigned int x = 0; x < FRAME_BUFFER_COUNT; ++x)
 			_ppExecuters[x] = std::make_unique<MCFrameRendererExecuter>(std::string("Frame executer (") + std::to_string(x) + std::string(")"));
@@ -24,7 +24,7 @@ namespace MC {
 #pragma region Public
 
 	MC_RESULT MCFrameScheduler::ScheduleFrame(MCFrame *pFrame) {
-		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 		if (_frameQueue.size() >= FRAME_QUEUE_SIZE)
 			return MC_RESULT_FAIL_NOT_READY;
 
@@ -36,13 +36,13 @@ namespace MC {
 	}
 
 	void MCFrameScheduler::UpdateScheduler() {
-		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 		//TryPresent();
 		TryQueueNextFrame();
 	}
 
 	void MCFrameScheduler::SetRenderers(MCFrameRenderer **ppRenderers, unsigned int count) {
-		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 
 		if (nullptr == ppRenderers) {
 			SafeReleaseCurrentRenderers();
@@ -62,7 +62,7 @@ namespace MC {
 #pragma endregion Queue and Present
 
 	void MCFrameScheduler::TryQueueNextFrame() {
-		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 		
 		if (_ppExecuters[_nextExecuterIndex]->QueryExecutionStage() != MCFRAME_RENDERER_EXECUTION_STAGE_IDLE
 	     || _frameQueue.empty())
@@ -77,7 +77,7 @@ namespace MC {
 	void MCFrameScheduler::QueueFrame(MCFrame *pFrame) {
 		// This method is not thread safe. It can only be called from the main
 		// thread.
-		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 
 		/*MCFrameRendererTargetInfo targetInfo;
 		GetRenderTargetInfo(&targetInfo);*/
@@ -89,12 +89,12 @@ namespace MC {
 	}
 
 	void MCFrameScheduler::IncrementRenderTargetIndex() {
-		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 		_nextExecuterIndex = ++_nextExecuterIndex % FRAME_BUFFER_COUNT;
 	}
 
 	/*void MCFrameScheduler::GetRenderTargetInfo(MCFrameRendererTargetInfo *pInfo) {
-		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 
 		pInfo->FrameIndex       = _nextRenderTargetIndex;
 		pInfo->pRenderTarget    = MCREGlobals::pMCD3D->GetRenderTarget         (_nextRenderTargetIndex);
@@ -103,7 +103,7 @@ namespace MC {
 	}*/
 
 	/*void MCFrameScheduler::TryPresent() {
-		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 
 		if (_pExecuter->QueryExecutionStage() != MCFRAME_RENDERER_EXECUTION_STAGE_WAITING_TO_PRESENT)
 			return;
@@ -113,7 +113,7 @@ namespace MC {
 	}*/
 	
 	void MCFrameScheduler::SafeReleaseCurrentRenderers() {
-		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 		for(unsigned int x = 0; x < FRAME_BUFFER_COUNT; ++x)
 			_ppExecuters[x]->DestroyCurrentRenderer();
 	}

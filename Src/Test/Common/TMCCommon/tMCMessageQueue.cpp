@@ -42,7 +42,7 @@ namespace TMCCommon {
 		}
 
 		TEST_METHOD(StoreData) {
-			MCThreads::RegisterCurrentThread("Unit test", MC_THREAD_CLASS_MAIN);
+			MCThreads::RegisterCurrentThread("Unit test", MC_THREAD_CLASS::MAIN);
 
 			MCMessageQueueWithMemoryBuffer<MC_MESSAGE128, 5, 200> queue("test queue");
 
@@ -66,7 +66,7 @@ namespace TMCCommon {
 		}
 
 		TEST_METHOD(MemoryReleasedAfterSwap) {
-			MCThreads::RegisterCurrentThread("Unit test", MC_THREAD_CLASS_MAIN);
+			MCThreads::RegisterCurrentThread("Unit test", MC_THREAD_CLASS::MAIN);
 
 			MCMessageQueueWithMemoryBuffer<MC_MESSAGE128, 5, 200> queue("test queue");
 
@@ -98,7 +98,7 @@ namespace TMCCommon {
 		}
 
 		TEST_METHOD(WritePastBufferEndThrowsA) {
-			MCThreads::RegisterCurrentThread("Unit test", MC_THREAD_CLASS_MAIN);
+			MCThreads::RegisterCurrentThread("Unit test", MC_THREAD_CLASS::MAIN);
 
 			MCMessageQueueWithMemoryBuffer<MC_MESSAGE128, 5, 200> queue("test queue");
 
@@ -118,7 +118,7 @@ namespace TMCCommon {
 		}
 
 		TEST_METHOD(WritePastBufferEndThrowsB) {
-			MCThreads::RegisterCurrentThread("Unit test", MC_THREAD_CLASS_MAIN);
+			MCThreads::RegisterCurrentThread("Unit test", MC_THREAD_CLASS::MAIN);
 
 			MCMessageQueueWithMemoryBuffer<MC_MESSAGE128, 202, 200> queue("test queue");
 

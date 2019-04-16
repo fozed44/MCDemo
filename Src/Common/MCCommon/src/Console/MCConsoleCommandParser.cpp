@@ -14,7 +14,7 @@ namespace MC {
 	MCConsoleCommandParser::~MCConsoleCommandParser() {}
 
 	MC_RESULT MCConsoleCommandParser::Parse(char *pBuffer, size_t bufferSize, MC_CONSOLE_COMMAND* pCommand) {
-		MCTHREAD_ASSERT(MC_THREAD_CLASS_MAIN);
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 		std::vector<std::string> commandStrings;
 		auto result = ParseStrings(pBuffer, bufferSize, &commandStrings);
 
