@@ -14,7 +14,7 @@ namespace MC {
 	struct MCResourceHandle {
 		ID3D12Resource*  pResource;
 		unsigned __int64 FenceValue;
-		inline ID3D12Resource* Key() { return pResource; }
+		inline ID3D12Resource* Key() const noexcept { return pResource; }
 	};
 
 	class MCResourceManager : public MCManagedKeyedHandleManager<MCResourceHandle, ID3D12Resource*, ComPtr<ID3D12Resource>, MCResourceManager> {
@@ -28,13 +28,16 @@ namespace MC {
 		MCResourceManager& operator= (MCResourceManager&&) = delete;
 		~MCResourceManager() {}
 	public:
+		/*
+			The Instance method is required because the MCManagedKeyedHandleManager base class requires it.
+		*/
 		static MCResourceManager* Instance() {
 			return MCREGlobals::pResourceManager;
 		}
 	public:
-		MC_RESULT GetResource(const MCResourceManager::HandleType& handle, ID3D12Resource** ppResource);
-		MC_RESULT GetResourceSync(const MCResourceManager::HandleType& handle, ID3D12Resource **pResource);
-		ID3D12Resource *GetResourceSync(const MCResourceManager::HandleType& handle);
+		inline MC_RESULT GetResource(const MCResourceManager::HandleType& handle, ID3D12Resource** ppResource) const;
+		inline MC_RESULT GetResourceSync(const MCResourceManager::HandleType& handle, ID3D12Resource **pResource) const;
+		inline ID3D12Resource *GetResourceSync(const MCResourceManager::HandleType& handle) const;
 		
 
 		//MCResourceHandle CreateResource(MC_RESOURCE_MANAGER_RESOURCE_TYPE, size_t sizeInBytes);

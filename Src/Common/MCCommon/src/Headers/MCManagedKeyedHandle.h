@@ -104,7 +104,7 @@ namespace MC {
 			EXIT_CRITICAL_SECTION;
 		}
 
-		const tKeyedHandle& UnwrapHandle(const HandleType& handle) const {
+		inline const tKeyedHandle& UnwrapHandle(const HandleType& handle) const noexcept {
 			return handle.Handle();
 		}
 

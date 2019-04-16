@@ -181,6 +181,7 @@
     <ClInclude Include="src\Shader\MCShaderManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Mesh\MCMeshAlt.cpp" />
     <ClCompile Include="src\PipelineStateObject\MCPipelineStateObjectManager.cpp" />
     <ClCompile Include="src\Render\Common\MCFrameRenderer.cpp" />
     <ClCompile Include="src\Render\MCRenderer.cpp" />

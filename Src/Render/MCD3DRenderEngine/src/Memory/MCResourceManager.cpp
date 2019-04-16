@@ -143,7 +143,7 @@ namespace MC {
 		return std::move(hResource);
 	}
 
-	MC_RESULT MCResourceManager::GetResource(const HResource& handle, ID3D12Resource **ppResource) {
+	MC_RESULT MCResourceManager::GetResource(const HResource& handle, ID3D12Resource **ppResource) const {
 		auto unwrappedHandle = UnwrapHandle(handle);
 
 		if (unwrappedHandle.FenceValue) {
@@ -158,12 +158,12 @@ namespace MC {
 		*ppResource = unwrappedHandle.pResource;
 		return MC_RESULT_OK;
 	}
-	MC_RESULT MCResourceManager::GetResourceSync(const MCResourceManager::HandleType& handle, ID3D12Resource **ppResource) {
+	MC_RESULT MCResourceManager::GetResourceSync(const MCResourceManager::HandleType& handle, ID3D12Resource **ppResource) const {
 		*ppResource = GetResourceSync(handle);
 		return MC_RESULT_OK;
 	}
 
-	ID3D12Resource *MCResourceManager::GetResourceSync(const MCResourceManager::HandleType& handle) {
+	ID3D12Resource *MCResourceManager::GetResourceSync(const MCResourceManager::HandleType& handle) const {
 		auto unwrappedHandle = UnwrapHandle(handle);
 
 		if (unwrappedHandle.FenceValue) {
