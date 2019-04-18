@@ -70,12 +70,12 @@ namespace MC {
 
 			auto parseResult = _pCommandParser->Parse(_pKeyBuffer, CONSOLE_KEY_BUFFER_SIZE, &cmd);
 
-			if (MC_RESULT_FAIL_INVALID_DATA == parseResult) {
+			if (MC_RESULT::FAIL_INVALID_DATA == parseResult) {
 				_pOutputTarget->NewLine();
 				_pOutputTarget->WriteString("Unrecognized Command.");
 			}
 
-			if (MC_RESULT_OK == parseResult) {
+			if (MC_RESULT::OK == parseResult) {
 				MC_MESSAGE128 msg{};
 				msg.Message    = MC_MESSAGE_CONSOLE_COMMAND_128;
 				msg.Visibility = MC_MESSAGE_VISIBILITY_ALL;

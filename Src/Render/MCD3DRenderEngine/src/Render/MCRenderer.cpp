@@ -45,7 +45,7 @@ namespace MC {
 
 	MC_RESULT MCRenderer::ScheduleFrame(MCFrame *pFrame) {
 		if (_state == MC_RENDER_STATE_OFF)
-			return MC_RESULT_FAIL_OFF;
+			return MC_RESULT::FAIL_OFF;
 
 		return _pScheduler->ScheduleFrame(pFrame);
 	}

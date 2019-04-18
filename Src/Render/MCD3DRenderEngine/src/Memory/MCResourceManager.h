@@ -35,9 +35,9 @@ namespace MC {
 			return MCREGlobals::pResourceManager;
 		}
 	public:
-		inline MC_RESULT GetResource(const MCResourceManager::HandleType& handle, ID3D12Resource** ppResource) const;
-		inline MC_RESULT GetResourceSync(const MCResourceManager::HandleType& handle, ID3D12Resource **pResource) const;
-		inline ID3D12Resource *GetResourceSync(const MCResourceManager::HandleType& handle) const;
+		MC_RESULT GetResource(const MCResourceManager::HandleType& handle, ID3D12Resource** ppResource) const;
+		MC_RESULT GetResourceSync(MCResourceManager::HandleType& handle, ID3D12Resource **pResource);
+		ID3D12Resource *GetResourceSync(MCResourceManager::HandleType& handle);
 		
 
 		//MCResourceHandle CreateResource(MC_RESOURCE_MANAGER_RESOURCE_TYPE, size_t sizeInBytes);

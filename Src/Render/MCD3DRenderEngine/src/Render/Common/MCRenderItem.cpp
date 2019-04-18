@@ -16,7 +16,7 @@ namespace MC {
 #pragma region Render
 
 	MC_RESULT MCRenderItem::Render() {
-		return MC_RESULT_OK;
+		return MC_RESULT::OK;
 	}
 
 #pragma endregion

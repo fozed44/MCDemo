@@ -26,13 +26,13 @@ namespace MC {
 	MC_RESULT MCFrameScheduler::ScheduleFrame(MCFrame *pFrame) {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 		if (_frameQueue.size() >= FRAME_QUEUE_SIZE)
-			return MC_RESULT_FAIL_NOT_READY;
+			return MC_RESULT::FAIL_NOT_READY;
 
 		if (_frameQueue.size() >= FRAME_QUEUE_SIZE)
-			return MC_RESULT_FAIL_NOT_READY;
+			return MC_RESULT::FAIL_NOT_READY;
 		_frameQueue.push(std::unique_ptr<MCFrame>(pFrame));
 
-		return MC_RESULT_OK;
+		return MC_RESULT::OK;
 	}
 
 	void MCFrameScheduler::UpdateScheduler() {
@@ -83,7 +83,7 @@ namespace MC {
 		GetRenderTargetInfo(&targetInfo);*/
 
 		auto queryFrameResult = _ppExecuters[_nextExecuterIndex]->QueueNextFrame(pFrame);
-		assert(queryFrameResult == MC_RESULT_OK);
+		assert(queryFrameResult == MC_RESULT::OK);
 
 		IncrementRenderTargetIndex();
 	}

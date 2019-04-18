@@ -156,7 +156,7 @@ namespace MC {
 #pragma region Update
 
 	void MCRouter::Update() {
-		while (MC_RESULT_OK != Swap()) {}
+		while (MC_RESULT::OK != Swap()) {}
 		Dispatch();
 	}
 
@@ -170,14 +170,14 @@ namespace MC {
 
 			if (writeLocks || readLocks) {
 				MC_WARN("MCRouter: can't swap, ({0:d}) write locks, ({1:d}) read locks.", writeLocks, readLocks);
-				return MC_RESULT_FAIL_NOT_READY;
+				return MC_RESULT::FAIL_NOT_READY;
 			}
 			
 			_pMessageQueue32 ->swap();
 			_pMessageQueue64 ->swap();
 			_pMessageQueue128->swap();
 
-			return MC_RESULT_OK;
+			return MC_RESULT::OK;
 		EXIT_CRITICAL_SECTION;
 	}
 

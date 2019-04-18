@@ -22,8 +22,8 @@ namespace MC {
 		MC_RESULT Render();
 
 	private:
-		MCFrameRenderer*                     _pRenderer;
-		std::vector<std::unique_ptr<MCMesh>> _meshes;
+		MCFrameRenderer*                      _pRenderer;
+		std::vector<std::unique_ptr<MCIMesh>> _meshes;
 	};
 
 }

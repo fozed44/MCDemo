@@ -70,7 +70,7 @@ namespace MC {
 
 			NOTE:
 
-			If ScheduleFrame returns MC_RESULT_OK then the renderer has taken ownership of the frame memory.
+			If ScheduleFrame returns MC_RESULT::OK then the renderer has taken ownership of the frame memory.
 			If, however, ScheduleFrame returns an fail result such as MC_RESULT_FAIL_NOT_READY then the caller
 			is still responsible for the frame memory.
 		*/

@@ -152,6 +152,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Mesh\Geometry\CubeGenerator.h" />
+    <ClInclude Include="src\Mesh\Geometry\GeometryGenerator.h" />
+    <ClInclude Include="src\Mesh\Geometry\SphereGenerator.h" />
     <ClInclude Include="src\PipelineStateObject\MCPipelineStateObjectManager.h" />
     <ClInclude Include="src\Render\Common\MCFrameRenderer.h" />
     <ClInclude Include="src\Render\MCRenderer.h" />
@@ -171,7 +174,7 @@
     <ClInclude Include="src\Font\MCFontLoader.h" />
     <ClInclude Include="src\Font\MCFontRenderer.h" />
     <ClInclude Include="src\Core\MCMath.h" />
-    <ClInclude Include="src\Mesh\MCMesh.h" />
+    <ClInclude Include="src\Mesh\MCMesh2.h" />
     <ClInclude Include="src\Core\MCUploadBuffer.h" />
     <ClInclude Include="src\Configuration\RenderConfig.h" />
     <ClInclude Include="src\Core\TestFunctions.h" />
@@ -181,7 +184,7 @@
     <ClInclude Include="src\Shader\MCShaderManager.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Mesh\MCMeshAlt.cpp" />
+    <ClInclude Include="src\Mesh\MCMesh.h" />
     <ClCompile Include="src\PipelineStateObject\MCPipelineStateObjectManager.cpp" />
     <ClCompile Include="src\Render\Common\MCFrameRenderer.cpp" />
     <ClCompile Include="src\Render\MCRenderer.cpp" />

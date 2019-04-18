@@ -18,7 +18,7 @@ namespace MC {
 		std::vector<std::string> commandStrings;
 		auto result = ParseStrings(pBuffer, bufferSize, &commandStrings);
 
-		if (result != MC_RESULT_OK) {
+		if (result != MC_RESULT::OK) {
 			pCommand->Command = MC_CONSOLE_COMMAND_CMD_INVALID;
 			pCommand->ParameterCount = 0;
 			pCommand->pParameterData = nullptr;
@@ -30,21 +30,21 @@ namespace MC {
 		if (pCommand->Command == MC_CONSOLE_COMMAND_CMD_INVALID) {
 			pCommand->ParameterCount = 0;
 			pCommand->pParameterData = nullptr;
-			return MC_RESULT_FAIL_INVALID_DATA;
+			return MC_RESULT::FAIL_INVALID_DATA;
 		}
 
 		pCommand->ParameterCount = static_cast<unsigned char>(commandStrings.size() - 1);
 
 		if (pCommand->ParameterCount == 0) {
 			pCommand->pParameterData = nullptr;
-			return MC_RESULT_OK;
+			return MC_RESULT::OK;
 		}
 
 		commandStrings.erase(commandStrings.begin());
 
 		pCommand->pParameterData = AllocateParameterData(commandStrings);
 
-		return MC_RESULT_OK;
+		return MC_RESULT::OK;
 	}
 
 	MC_RESULT MCConsoleCommandParser::ParseStrings(char *pBuffer, size_t bufferSize, std::vector<std::string>* pResult) {
@@ -59,20 +59,20 @@ namespace MC {
 				}
 				if ('\0' == *elementEnd) {
 					return pResult->size() > 0 
-						? MC_RESULT_OK 
-						: MC_RESULT_FAIL_INVALID_DATA;
+						? MC_RESULT::OK 
+						: MC_RESULT::FAIL_INVALID_DATA;
 				}
 			}
 			if ('\0' == *elementEnd) {
 				pResult->push_back(std::string(elementStart, elementEnd) + std::string("\0"));
-				return MC_RESULT_OK;
+				return MC_RESULT::OK;
 			}
 			if (' ' == *elementEnd) {
 				pResult->push_back(std::string(elementStart, elementEnd) + std::string("\0"));
 				elementStart = ++elementEnd;
 			}
 		}
-		return MC_RESULT_FAIL_INVALID_DATA;
+		return MC_RESULT::FAIL_INVALID_DATA;
 	}
 
 	char** MCConsoleCommandParser::AllocateParameterData(const std::vector<std::string>& commandArgs) {

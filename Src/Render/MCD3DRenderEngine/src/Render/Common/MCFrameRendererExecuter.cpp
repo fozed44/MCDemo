@@ -40,7 +40,7 @@ namespace MC {
 	MC_RESULT MCFrameRendererExecuter::QueueNextFrame(MCFrame *pFrame) {
 
 		if (_executionStage.load() != MCFRAME_RENDERER_EXECUTION_STAGE_IDLE)
-			return MC_RESULT_FAIL_NOT_READY;
+			return MC_RESULT::FAIL_NOT_READY;
 
 		assert(pFrame);
 		assert(!_pNextFrame);
@@ -49,7 +49,7 @@ namespace MC {
 
 		_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_FRAME_ACCEPTED);
 
-		return MC_RESULT_OK;
+		return MC_RESULT::OK;
 	}
 	
 	void MCFrameRendererExecuter::DestroyCurrentRenderer() {

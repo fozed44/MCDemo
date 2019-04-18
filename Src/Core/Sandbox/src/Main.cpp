@@ -21,6 +21,8 @@
 #include "../../../Common/MCCommon/src/Console/MCConsole.h"
 #include "../../../Common/MCCommon/src/Console/MCConsoleOutputTarget.h"
 #include "../../../Common/MCCommon/src/Data/MCResult.h"
+#include "../../../Render/MCD3DRenderEngine/src/Mesh/MCMesh.h"
+#include "../../../Render/MCD3DRenderEngine/src/Mesh/Geometry/GeometryGenerator.h"
 #include <iostream>
 #include <thread>
 #include <atomic>
@@ -31,27 +33,27 @@
 class TempConsoleOutputTarget : public MC::MCConsoleOutputTarget {
 	MC::MC_RESULT WriteString(const char* pOutput) override {
 		std::cout << pOutput;
-		return MC::MC_RESULT_OK;
+		return MC::MC_RESULT::OK;
 	}
 	MC::MC_RESULT WriteChar(char output) override {
 		std::cout << output;
-		return MC::MC_RESULT_OK;
+		return MC::MC_RESULT::OK;
 	}
 	MC::MC_RESULT Backspace() override {
 		std::cout << "\b \b";
-		return MC::MC_RESULT_OK;
+		return MC::MC_RESULT::OK;
 	}
 	MC::MC_RESULT ClearCurrent() override {
 		std::cout << std::endl;
-		return MC::MC_RESULT_OK;
+		return MC::MC_RESULT::OK;
 	}
 	MC::MC_RESULT Prompt() override {
 		std::cout << "*->";
-		return MC::MC_RESULT_OK;
+		return MC::MC_RESULT::OK;
 	}
 	MC::MC_RESULT NewLine() override {
 		std::cout << std::endl;
-		return MC::MC_RESULT_OK;
+		return MC::MC_RESULT::OK;
 	}
 };
 
@@ -122,6 +124,16 @@ int Sandbox() {
 	frame.Camera.Position = { 0.0f, 0.0f, -10.0f };
 	frame.Camera.LookAt   = { 0.0f, 0.0f, 0.0f };
 	
+	/// TEST CODE
+	{
+		MC::MCStaticMesh<MC::MCVertex1Color, DXGI_FORMAT_R16_UINT> tMesh(std::string("testMesh"));
+		MC::GeometryGeneration::GenerateCubeMesh(
+			{ 0.0f, 0.0f, 0.0f },
+			3.0f, 3.0f, 3.0f,
+			&tMesh
+		);
+	}
+
 	const __int64 frameCountBufferSize = 50;
 	float frameCountBuffer[frameCountBufferSize];
 	MC::MCSpaceFrame *pNextFrame = new MC::MCSpaceFrame();
@@ -142,7 +154,7 @@ int Sandbox() {
 			frame.Time = masterTimer->TotalTime();
 
 			//MC::MCREGlobals::pMCD3D->RenderFrame(&frame);
-			if (MC::MC_RESULT_OK == MC::MCREGlobals::pRenderEngine->ScheduleFrame(pNextFrame)) {
+			if (MC::MC_RESULT::OK == MC::MCREGlobals::pRenderEngine->ScheduleFrame(pNextFrame)) {
 				pNextFrame = new MC::MCSpaceFrame();
 				pNextFrame->FrameType = MC::MC_FRAME_TYPE_MCFRAME_SPACE;
 				frameCount++;

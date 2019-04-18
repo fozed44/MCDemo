@@ -41,8 +41,8 @@ namespace MC {
 
 		// At this point we need to make sure that the GPU is done using the upload buffer
 		// from the last call to CreateStaticBufferAsync.
-		if (MCREGlobals::pMCD3D->GetCurrentFenceValue() <= _uploadBufferFence)
-			return MC_RESULT_FAIL_UPLOADING;
+		if (MCREGlobals::pMCD3D->GetCurrentFenceValue() < _uploadBufferFence)
+			return MC_RESULT::FAIL_UPLOADING;
 
 		// the result.
 		ComPtr<ID3D12Resource> defaultBuffer;
@@ -127,12 +127,12 @@ namespace MC {
 			defaultBuffer
 		));
 
-		return MC_RESULT_OK;
+		return MC_RESULT::OK;
 	}
 
 	MCResourceManager::HandleType MCResourceManager::CreateStaticBufferSync(void *pInitData, size_t numBytes, bool syncLoad) {
 		HResource hResource;
-		while (CreateStaticBufferAsync(pInitData, numBytes, &hResource) != MC_RESULT_OK) {}
+		while (CreateStaticBufferAsync(pInitData, numBytes, &hResource) != MC_RESULT::OK) {}
 
 		auto unwrappedHandle = UnwrapHandle(hResource);
 		MCREGlobals::pMCD3D->WaitForFenceValue(unwrappedHandle.FenceValue);
@@ -148,7 +148,7 @@ namespace MC {
 
 		if (unwrappedHandle.FenceValue) {
 			if (MCREGlobals::pMCD3D->GetCurrentFenceValue() < unwrappedHandle.FenceValue)
-				return MC_RESULT_FAIL_UPLOADING;
+				return MC_RESULT::FAIL_UPLOADING;
 
 			// Once we know the fence value has been reached, we set FenceValue to zero. This allows
 			// us to check the loaded status of the resource via if(FenceValue) rather than having
@@ -156,14 +156,14 @@ namespace MC {
 			const_cast<MCResourceHandle&>(unwrappedHandle).FenceValue = 0;
 		}
 		*ppResource = unwrappedHandle.pResource;
-		return MC_RESULT_OK;
+		return MC_RESULT::OK;
 	}
-	MC_RESULT MCResourceManager::GetResourceSync(const MCResourceManager::HandleType& handle, ID3D12Resource **ppResource) const {
+	MC_RESULT MCResourceManager::GetResourceSync(MCResourceManager::HandleType& handle, ID3D12Resource **ppResource){
 		*ppResource = GetResourceSync(handle);
-		return MC_RESULT_OK;
+		return MC_RESULT::OK;
 	}
 
-	ID3D12Resource *MCResourceManager::GetResourceSync(const MCResourceManager::HandleType& handle) const {
+	ID3D12Resource *MCResourceManager::GetResourceSync(MCResourceManager::HandleType& handle){
 		auto unwrappedHandle = UnwrapHandle(handle);
 
 		if (unwrappedHandle.FenceValue) {

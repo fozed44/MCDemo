@@ -33,7 +33,7 @@ namespace MC {
 		/* Queue a frame to the render engine.
 
 			Note:
-				If the result of ScheduleFrame is MC_RESULT_OK then the render engine has taken
+				If the result of ScheduleFrame is MC_RESULT::OK then the render engine has taken
 				control of the memory for the frame. If the result is a fail result, then the
 				caller is still responsible for the memory. */
 		MC_RESULT ScheduleFrame(MCFrame *pFrame);
