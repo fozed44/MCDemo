@@ -1,7 +1,9 @@
 #include "../../../../Common/MCLog/src/Headers/MCLog.h"
 #include "../../../../Common/MCCommon/src/Headers/Utility.h"
+#include "../../../../Common/MCCommon/src/Data/MCThreads.h"
 #include "../Core/MCD3D.h"
 #include "MCRootSignatureManager.h"
+#include "MCRootSignatures.h"
 #include "assert.h"
 
 namespace MC {
@@ -11,6 +13,12 @@ namespace MC {
 	MCRootSignatureManager::MCRootSignatureManager() {
 		// ensure this object is only created a single time.
 		assert(!MCREGlobals::pRSManager);
+
+		// Ensure that this object is only created on the main thread.
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
+
+		// Create the standard root signatures
+		InitializeStandardRootSignatures();
 	}
 
 	MCRootSignatureManager::~MCRootSignatureManager() {}
@@ -52,4 +60,17 @@ namespace MC {
 
 #pragma endregion
 
+#pragma region Standard Signatures
+
+	void MCRootSignatureManager::InitializeStandardRootSignatures() {
+		// Create the default root signature.
+		_standardSignatures[STANDARD_ROOT_SIGNATURE::DEFAULT] = MC::RootSignatures::Default();
+	}
+
+	HRootSignature MCRootSignatureManager::GetRootSignatureHandle(STANDARD_ROOT_SIGNATURE standardSignature) {
+		auto& comPtr = _standardSignatures[standardSignature];
+		return CreateRef(comPtr.Get(), comPtr);
+	}
+
+#pragma endregion
 }
