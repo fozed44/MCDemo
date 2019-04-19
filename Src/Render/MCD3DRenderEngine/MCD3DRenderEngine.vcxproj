@@ -156,6 +156,7 @@
     <ClInclude Include="src\Mesh\Geometry\GeometryGenerator.h" />
     <ClInclude Include="src\Mesh\Geometry\SphereGenerator.h" />
     <ClInclude Include="src\PipelineStateObject\MCPipelineStateObjectManager.h" />
+    <ClInclude Include="src\PipelineStateObject\MCPipelineStateObjects.h" />
     <ClInclude Include="src\Render\Common\MCFrameRenderer.h" />
     <ClInclude Include="src\Render\MCRenderer.h" />
     <ClInclude Include="src\Render\Render3D\MCFrameRenderer3D.h" />
@@ -187,6 +188,7 @@
   <ItemGroup>
     <ClInclude Include="src\Mesh\MCMesh.h" />
     <ClCompile Include="src\PipelineStateObject\MCPipelineStateObjectManager.cpp" />
+    <ClCompile Include="src\PipelineStateObject\MCPipelineStateObjects.cpp" />
     <ClCompile Include="src\Render\Common\MCFrameRenderer.cpp" />
     <ClCompile Include="src\Render\MCRenderer.cpp" />
     <ClCompile Include="src\Render\Render3D\MCFrameRenderer3D.cpp" />

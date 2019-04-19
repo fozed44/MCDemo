@@ -108,6 +108,9 @@
     <ClInclude Include="src\RootSignature\MCRootSignatures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\PipelineStateObject\MCPipelineStateObjects.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Shader\MCShaderManager.cpp">
@@ -177,6 +180,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RootSignature\MCRootSignatures.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PipelineStateObject\MCPipelineStateObjects.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
