@@ -50,7 +50,8 @@ namespace MC {
 
 	template <typename tManagedHandle,typename tManagedItem, typename tDerived>
 	class MCManagedHandleManager {
-		typedef MCManagedHandle<tManagedHandle, tDerived> HandleType;
+	public:
+		using HandleType = MCManagedHandle<tManagedHandle, tDerived>;
 	public:
 		MCManagedHandleManager() { MCCriticalSection::InitializeLock(&_lock); }
 		virtual ~MCManagedHandleManager() {}
@@ -77,7 +78,7 @@ namespace MC {
 			}
 			EXIT_CRITICAL_SECTION;
 		}
-		const tManagedHandle& UnwrapHandle(const HandleType& handle) const {
+		const tManagedHandle& UnwrapHandle(const HandleType& handle) const noexcept {
 			return handle.Handle();
 		}
 

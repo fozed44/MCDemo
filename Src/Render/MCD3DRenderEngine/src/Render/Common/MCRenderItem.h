@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../Core/MCD3D12Core.h"
+#include "../../Shader/MCShaderManager.h"
 #include "../../Core/MCD3D.h"
 
 namespace MC {
@@ -24,6 +25,7 @@ namespace MC {
 	private:
 		MCFrameRenderer*                      _pRenderer;
 		std::vector<std::unique_ptr<MCIMesh>> _meshes;
+		HShader                               _shader;
 	};
 
 }

@@ -17,7 +17,7 @@ namespace MC {
 
 	MCShaderManager::~MCShaderManager() {}
 
-	MCShaderHandle MCShaderManager::Load(const char *pFilename) {
+	HShader MCShaderManager::Load(const char *pFilename) {
 
 		// TODO:
 		//	This method has zero error checking.
@@ -42,7 +42,7 @@ namespace MC {
 		return CreateRef(blob.Get(), blob);
 	}
 
-	D3D12_SHADER_BYTECODE MCShaderManager::GetByteCode(const MCShaderHandle &handle) {
+	D3D12_SHADER_BYTECODE MCShaderManager::GetByteCode(const HShader &handle) {
 		auto pBlob = UnwrapHandle(handle);
 		return D3D12_SHADER_BYTECODE{
 			static_cast<BYTE*>(pBlob->GetBufferPointer()),

@@ -9,13 +9,11 @@
 
 using Microsoft::WRL::ComPtr;
 
-namespace MC {	
+namespace MC {
 
-	class MCShaderManager;
-
-	typedef MCManagedHandle<ID3DBlob*, MCShaderManager> MCShaderHandle;
-
-	class MCShaderManager : public MCManagedHandleManager<ID3DBlob*, ComPtr<ID3DBlob>, MCShaderManager> {
+	class MCShaderManager : public MCManagedHandleManager<ID3DBlob*, ComPtr<ID3DBlob>, MCShaderManager> {		
+	public:
+		using HShader = MCShaderManager::HandleType;
 	public:
 		MCShaderManager();
 		MCShaderManager(MCShaderManager&)              = delete;
@@ -29,8 +27,9 @@ namespace MC {
 			return MCREGlobals::pShaderManager;
 		}
 	public:
-		MCShaderHandle Load(const char *pFilename);
-		D3D12_SHADER_BYTECODE GetByteCode(const MCShaderHandle& handle);
+		HShader Load(const char *pFilename);
+		D3D12_SHADER_BYTECODE GetByteCode(const HShader& handle);
 	};
 
+	using HShader = MCShaderManager::HShader;
 }
