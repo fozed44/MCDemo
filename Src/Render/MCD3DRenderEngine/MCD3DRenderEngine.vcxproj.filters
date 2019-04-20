@@ -111,6 +111,12 @@
     <ClInclude Include="src\PipelineStateObject\MCPipelineStateObjects.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Mesh\MCMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\MCRenderObjects.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Shader\MCShaderManager.cpp">
@@ -174,9 +180,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Render\Common\MCRenderItem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Mesh\MCMesh.h">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RootSignature\MCRootSignatures.cpp">

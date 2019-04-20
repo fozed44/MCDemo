@@ -50,4 +50,14 @@ namespace MC {
 		};
 	}
 
+	HShader MCShaderManager::GetShaderHandle(STANDARD_SHADER standardShader) {
+
+		auto iterator = _standardShaders.find(standardShader);
+
+		if (iterator == _standardShaders.end()) {
+			_standardShaders[standardShader]
+		}
+
+	}
+
 }

@@ -16,15 +16,7 @@ using Microsoft::WRL::ComPtr;
 
 namespace MC {
 
-	struct MCVertex1Color {
-		DirectX::XMFLOAT3 Position;
-		DirectX::XMFLOAT4 Color;
-	};
-
-	struct ObjectConstants {
-		DirectX::XMFLOAT4X4 WorldViewProj = MCMath::Identity4x4();
-		float  time                      = 1.0;
-	};
+	
 
 #pragma region old
 

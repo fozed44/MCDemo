@@ -11,6 +11,10 @@ using Microsoft::WRL::ComPtr;
 
 namespace MC {
 
+	typedef enum class STANDARD_SHADER {
+		DEFAULT = 0
+	} STANDARD_SHADER;
+
 	class MCShaderManager : public MCManagedHandleManager<ID3DBlob*, ComPtr<ID3DBlob>, MCShaderManager> {		
 	public:
 		using HShader = MCShaderManager::HandleType;
@@ -22,13 +26,15 @@ namespace MC {
 		MCShaderManager& operator= (MCShaderManager&&) = delete;
 		~MCShaderManager();
 	private:
-	public:
-		inline static MCShaderManager* Instance() {
-			return MCREGlobals::pShaderManager;
-		}
-	public:
+	public: /* Instance required by MCManagedHandleManager */
+		inline static MCShaderManager* Instance() { return MCREGlobals::pShaderManager; }
+	public: /* API */
 		HShader Load(const char *pFilename);
+		HShader GetShaderHandle(STANDARD_SHADER standardShader);
 		D3D12_SHADER_BYTECODE GetByteCode(const HShader& handle);
+		
+	private:
+		std::map<STANDARD_SHADER, ComPtr<ID3DBlob*>> _standardShaders;
 	};
 
 	using HShader = MCShaderManager::HShader;

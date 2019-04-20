@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\MCRenderObjects.h" />
     <ClInclude Include="src\Mesh\Geometry\CubeGenerator.h" />
     <ClInclude Include="src\Mesh\Geometry\GeometryGenerator.h" />
     <ClInclude Include="src\Mesh\Geometry\SphereGenerator.h" />
