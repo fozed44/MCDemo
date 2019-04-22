@@ -3,6 +3,8 @@
 #include "../../Core/MCD3D12Core.h"
 #include "../../Shader/MCShaderManager.h"
 #include "../../Core/MCD3D.h"
+#include "../../RootSignature/MCRootSignatureManager.h"
+#include "../../PipelineStateObject/MCPipelineStateObjectManager.h"
 
 namespace MC {
 
@@ -11,7 +13,7 @@ namespace MC {
 	class MCRenderItem
 	{
 	public: /* ctor */
-		MCRenderItem(MCFrameRenderer* pRenderer);
+		MCRenderItem();
 		~MCRenderItem();
 
 		MCRenderItem(MCRenderItem&)             = delete;
@@ -20,12 +22,14 @@ namespace MC {
 		MCRenderItem& operator=(MCRenderItem&&) = delete;
 
 	public: /* API */
-		MC_RESULT Render();
+		MC_RESULT XM_CALLCONV Render(DirectX::FXMMATRIX viewMatrix, DirectX::CXMMATRIX projMatrix, ID3D12GraphicsCommandList* pCommandList);
 
 	private:
-		MCFrameRenderer*                      _pRenderer;
+		DirectX::XMFLOAT4X4                   _worldMatrix;
 		std::vector<std::unique_ptr<MCIMesh>> _meshes;
 		HShader                               _shader;
+		HRootSignature						  _rootSignature;
+		HPipelineState						  _pipelineState;
 	};
 
 }

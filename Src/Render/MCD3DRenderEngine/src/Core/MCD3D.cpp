@@ -16,8 +16,6 @@
 
 #include "MCD3D12RenderUtilities.h"
 
-#define MC_DEPTH_STENCIL_FORMAT DXGI_FORMAT_D32_FLOAT
-
 namespace MC {
 
 #pragma region old

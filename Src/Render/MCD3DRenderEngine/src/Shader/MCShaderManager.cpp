@@ -1,6 +1,7 @@
 #include "MCShaderManager.h"
 #include "../../../../Common/MCCommon/src/Headers/Paths.h"
 #include "../../../../Common/MCCommon/src/Headers/Utility.h"
+#include "../../../../Common/MCLog/src/Headers/MCLog.h"
 
 #include <fstream>
 
@@ -10,14 +11,33 @@
 
 namespace MC {
 
+#pragma region ctor
+
 	MCShaderManager::MCShaderManager() {
 		// Make sure the shader manager is only created a single time.
 		assert(!MCREGlobals::pShaderManager);
+
+		// Load the default filenames into the filename map.
+		LoadFilenameMap();
 	}
 
 	MCShaderManager::~MCShaderManager() {}
 
-	HShader MCShaderManager::Load(const char *pFilename) {
+#pragma endregion
+
+#pragma region Default filename map.
+
+	void MCShaderManager::LoadFilenameMap() {
+		_filenameMap[STANDARD_SHADER::DEFAULT_PIXEL]  = "StandardPixel.cso";
+		_filenameMap[STANDARD_SHADER::DEFAULT_VERTEX] = "StandardVertex.cso";
+	}
+
+#pragma endregion
+
+#pragma region API
+
+	ComPtr<ID3DBlob> MCShaderManager::LoadFileInternal(const char *pFilename) {
+		RENDER_TRACE("Loading shader file '{0}'", pFilename);
 
 		// TODO:
 		//	This method has zero error checking.
@@ -38,7 +58,14 @@ namespace MC {
 
 		fin.read((char*)blob->GetBufferPointer(), size);
 		fin.close();
-		
+
+		RENDER_TRACE("Loaded '{0}'", pFilename);
+
+		return blob;
+	}
+
+	HShader MCShaderManager::Load(const char *pFilename) {		
+		auto blob = LoadFileInternal(pFilename);
 		return CreateRef(blob.Get(), blob);
 	}
 
@@ -54,10 +81,16 @@ namespace MC {
 
 		auto iterator = _standardShaders.find(standardShader);
 
-		if (iterator == _standardShaders.end()) {
-			_standardShaders[standardShader]
-		}
+		if (iterator != _standardShaders.end())
+			return CreateRef((iterator->second).Get(), iterator->second);
 
+		auto comPtr = LoadFileInternal(_filenameMap[standardShader].c_str());
+		
+		_standardShaders[standardShader] = comPtr;
+
+		return CreateRef(comPtr.Get(), comPtr);
 	}
+
+#pragma endregion
 
 }

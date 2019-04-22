@@ -4,10 +4,13 @@
 #include "../Core/MCREGlobals.h"
 #include "../RootSignature/MCRootSignatureManager.h"
 #include "../Core/MCRenderObjects.h"
+#include "../Shader/MCShaderManager.h"
+#include "../Core/MCD3D.h"
 
 namespace MC { namespace PSOs {
 
 	ComPtr<ID3D12PipelineState> Default() {
+		INIT_TRACE("Create default PSO");
 
 		D3D12_RASTERIZER_DESC rasterizerDesc{};
 		
@@ -31,8 +34,34 @@ namespace MC { namespace PSOs {
 
 		psoDesc.InputLayout = { MCVertex1Color_desc, _countof(MCVertex1Color_desc) };
 		psoDesc.pRootSignature = standardRootSignature;
-		psoDesc.VS = MCREGlobals::pShaderManager->GetByteCode
-		
+		psoDesc.VS = MCREGlobals::pShaderManager->GetByteCode(STANDARD_SHADER::DEFAULT_VERTEX);
+		psoDesc.PS = MCREGlobals::pShaderManager->GetByteCode(STANDARD_SHADER::DEFAULT_PIXEL);
+		psoDesc.RasterizerState = rasterizerDesc;
+		psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+		psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+		psoDesc.SampleMask = UINT_MAX;
+		psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+		psoDesc.NumRenderTargets = 1;
+		psoDesc.RTVFormats[0] = BACK_BUFFER_FORMAT;
+
+		psoDesc.SampleDesc.Count   = 1;
+		psoDesc.SampleDesc.Quality = 0;
+
+		psoDesc.DSVFormat = MC_DEPTH_STENCIL_FORMAT;
+
+		ComPtr<ID3D12PipelineState> pPipelineState;
+
+		MCREGlobals::pMCDXGI->Get3DDevice()->CreateGraphicsPipelineState(
+			&psoDesc,
+			__uuidof(pPipelineState),
+			&pPipelineState
+		);
+
+		pPipelineState->SetName(L"Default PSO");
+
+		INIT_TRACE("Created default PSO.");
+
+		return pPipelineState;
 	}
 
 } }

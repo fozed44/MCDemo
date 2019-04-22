@@ -7,6 +7,8 @@
 
 using Microsoft::WRL::ComPtr;
 
+class MCRenderItem;
+
 namespace MC {
 
 	class MCFrameRenderer {
@@ -50,9 +52,14 @@ namespace MC {
 		ComPtr<ID3D12DescriptorHeap>      _CBVDescriptorHeap;
 
 		DirectX::XMFLOAT4X4               _projectionMatrix;
+		float                             _aspectRatio;
+		float                             _fov;
+		float                             _farPlane;
 
 		D3D12_VIEWPORT                    _viewPort;
 		D3D12_RECT                        _scissorRect;
+
+		std::vector<std::unique_ptr<MCRenderItem>> _renderItems;
 
 	protected: /* Descriptor handle increment sizes. */
 

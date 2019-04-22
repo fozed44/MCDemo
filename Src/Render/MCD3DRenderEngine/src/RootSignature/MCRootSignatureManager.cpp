@@ -28,6 +28,8 @@ namespace MC {
 #pragma region create signatures
 
 	MCRootSignatureManager::HRootSignature MCRootSignatureManager::CreateRootSignature(const D3D12_ROOT_SIGNATURE_DESC& desc, const std::string& name) {
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
+
 		RENDER_TRACE("Begin initialize shader: {0}", name);
 		
 		// Create a root signature with a single slot which pointer to a

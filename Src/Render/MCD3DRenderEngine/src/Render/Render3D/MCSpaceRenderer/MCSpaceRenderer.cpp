@@ -4,6 +4,7 @@
 #include "../../../../../../Common/MCLog/src/Headers/MCLog.h"
 #include "../../../../../../Common/MCCommon/src/Data/MCThreads.h"
 #include "../../../../../../Common/MCCommon/src/Data/MCResult.h"
+#include "../../Common/MCRenderItem.h"
 
 namespace MC {
 
@@ -69,6 +70,29 @@ namespace MC {
 
 		MCThrowIfFailed(_pCommandAllocator->Reset());
 		MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));
+
+		DirectX::XMVECTOR cameraTarget = DirectX::XMVectorSet(
+											pFrame->Camera.LookAt.x,
+											pFrame->Camera.LookAt.y,
+											pFrame->Camera.LookAt.z,
+											0.0f
+										 );
+
+		DirectX::XMVECTOR cameraPosition = DirectX::XMVectorSet(
+											pFrame->Camera.Position.x,
+											pFrame->Camera.Position.y,
+											pFrame->Camera.Position.z,
+											1.0f
+		                                   );
+
+		DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+		DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixLookAtLH(cameraPosition, cameraTarget, up);
+
+		DirectX::XMMATRIX proj = DirectX::XMMatrixPerspectiveFovLH(_fov, _aspectRatio, 1.0f, _farPlane);
+
+		for(auto& renderItem : _renderItems)
+			renderItem->Render(viewMatrix, )
 
 		_pCommandList->RSSetViewports(1, &_viewPort);
 		_pCommandList->RSSetScissorRects(1, &_scissorRect);

@@ -48,6 +48,8 @@ namespace MC { namespace RootSignatures {
 			&pResult
 		));
 
-	}
+		pResult->SetName(L"Default RootSignature.");
 
+		return pResult;
+	}
 } }

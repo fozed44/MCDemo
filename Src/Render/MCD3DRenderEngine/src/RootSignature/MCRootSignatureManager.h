@@ -3,6 +3,7 @@
 #include "../Core/MCD3D12Core.h"
 #include "../Core/MCREGlobals.h"
 #include "../../../../Common/MCCommon/src/Headers/MCManagedHandle.h"
+#include "../../../../Common/MCCommon/src/Headers/MCCriticalSection.h"
 
 using Microsoft::WRL::ComPtr;
 

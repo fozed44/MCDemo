@@ -1,4 +1,5 @@
 #pragma once
+#include "DirectXMath.h"
 
 namespace MC {
 
@@ -9,43 +10,25 @@ namespace MC {
 		these primitives should only be used when necessary.
 	*/	
 
-	struct MCFLOAT2 {
-		float x;
-		float y;
-	};
-
-	struct MCFLOAT3 {
-		float x;
-		float y;
-		float z;
-	};
-
-	struct MCFLOAT4 {
-		float x;
-		float y;
-		float z;
-		float w;
-	};
-
 	struct MCSIMPLE_VERTEX {
-		MCFLOAT3 Position;
+		DirectX::XMFLOAT3 Position;
 	};
 
 	struct MCVERTEX {
-		MCFLOAT3 Position;
-		MCFLOAT3 Normal;
+		DirectX::XMFLOAT3 Position;
+		DirectX::XMFLOAT3 Normal;
 	};
 
 	struct MCCOLOR_VERTEX {
-		MCFLOAT3 Position;
-		MCFLOAT3 Normal;
-		MCFLOAT4 Color;
+		DirectX::XMFLOAT3 Position;
+		DirectX::XMFLOAT3 Normal;
+		DirectX::XMFLOAT4 Color;
 	};
 
 	struct MCTEX_VERTEX {
-		MCFLOAT3 Position;
-		MCFLOAT3 Normal;
-		MCFLOAT2 Tex;
+		DirectX::XMFLOAT3 Position;
+		DirectX::XMFLOAT3 Normal;
+		DirectX::XMFLOAT2 Tex;
 	};
 
 	typedef enum MCVERTEX_FORMAT {

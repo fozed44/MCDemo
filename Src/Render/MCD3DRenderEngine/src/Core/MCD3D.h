@@ -14,6 +14,8 @@
 
 using Microsoft::WRL::ComPtr;
 
+#define MC_DEPTH_STENCIL_FORMAT DXGI_FORMAT_D32_FLOAT
+
 namespace MC {
 
 	

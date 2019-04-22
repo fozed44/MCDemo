@@ -13,20 +13,20 @@ namespace MC {
 	typedef void* MCFrameItemHandle;
 
 	struct MCCamera {
-		MCFLOAT3 Position;
-		MCFLOAT3 LookAt;
+		DirectX::XMFLOAT3 Position;
+		DirectX::XMFLOAT3 LookAt;
 	};
 
 	struct MCFrameRenderItem2D {
 		MCFrameItemHandle hRenderItem;
-		MCFLOAT2          Position;
-		MCFLOAT2          Look;
+		DirectX::XMFLOAT2 Position;
+		DirectX::XMFLOAT2 Look;
 	};
 
 	struct MCFrameRenderItem3D {
 		MCFrameItemHandle hRenderItem;
-		MCFLOAT3          Position;
-		MCFLOAT3          Look;
+		DirectX::XMFLOAT3 Position;
+		DirectX::XMFLOAT3 Look;
 	};
 
 	typedef enum MC_FRAME_TYPE {
