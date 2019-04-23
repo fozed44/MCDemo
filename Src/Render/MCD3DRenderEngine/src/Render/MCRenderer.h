@@ -23,24 +23,24 @@ namespace MC {
 		4) MCFrameRenderer:
 			One of several implementations of the MCFrameRenderer base class.
 
-			    *----------*
-			    | Renderer |
-			    *----------*
-					 |
-					 +
-			 *----------------*
-			 | FrameScheduler |
-			 *----------------*
-					 |
-					 +
-		 *-----------------------*
-		 | FrameRendererExecuter |
-		 *-----------------------*
-					 |
-					 +
-		    *------------------*
-		    |   FrameRenderer  |
-		    *------------------*
+			    +----------+
+			    | Renderer |----------------+
+			    +----------+                 \
+					 |                       |
+					 +                       |
+			 +----------------+              |
+			 | FrameScheduler |              |
+			 +----------------+              |
+					 |                       |
+					 +                       |
+		 +-----------------------+           |
+		 | FrameRendererExecuter |           |
+		 +-----------------------+           |
+					 |                       |
+					 +                       +
+		    +------------------+     +-----------------+      
+		    |   FrameRenderer  |+--->|  MCRenderScene  |
+		    +------------------+     +-----------------+
 	*/
 	typedef enum MC_RENDER_STATE {
 		MC_RENDER_STATE_OFF   = 0,

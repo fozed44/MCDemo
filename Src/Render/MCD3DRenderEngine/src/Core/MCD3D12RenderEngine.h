@@ -10,6 +10,18 @@
 
 namespace MC {
 
+	/*
+		-- HANDLE ABSTRACTIONS --
+	
+		These typedefs are used to abstract handles used internally by the d3d12 engine.
+
+		All code outside of the render code must use these abstractions. This way, all outside code is not
+		dependent on handles specific to the d3d12 engine, and a new engine could be created, and that new
+		engine would only have to re-define these types to work with the dependent code.
+	*/
+
+	typedef HRenderItem MCRENDER_ITEM_HANDLE;
+
 	class MCD3D12RenderEngine {
 	public:
 		MCD3D12RenderEngine(const RENDER_CONFIG *pRenderConfig);
@@ -26,6 +38,8 @@ namespace MC {
 		MCHANDLE LoadMesh(MCMESH_DESC desc);
 
 		MCHANDLE LoadSprite(MCSPRITE_DESC desc);
+
+		MCRENDER_ITEM_HANDLE LoadGeometry(const MCGEOMETRY_MESH_DESC& desc);
 
 		/* Call update once per game loop iteration.*/
 		void      Update();

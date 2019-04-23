@@ -89,10 +89,11 @@ namespace MC {
 
 		DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixLookAtLH(cameraPosition, cameraTarget, up);
 
-		DirectX::XMMATRIX proj = DirectX::XMMatrixPerspectiveFovLH(_fov, _aspectRatio, 1.0f, _farPlane);
+		DirectX::XMMATRIX projMatrix = DirectX::XMMatrixPerspectiveFovLH(_fov, _aspectRatio, 1.0f, _farPlane);
 
-		for(auto& renderItem : _renderItems)
-			renderItem->Render(viewMatrix, )
+		for (int x = 0; x < _renderItems.size(); ++x) {
+			_renderItems[x]->Render(viewMatrix, projMatrix, _pCommandList.Get());
+		}
 
 		_pCommandList->RSSetViewports(1, &_viewPort);
 		_pCommandList->RSSetScissorRects(1, &_scissorRect);

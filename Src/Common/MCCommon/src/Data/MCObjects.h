@@ -37,10 +37,10 @@ namespace MC {
 		bool                Alpha;
 	};
 
-	typedef enum MCMESH_FORMAT {
-		MCMESH_FORMAT_INVALID        = 0,
-		MCMESH_FORMAT_TRIANGLE_STRIP = 1,
-		MCMESH_FORMAT_TRIANGLE_LIST  = 2
+	typedef enum class MCMESH_FORMAT {
+		INVALID        = 0,
+		TRIANGLE_STRIP = 1,
+		TRIANGLE_LIST  = 2
 	} MCMESH_FORMAT;
 
 	struct MCMESH_DESC {
@@ -51,6 +51,17 @@ namespace MC {
 		void*           pIndexData;
 		MCBIT_DEPTH     IndexBitDepth;
 		unsigned int    IndexBufferByteSize;
+	};
+
+	typedef enum class MCGEOMETRY_MESH_TYPE {
+		CUBE	= 0,
+		SPHERE  = 1
+	};
+
+	struct MCGEOMETRY_MESH_DESC {
+		MCGEOMETRY_MESH_TYPE Type;
+		DirectX::XMFLOAT3    Position;
+		DirectX::XMFLOAT3    Scale;
 	};
 
 }

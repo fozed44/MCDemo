@@ -34,10 +34,10 @@ namespace MC {
 		HRootSignature CreateRootSignature(const D3D12_ROOT_SIGNATURE_DESC& desc, const std::string& name);
 
 		/*	Converts a managed handle to a root signature to the underlying ID3D12RootSignature* */
-		inline ID3D12RootSignature* GetRootSignature(const HRootSignature& hSig) const noexcept { return UnwrapHandle(hSig); }
+		ID3D12RootSignature* GetRootSignature(const HRootSignature& hSig) const noexcept { return UnwrapHandle(hSig); }
 
 		/*	Use GetRootSignatureHandle to get a signature handler to a standard (built in) signature. */
-		inline HRootSignature GetRootSignatureHandle(STANDARD_ROOT_SIGNATURE standardSignature);
+		HRootSignature GetRootSignatureHandle(STANDARD_ROOT_SIGNATURE standardSignature);
 
 	private: /* Standard Root Signatures */
 		std::map<STANDARD_ROOT_SIGNATURE, ComPtr<ID3D12RootSignature>> _standardSignatures;

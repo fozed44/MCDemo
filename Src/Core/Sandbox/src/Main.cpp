@@ -23,6 +23,7 @@
 #include "../../../Common/MCCommon/src/Data/MCResult.h"
 #include "../../../Render/MCD3DRenderEngine/src/Mesh/MCMesh.h"
 #include "../../../Render/MCD3DRenderEngine/src/Mesh/Geometry/GeometryGenerator.h"
+#include "../../../Render/MCD3DRenderEngine/src/Core/MCRenderObjects.h"
 #include <iostream>
 #include <thread>
 #include <atomic>
@@ -137,7 +138,9 @@ int Sandbox() {
 	const __int64 frameCountBufferSize = 50;
 	float frameCountBuffer[frameCountBufferSize];
 	MC::MCSpaceFrame *pNextFrame = new MC::MCSpaceFrame();
-	pNextFrame->FrameType = MC::MC_FRAME_TYPE_MCFRAME_SPACE;
+	pNextFrame->FrameType       = MC::MC_FRAME_TYPE_MCFRAME_SPACE;
+	pNextFrame->Camera.Position = { 0.0f, 0.0f, -10.0f };
+	pNextFrame->Camera.LookAt   = { 0.0f, 0.0f, 0.0f };
 	while (msg.message != WM_QUIT)
 	{
 		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
@@ -156,7 +159,9 @@ int Sandbox() {
 			//MC::MCREGlobals::pMCD3D->RenderFrame(&frame);
 			if (MC::MC_RESULT::OK == MC::MCREGlobals::pRenderEngine->ScheduleFrame(pNextFrame)) {
 				pNextFrame = new MC::MCSpaceFrame();
-				pNextFrame->FrameType = MC::MC_FRAME_TYPE_MCFRAME_SPACE;
+				pNextFrame->FrameType       = MC::MC_FRAME_TYPE_MCFRAME_SPACE;
+				pNextFrame->Camera.Position = { 0.0f, 0.0f, -10.0f };
+				pNextFrame->Camera.LookAt   = { 0.0f, 0.0f, 0.0f };
 				frameCount++;
 			}
 

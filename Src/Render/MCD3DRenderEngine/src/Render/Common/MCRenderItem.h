@@ -8,8 +8,6 @@
 
 namespace MC {
 
-	class MCFrameRenderer;
-
 	class MCRenderItem
 	{
 	public: /* ctor */

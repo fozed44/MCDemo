@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Render\Common\MCRenderScene.h" />
     <ClInclude Include="src\Core\MCRenderObjects.h" />
     <ClInclude Include="src\Mesh\Geometry\CubeGenerator.h" />
     <ClInclude Include="src\Mesh\Geometry\GeometryGenerator.h" />
@@ -188,6 +189,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Mesh\MCMesh.h" />
+    <ClCompile Include="src\Render\Common\MCRenderScene.cpp" />
     <ClCompile Include="src\PipelineStateObject\MCPipelineStateObjectManager.cpp" />
     <ClCompile Include="src\PipelineStateObject\MCPipelineStateObjects.cpp" />
     <ClCompile Include="src\Render\Common\MCFrameRenderer.cpp" />

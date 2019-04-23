@@ -63,6 +63,10 @@ namespace MC {
 	  _pRenderer->SetState(renderState);
   }
 
+  MCHANDLE MCD3D12RenderEngine::LoadGeometry(MCGEOMETRY_MESH_DESC desc) {
+
+  }
+
 #pragma endregion
 
 }

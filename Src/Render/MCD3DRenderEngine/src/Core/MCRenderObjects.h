@@ -34,6 +34,6 @@ namespace MC {
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, // Input slot class
 			0                                           // Instance Data Step Rate
 		}
-	}
+	};
 
 }

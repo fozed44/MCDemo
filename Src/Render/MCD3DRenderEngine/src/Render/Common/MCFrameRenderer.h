@@ -2,12 +2,12 @@
 
 #include "../../Core/MCD3D12Core.h"
 #include "../../Core/MCD3D.h"
+#include "../../Render/Common/MCRenderItem.h"
+
 
 #include <string>
 
 using Microsoft::WRL::ComPtr;
-
-class MCRenderItem;
 
 namespace MC {
 
@@ -32,7 +32,7 @@ namespace MC {
 		/* Use the value of _frameIndex (set during construction) to acquire the render target from MCDXGI */
 		void AcquireRenderTargetInfo();
 
-		/* for debuging... delete later.*/
+		/* for debugging... delete later.*/
 		unsigned int FrameIndex() { return _frameIndex; }
 
 	protected: /* D3D12 Objects */

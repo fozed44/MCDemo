@@ -77,6 +77,11 @@ namespace MC {
 		};
 	}
 
+	D3D12_SHADER_BYTECODE MCShaderManager::GetByteCode(STANDARD_SHADER standardShader) {
+		auto handle = GetShaderHandle(standardShader);
+		return GetByteCode(handle);
+	}
+
 	HShader MCShaderManager::GetShaderHandle(STANDARD_SHADER standardShader) {
 
 		auto iterator = _standardShaders.find(standardShader);

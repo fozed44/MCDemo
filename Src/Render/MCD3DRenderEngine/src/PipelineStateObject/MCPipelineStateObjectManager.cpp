@@ -61,6 +61,7 @@ namespace MC {
 
 	MC_RESULT MCPipelineStateObjectManager::Clear() {
 		_standardPSOMap.clear();
+		return MC_RESULT::OK;
 	}
 
 	ComPtr<ID3D12PipelineState> MCPipelineStateObjectManager::GetStandardPiplineState(STANDARD_PSO standardPSO) {

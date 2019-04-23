@@ -45,7 +45,7 @@ namespace MC {
 		
 		ComPtr<ID3D12RootSignature> pResult;
 
-		MCThrowIfFailed(MCREGlobals::pMCDXGI->Get3DDevice->CreateRootSignature(
+		MCThrowIfFailed(MCREGlobals::pMCDXGI->Get3DDevice()->CreateRootSignature(
 			0,
 			serializedRootSignature->GetBufferPointer(),
 			serializedRootSignature->GetBufferSize(),

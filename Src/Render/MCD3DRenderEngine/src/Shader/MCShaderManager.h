@@ -38,7 +38,10 @@ namespace MC {
 		HShader GetShaderHandle(STANDARD_SHADER standardShader);
 
 		/*	Get the byte-code for a loaded shader. */
-		D3D12_SHADER_BYTECODE GetByteCode(const HShader& handle);		
+		D3D12_SHADER_BYTECODE GetByteCode(const HShader& handle);
+
+		/* Get the byte-code for a standard shader. */
+		D3D12_SHADER_BYTECODE GetByteCode(STANDARD_SHADER standardShader);
 
 	private:
 		std::map<STANDARD_SHADER, ComPtr<ID3DBlob>> _standardShaders;
