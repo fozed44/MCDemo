@@ -8,7 +8,7 @@ namespace MC {
 
 	class MCSpaceRenderer : public MCFrameRenderer3D {
 	public: /* ctor */
-		MCSpaceRenderer(const std::string& name, unsigned int frameIndex);
+		MCSpaceRenderer(const std::string& name, unsigned int frameIndex, MCRenderScene* pScene);
 		virtual ~MCSpaceRenderer();
 		MCSpaceRenderer(MCSpaceRenderer&)              = delete;
 		MCSpaceRenderer(MCSpaceRenderer&&)             = delete;

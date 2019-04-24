@@ -2,6 +2,7 @@
 
 #include "../../../../Common/MCCommon/src/Data/MCResult.h"
 #include "Common/MCFrameScheduler.h"
+#include "Common/MCRenderScene.h"
 
 #include <memory>
 
@@ -79,6 +80,12 @@ namespace MC {
 	private:
 		MC_RENDER_STATE                     _state;
 		std::unique_ptr<MCFrameScheduler>   _pScheduler;
+		std::unique_ptr<MCRenderScene>      _pScene;
+
+	private:
+		/*	Called as a consequence of setting a new state. If the new state requires a new renderer
+			or renderers then a new scene should be re-created as well. */
+		void InitializeNewScene();
 	};
 
 }

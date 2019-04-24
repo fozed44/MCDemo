@@ -12,12 +12,13 @@ namespace MC {
 
 #pragma endregion
 
-	MCFrameRenderer::MCFrameRenderer(const std::string& name, unsigned int frameIndex) 
+	MCFrameRenderer::MCFrameRenderer(const std::string& name, unsigned int frameIndex, MCRenderScene* pScene) 
 		: _name{ name },
 		  _frameIndex{ frameIndex },
 		  _aspectRatio{ 1.0f },
 		  _fov{ 0.25f * 3.14159f },
-		  _farPlane{ 1000.0f } {
+		  _farPlane{ 1000.0f },
+		  _pScene{ pScene } {
 
 		// A Frame renderer should only be constructed on the main thread.
 		MCThreads::Assert(MC_THREAD_CLASS::MAIN);

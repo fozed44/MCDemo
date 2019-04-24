@@ -10,8 +10,8 @@ namespace MC {
 
 #pragma region Ctor
 
-	MCSpaceRenderer::MCSpaceRenderer(const std::string& name, unsigned int frameIndex) 
-		: MCFrameRenderer3D(name, frameIndex) {
+	MCSpaceRenderer::MCSpaceRenderer(const std::string& name, unsigned int frameIndex, MCRenderScene* pScene) 
+		: MCFrameRenderer3D(name, frameIndex, pScene) {
 		InitializeSpaceRenderer();
 	}
 

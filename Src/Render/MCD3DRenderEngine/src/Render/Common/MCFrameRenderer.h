@@ -3,7 +3,7 @@
 #include "../../Core/MCD3D12Core.h"
 #include "../../Core/MCD3D.h"
 #include "../../Render/Common/MCRenderItem.h"
-
+#include "../Common/MCRenderScene.h"
 
 #include <string>
 
@@ -13,7 +13,7 @@ namespace MC {
 
 	class MCFrameRenderer {
 	public: /* ctor / dtor / assignment*/
-		MCFrameRenderer(const std::string& name, unsigned int frameIndex);
+		MCFrameRenderer(const std::string& name, unsigned int frameIndex, MCRenderScene* pScene);
 		virtual ~MCFrameRenderer();
 		MCFrameRenderer(MCFrameRenderer&)              = delete;
 		MCFrameRenderer(MCFrameRenderer&&)             = delete;
@@ -57,9 +57,7 @@ namespace MC {
 		float                             _farPlane;
 
 		D3D12_VIEWPORT                    _viewPort;
-		D3D12_RECT                        _scissorRect;
-
-		std::vector<std::unique_ptr<MCRenderItem>> _renderItems;
+		D3D12_RECT                        _scissorRect;		
 
 	protected: /* Descriptor handle increment sizes. */
 
@@ -80,6 +78,9 @@ namespace MC {
 
 		/* Identifies this renderer. This is the value passed to the name parameter of the constructor. */
 		std::string _name;
+
+		/* Pointer to the render scene. */
+		MCRenderScene* _pScene;
 	};
 
 }

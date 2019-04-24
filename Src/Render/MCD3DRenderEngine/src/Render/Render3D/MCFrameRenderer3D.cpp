@@ -7,8 +7,8 @@ namespace MC {
 
 #pragma region ctor
 
-	MCFrameRenderer3D::MCFrameRenderer3D(const std::string& name, unsigned int frameIndex) 
-		: MCFrameRenderer(name, frameIndex) {
+	MCFrameRenderer3D::MCFrameRenderer3D(const std::string& name, unsigned int frameIndex, MCRenderScene* pScene) 
+		: MCFrameRenderer(name, frameIndex, pScene) {
 		InitializeRenderer3D();
 	}
 
@@ -28,7 +28,4 @@ namespace MC {
 	}	
 
 #pragma endregion
-
-
-
 }
