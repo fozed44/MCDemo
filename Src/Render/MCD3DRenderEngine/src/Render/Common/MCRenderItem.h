@@ -11,7 +11,13 @@ namespace MC {
 	class MCRenderItem
 	{
 	public: /* ctor */
-		MCRenderItem();
+		MCRenderItem(
+			std::vector<std::unique_ptr<MCIMesh>> _meshes,
+			HShader        hShader,
+			HRootSignature hRootSignature,
+			HPipelineState hPipelineState
+		);
+
 		~MCRenderItem();
 
 		MCRenderItem(MCRenderItem&)             = delete;
@@ -25,9 +31,9 @@ namespace MC {
 	private:
 		DirectX::XMFLOAT4X4                   _worldMatrix;
 		std::vector<std::unique_ptr<MCIMesh>> _meshes;
-		HShader                               _shader;
-		HRootSignature						  _rootSignature;
-		HPipelineState						  _pipelineState;
+		HShader                               _hShader;
+		HRootSignature						  _hRootSignature;
+		HPipelineState						  _hPipelineState;
 	};
 
 }

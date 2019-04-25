@@ -61,7 +61,7 @@ namespace MC {
 	struct MCGEOMETRY_MESH_DESC {
 		MCGEOMETRY_MESH_TYPE Type;
 		DirectX::XMFLOAT3    Position;
-		DirectX::XMFLOAT3    Scale;
+		DirectX::XMFLOAT3    Scale;  // Use Scale.x for a radius		
 	};
 
 }

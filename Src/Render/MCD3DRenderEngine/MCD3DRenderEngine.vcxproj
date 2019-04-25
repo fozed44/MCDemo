@@ -183,6 +183,7 @@
     <ClInclude Include="src\Core\TestFunctions.h" />
     <ClInclude Include="src\Core\MCRenderWindow.h" />
     <ClInclude Include="src\Render\Render3D\MCSpaceRenderer\MCSpaceRenderer.h" />
+    <ClInclude Include="src\Render\Utility\MCSceneLoader.h" />
     <ClInclude Include="src\RootSignature\MCRootSignatureManager.h" />
     <ClInclude Include="src\RootSignature\MCRootSignatures.h" />
     <ClInclude Include="src\Shader\MCShaderManager.h" />
@@ -202,6 +203,7 @@
     <ClCompile Include="src\Render\Common\MCRenderItem.cpp" />
     <ClCompile Include="src\Memory\MCResourceManager.cpp" />
     <ClCompile Include="src\Render\Render3D\MCSpaceRenderer\MCSpaceRenderer.cpp" />
+    <ClCompile Include="src\Render\Utility\MCSceneLoader.cpp" />
     <ClCompile Include="src\RootSignature\MCRootSignatureManager.cpp" />
     <ClCompile Include="src\RootSignature\MCRootSignatures.cpp" />
     <ClCompile Include="src\Shader\MCShaderManager.cpp" />

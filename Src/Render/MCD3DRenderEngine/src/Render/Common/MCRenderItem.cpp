@@ -6,7 +6,17 @@ namespace MC {
 
 #pragma region ctor
 
-	MCRenderItem::MCRenderItem() {
+	MCRenderItem::MCRenderItem(
+		std::vector<std::unique_ptr<MCIMesh>> _meshes,
+		HShader        hShader, 
+		HRootSignature hRootSignature,
+		HPipelineState hPipelineState
+	)
+		: _meshes{ _meshes },
+		  _hShader{std::move(hShader)},
+		  _hRootSignature{std::move(hRootSignature)},
+		  _hPipelineState{std::move(hPipelineState)}
+	{
 		// Render items can only be created on the main thread
 		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 	}
