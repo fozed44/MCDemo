@@ -20,9 +20,9 @@ namespace MC {
 		HRenderItem LoadGeometry(const MCGEOMETRY_MESH_DESC& desc) {
 			switch (desc.Type) {
 			case MCGEOMETRY_MESH_TYPE::SPHERE:
-				std::unique_ptr<MCRenderItem> = make_unique<MCRenderItem>();
+				std::unique_ptr<MCRenderItem>  = make_unique<MCRenderItem>();
 				std::unique_ptr<MCStaticMesh<tVertex, INDEX_FORAMT>> = make_unique<MCStaticMesh<tVertex, INDEX_FORMAT>>();
-				MC::GeometryGeneration::GenerateSphereMesh(desc.Scale.x, desc.Position,)
+				MC::GeometryGeneration::GenerateSphereMesh(desc.Scale.x, desc.Position, desc.NumSubdivisions, )
 			case MCGEOMETRY_MESH_TYPE::CUBE:
 			}
 		}
