@@ -37,6 +37,10 @@ namespace MC {
 		/*	Retrieve a handle for the given standard shader. */
 		HShader GetShaderHandle(STANDARD_SHADER standardShader);
 
+		/* Retrieve a handle for the vertex type 'tVertex' */
+		template<typename tVertex>
+		HShader GetVertexShaderHandle();
+
 		/*	Get the byte-code for a loaded shader. */
 		D3D12_SHADER_BYTECODE GetByteCode(const HShader& handle);
 

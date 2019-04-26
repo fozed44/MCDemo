@@ -26,10 +26,14 @@ namespace MC {
 		MCRenderItem& operator=(MCRenderItem&&) = delete;
 
 	public: /* API */
-		MC_RESULT XM_CALLCONV Render(DirectX::FXMMATRIX viewMatrix, DirectX::CXMMATRIX projMatrix, ID3D12GraphicsCommandList* pCommandList);
+		MC_RESULT XM_CALLCONV Render(
+			DirectX::FXMMATRIX         viewMatrix,
+			DirectX::CXMMATRIX         projMatrix,
+			DirectX::CXMMATRIX         worldMatrix,
+			ID3D12GraphicsCommandList* pCommandList
+		);
 
 	private:
-		DirectX::XMFLOAT4X4                   _worldMatrix;
 		std::vector<std::unique_ptr<MCIMesh>> _meshes;
 		HShader                               _hShader;
 		HRootSignature						  _hRootSignature;

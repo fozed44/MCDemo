@@ -17,6 +17,13 @@ namespace MC {
 	}
 
 	void MCRenderer::SetState(MC_RENDER_STATE state) {
+		// The state can only be changed from the main thread. This must be enforced along with
+		// enforcing operations with the scene loader to happen on the main thread. This means
+		// we do not need any synchronization code between setting the render state (which and
+		// create and destroy renderers and therefore scenes) and loading items into the current
+		// render scene.
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
+
 		// Don't do anything if we aren't actually changing states.
 		if (state == _state)
 			return;

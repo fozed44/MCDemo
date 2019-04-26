@@ -77,6 +77,13 @@ namespace MC {
 		*/
 		MC_RESULT ScheduleFrame(MCFrame *pFrame);
 
+		/*	Retrieve a pointer to the current scene loader. 
+			
+			Note that even though this method it's self does not have any thread restrictions, all of the operations
+			on the scene loader are restricted to the main thread in order to prevent interaction with render state
+			changes. */
+		const MCSceneLoader* GetSceneLoader() { return _pScene->GetSceneLoader(); }
+
 	private:
 		MC_RENDER_STATE                     _state;
 		std::unique_ptr<MCFrameScheduler>   _pScheduler;

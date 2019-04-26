@@ -18,7 +18,7 @@ namespace MC {
 		  _hPipelineState{std::move(hPipelineState)}
 	{
 		// Render items can only be created on the main thread
-		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);		
 	}
 
 
@@ -28,11 +28,13 @@ namespace MC {
 
 #pragma region Render
 
-	MC_RESULT XM_CALLCONV MCRenderItem::Render(DirectX::FXMMATRIX viewMatrix, DirectX::CXMMATRIX projMatrix, ID3D12GraphicsCommandList* pCommandList) {
-
-		DirectX::XMMATRIX world = XMLoadFloat4x4(&_worldMatrix);
-
-		DirectX::XMMATRIX worldViewProj = world * viewMatrix*projMatrix;
+	MC_RESULT XM_CALLCONV MCRenderItem::Render(
+		DirectX::FXMMATRIX         viewMatrix,
+		DirectX::CXMMATRIX         projMatrix,
+		DirectX::CXMMATRIX         worldMatrix,
+		ID3D12GraphicsCommandList* pCommandList
+	) {
+		DirectX::XMMATRIX worldViewProj = worldMatrix * viewMatrix*projMatrix;
 
 		for (auto& mesh : _meshes) {
 			mesh->Draw(pCommandList);

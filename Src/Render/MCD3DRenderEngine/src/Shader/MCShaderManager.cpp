@@ -2,6 +2,7 @@
 #include "../../../../Common/MCCommon/src/Headers/Paths.h"
 #include "../../../../Common/MCCommon/src/Headers/Utility.h"
 #include "../../../../Common/MCLog/src/Headers/MCLog.h"
+#include "../Core/MCRenderObjects.h"
 
 #include <fstream>
 
@@ -94,6 +95,11 @@ namespace MC {
 		_standardShaders[standardShader] = comPtr;
 
 		return CreateRef(comPtr.Get(), comPtr);
+	}
+
+	template<>
+	HShader MCShaderManager::GetVertexShaderHandle<MCVertex1Color>() {
+		return GetShaderHandle(STANDARD_SHADER::DEFAULT_VERTEX);
 	}
 
 #pragma endregion

@@ -5,6 +5,8 @@
 #include "../PipelineStateObject/MCPipelineStateObjectManager.h"
 #include "../Shader/MCShaderManager.h"
 #include "../Memory/MCResourceManager.h"
+#include "../Render/Utility/MCSceneLoader.h"
+#include "../Core/MCRenderObjects.h"
 #include "MCD3D.h"
 #include "MCDXGI.h"
 #include "MCRenderWindow.h"
@@ -63,8 +65,8 @@ namespace MC {
 	  _pRenderer->SetState(renderState);
   }
 
-  MCHANDLE MCD3D12RenderEngine::LoadGeometry(MCGEOMETRY_MESH_DESC desc) {
-
+  MCRENDER_ITEM_HANDLE MCD3D12RenderEngine::LoadGeometry(const MCGEOMETRY_MESH_DESC& desc) {
+	  return _pRenderer->GetSceneLoader()->LoadGeometry<MCVertex1Color, DXGI_FORMAT_R16_UINT>(desc);
   }
 
 #pragma endregion

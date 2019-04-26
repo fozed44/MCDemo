@@ -26,7 +26,7 @@ namespace MC {
 			
 			In general the scene loader (GetSceneLoader) should be used to populate render
 			items. */
-		HRenderItem AddRenderItem(MCRenderItem* pRenderItem);
+		HRenderItem AddRenderItem(std::unique_ptr<MCRenderItem> pRenderItem);
 
 		/* Get the scene loader. The scene loader should be used to load items into
 		   the scene. 
