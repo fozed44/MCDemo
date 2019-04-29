@@ -42,6 +42,13 @@ namespace MC {
 				SetRenderer can be called with nullptr as the parameters to safely shut down the current executer. */
 		void SetRenderers(MCFrameRenderer **ppRenderers, unsigned int count);
 
+		/* Suspend and Unsuspend the execution of the renderers. These methods must be called from the main thread. */
+		MC_RESULT SuspendSync();
+		void Unsuspend();
+
+		/* Call to force the renderers to re-acquire their render targets. The executers must be paused. */
+		void ReAcuireRenderTargets();
+
 	private: /* Queue and Present. */
 		/*	The Queue and Present methods are called by (directly or indirectly) by UpdateSchedule. These are
 		the methods that perform the per-game-loop frame scheduling logic. */
@@ -52,11 +59,7 @@ namespace MC {
 
 		void QueueFrame(MCFrame *pFrame);
 
-		/*void TryPresent();*/
-
-		void IncrementRenderTargetIndex();
-
-		//void GetRenderTargetInfo(MCFrameRendererTargetInfo *pInfo);
+		void IncrementNextExecuterIndex();
 
 		void SafeReleaseCurrentRenderers();
 

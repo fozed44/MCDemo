@@ -214,6 +214,11 @@ namespace MC {
 		D3D12_CPU_DESCRIPTOR_HANDLE GetDepthStencilCPUHandle();
 		D3D12_GPU_DESCRIPTOR_HANDLE GetDepthStencilGPUHandle();
 
+		/*
+		Call to resize the swap chain buffers. Will release and restore resources.
+		*/
+		void Resize();
+
 	private:
 
 		ComPtr<ID3D12Fence>               _pFence;
@@ -237,7 +242,7 @@ namespace MC {
 
 		// Depth Stencil
 		ComPtr<ID3D12Resource>            _pDepthStencil;
-
+		
 	private:
 		void Init3DDevice();
 		void InitFence();
@@ -248,16 +253,9 @@ namespace MC {
 		void InitDescriptorHeaps();
 		void InitRenderTargets();
 		void InitRenderTargetViews();
-		void InitDepthStencilBuffers();
-		void InitDepthStencilBufferViews();
-		void InitFinalize();
-
-	private:
-
-		/*
-		Call to resize the swap chain buffers. Will release and restore resources.
-		*/
-		void Resize();
+		void InitDepthStencilBuffer();
+		void InitDepthStencilBufferView();
+		void InitFinalize();		
 
 	private:
 		// The device is actually created and owned by the MCDXGI. Specifically

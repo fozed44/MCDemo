@@ -28,8 +28,6 @@ namespace MC {
 		if (_frameQueue.size() >= FRAME_QUEUE_SIZE)
 			return MC_RESULT::FAIL_NOT_READY;
 
-		if (_frameQueue.size() >= FRAME_QUEUE_SIZE)
-			return MC_RESULT::FAIL_NOT_READY;
 		_frameQueue.push(std::unique_ptr<MCFrame>(pFrame));
 
 		return MC_RESULT::OK;
@@ -37,7 +35,6 @@ namespace MC {
 
 	void MCFrameScheduler::UpdateScheduler() {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
-		//TryPresent();
 		TryQueueNextFrame();
 	}
 
@@ -55,6 +52,27 @@ namespace MC {
 				_ppExecuters[x]->SetFrameRenderer(std::unique_ptr<MCFrameRenderer>(ppRenderers[x]));
 			}
 		}
+	}
+
+	MC_RESULT MCFrameScheduler::SuspendSync() {
+		for (auto&& executer : _ppExecuters) {
+			auto result = executer->SuspendSync();
+
+			if (result != MC_RESULT::OK)
+				return result;
+		}
+
+		return MC_RESULT::OK;
+	}
+
+	void MCFrameScheduler::Unsuspend() {
+		for (auto&& executer : _ppExecuters)
+			executer->Unsuspend();
+	}
+
+	void MCFrameScheduler::ReAcuireRenderTargets() {
+		for (auto&& executer : _ppExecuters)
+			executer->ReAcquireRenderTarget();
 	}
 
 #pragma endregion
@@ -79,38 +97,17 @@ namespace MC {
 		// thread.
 		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 
-		/*MCFrameRendererTargetInfo targetInfo;
-		GetRenderTargetInfo(&targetInfo);*/
-
 		auto queryFrameResult = _ppExecuters[_nextExecuterIndex]->QueueNextFrame(pFrame);
+
 		assert(queryFrameResult == MC_RESULT::OK);
 
-		IncrementRenderTargetIndex();
+		IncrementNextExecuterIndex();
 	}
 
-	void MCFrameScheduler::IncrementRenderTargetIndex() {
+	void MCFrameScheduler::IncrementNextExecuterIndex() {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 		_nextExecuterIndex = ++_nextExecuterIndex % FRAME_BUFFER_COUNT;
 	}
-
-	/*void MCFrameScheduler::GetRenderTargetInfo(MCFrameRendererTargetInfo *pInfo) {
-		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
-
-		pInfo->FrameIndex       = _nextRenderTargetIndex;
-		pInfo->pRenderTarget    = MCREGlobals::pMCD3D->GetRenderTarget         (_nextRenderTargetIndex);
-		pInfo->hCPURenderTarget = MCREGlobals::pMCD3D->GetRenderTargetCPUHandle(_nextRenderTargetIndex);
-		pInfo->hGPURenderTarget = MCREGlobals::pMCD3D->GetRenderTargetGPUHandle(_nextRenderTargetIndex);
-	}*/
-
-	/*void MCFrameScheduler::TryPresent() {
-		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
-
-		if (_pExecuter->QueryExecutionStage() != MCFRAME_RENDERER_EXECUTION_STAGE_WAITING_TO_PRESENT)
-			return;
-
-		MCREGlobals::pMCDXGI->Present();
-		_pExecuter->NotifyFramePresented();		
-	}*/
 	
 	void MCFrameScheduler::SafeReleaseCurrentRenderers() {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);

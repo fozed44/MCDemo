@@ -38,6 +38,9 @@ namespace MC {
 #pragma region Render Control
 
 	MC_RESULT MCFrameRendererExecuter::QueueNextFrame(MCFrame *pFrame) {
+		// Ensure that a frame is queued from the main thread only.
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
+
 
 		if (_executionStage.load() != MCFRAME_RENDERER_EXECUTION_STAGE_IDLE)
 			return MC_RESULT::FAIL_NOT_READY;
@@ -70,6 +73,25 @@ namespace MC {
 
 #pragma region Thread Control
 
+	MC_RESULT MCFrameRendererExecuter::SuspendSync() {
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
+		_suspendFlag = true;
+
+		// TODO
+		//	We need to add some error checking so that if the render thread is not suspended after
+		//  a certain amount of time, we return an error code.
+
+		while (_executionStage.load() != MCFRAME_RENDERER_EXECUTION_STAGE_SUSPENDED)
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+		return MC_RESULT::OK;
+	}
+
+	void MCFrameRendererExecuter::Unsuspend() {
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
+		_suspendFlag = false;
+	}
+
 	void MCFrameRendererExecuter::StartRenderThread() {
 		assert(_pRenderer);
 		assert(!_pThread);
@@ -94,6 +116,12 @@ namespace MC {
 		_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_NO_THREAD);
 	}
 
+	void MCFrameRendererExecuter::ReAcquireRenderTarget() {
+		assert(_executionStage.load() == MCFRAME_RENDERER_EXECUTION_STAGE_SUSPENDED);
+
+		_pRenderer->AcquireRenderTargetInfo();
+	}
+
 #pragma endregion
 
 #pragma region Render Loop
@@ -110,6 +138,14 @@ namespace MC {
 		);
 
 		while (!_exitFlag) {
+			if (_suspendFlag) {
+				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_SUSPENDED);
+
+				while (!_exitFlag && _suspendFlag)
+					std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_IDLE);
+			}
 			if (_executionStage.load() == MCFRAME_RENDERER_EXECUTION_STAGE_FRAME_ACCEPTED) {
 				
 				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_WAITING_ON_GPU);

@@ -900,8 +900,8 @@ MCD3D::MCD3D()  {
 	InitDescriptorHeaps();
 	InitRenderTargets();
 	InitRenderTargetViews();
-	InitDepthStencilBuffers();
-	InitDepthStencilBufferViews();
+	InitDepthStencilBuffer();
+	InitDepthStencilBufferView();
 	InitFinalize();
 
 	MC_INFO("End render initialization.");
@@ -1045,8 +1045,8 @@ void MCD3D::InitRenderTargetViews() {
 	INIT_TRACE("End init RTV Heap.");
 }
 
-void MCD3D::InitDepthStencilBuffers() {
-	INIT_TRACE("Init depth stencil buffers.");
+void MCD3D::InitDepthStencilBuffer() {
+	INIT_TRACE("Init depth stencil buffer.");
 
 	int width, height;
 
@@ -1086,7 +1086,7 @@ void MCD3D::InitDepthStencilBuffers() {
 	INIT_TRACE("End init depth stencil buffer.");
 }
 
-void MCD3D::InitDepthStencilBufferViews() {
+void MCD3D::InitDepthStencilBufferView() {
 	INIT_TRACE("Begin init depth stencil buffer views.");
 
 	CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHeapHandle(_pDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
@@ -1266,23 +1266,23 @@ void MCD3D::Resize() {
 	for (int i = 0; i < FRAME_BUFFER_COUNT; ++i)
 		_ppRenderTargets[i].Reset();
 
-	/*_pDepthStencil.Reset();*/
+	_pDepthStencil.Reset();
 
 	MCREGlobals::pMCDXGI->ForceResize();
 
 	InitRenderTargets();
 	InitRenderTargetViews();
 
-	/*InitDepthStencilBuffer();
-	InitDepthStencilBufferView();*/
+	InitDepthStencilBuffer();
+	InitDepthStencilBufferView();
 
-	/*_pCommandList->ResourceBarrier(
+	_pCommandList->ResourceBarrier(
 		1,
 		&CD3DX12_RESOURCE_BARRIER::Transition(_pDepthStencil.Get(),
 			D3D12_RESOURCE_STATE_COMMON,
 			D3D12_RESOURCE_STATE_DEPTH_WRITE
 		)
-	);*/
+	);
 
 	MCThrowIfFailed(_pCommandList->Close());
 
@@ -1290,22 +1290,6 @@ void MCD3D::Resize() {
 	_pCommandQueue->ExecuteCommandLists(1, &pCommandList);
 
 	FlushCommandQueue();
-
-	int newWidth, newHeight;
-	MCREGlobals::pMCDXGI->GetFrameBufferSize(&newWidth, &newHeight);
-
-	/*_viewPort = {};
-	_viewPort.TopLeftX = 0.0f;
-	_viewPort.TopLeftY = 0.0f;
-	_viewPort.Width = static_cast<float>(newWidth);
-	_viewPort.Height = static_cast<float>(newHeight);
-	_viewPort.MinDepth = 0.0f;
-	_viewPort.MaxDepth = 1.0f;
-
-	_scissorRect.top = 0;
-	_scissorRect.left = 0;
-	_scissorRect.right = newWidth;
-	_scissorRect.bottom = newHeight;*/
 }
 
 #pragma endregion

@@ -5,6 +5,8 @@
 
 namespace MC {
 
+#pragma region ctor
+
 	MCRenderer::MCRenderer() : _state{ MC_RENDER_STATE_OFF } {
 		_pScene     = std::make_unique<MCRenderScene>();
 		_pScheduler = std::make_unique<MCFrameScheduler>();
@@ -12,9 +14,37 @@ namespace MC {
 
 	MCRenderer::~MCRenderer() { }
 
+#pragma endregion
+
+#pragma region update
+
 	void MCRenderer::Update() {
+		if (MCREGlobals::pMCDXGI->IsResizeQueued())
+			HandleResize();
 		_pScheduler->UpdateScheduler();
 	}
+
+#pragma endregion
+
+#pragma region handle resize
+
+	void MCRenderer::HandleResize() {
+		// Pause the executors
+		auto result = _pScheduler->SuspendSync();
+		if (result != MC_RESULT::OK) {
+			MCTHROW("Error suspending an executer.");
+		}
+
+		MCREGlobals::pMCD3D->Resize();
+
+		_pScheduler->ReAcuireRenderTargets();
+
+		_pScheduler->Unsuspend();
+	}
+
+#pragma endregion
+
+#pragma region SetState
 
 	void MCRenderer::SetState(MC_RENDER_STATE state) {
 		// The state can only be changed from the main thread. This must be enforced along with
@@ -55,6 +85,8 @@ namespace MC {
 		}
 		MCTHROW("unknown MC_RENDERER_STATE");
 	}
+
+#pragma endregion
 
 	MC_RESULT MCRenderer::ScheduleFrame(MCFrame *pFrame) {
 		if (_state == MC_RENDER_STATE_OFF)

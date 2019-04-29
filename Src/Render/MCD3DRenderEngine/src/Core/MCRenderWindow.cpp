@@ -40,7 +40,7 @@ namespace MC {
 			msg.Message = MC_MESSAGE_CONSOLE_OUTPUT_128;
 			auto strAddress = MCCOGlobals::pRouter->PushTo(msg, static_cast<unsigned short>(mouseButtonMessageSize));
 			strcpy_s(strAddress, mouseButtonMessageSize, mouseButtonMessage.c_str());
-			//MC_INFO("Mouse button down at {0:d}, {1:d}", LOWORD(lParam), HIWORD(lParam));
+			
 			lastMousePos.x = LOWORD(lParam);
 			lastMousePos.y = HIWORD(lParam);
 			SetCapture(hWnd);
@@ -60,6 +60,10 @@ namespace MC {
 					MCRenderWindow::_phi = 0.1f;
 				if (MCRenderWindow::_phi > 3.04159f)
 					MCRenderWindow::_phi = 3.04159f;
+			} 
+			if (wParam & MK_RBUTTON) {
+				float dy = (y - lastMousePos.y) * 0.25f;
+				MCRenderWindow::_radius += dy;
 			}
 			lastMousePos.x = x;
 			lastMousePos.y = y;

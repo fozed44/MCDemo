@@ -15,6 +15,7 @@ namespace MC {
 		MCFRAME_RENDERER_EXECUTION_STAGE_CPU_RENDERING  = 2,
 		MCFRAME_RENDERER_EXECUTION_STAGE_WAITING_ON_GPU = 3,
 		MCFRAME_RENDERER_EXECUTION_STAGE_IDLE           = 4,
+		MCFRAME_RENDERER_EXECUTION_STAGE_SUSPENDED      = 5
 	} MCFRAME_RENDERER_EXECUTION_STAGE;
 
 	class MCFrameRendererExecuter {
@@ -45,6 +46,17 @@ namespace MC {
 		no renderer is currently set. DestroyCurrentRenderer must be called first. */
 		void SetFrameRenderer(std::unique_ptr<MCFrameRenderer> pRenderer);
 
+		/* Must be called from the main thread. Sets the suspend flag. Blocks until the execution state has reached 
+		   MCFRAME_RENDERER_EXECUTION_STAGE_SUSPENDED. */
+		MC_RESULT SuspendSync();
+
+		/* Sets the suspend flag to false, returning immediately. Must also be called from the main thread. */
+		void Unsuspend();
+
+		/* Cause the renderer to re-acquire the render target. The executer must be suspended. This method is needed
+		   after a resize. */
+		void ReAcquireRenderTarget();
+
 	public: /* query */
 
 		MCFRAME_RENDERER_EXECUTION_STAGE QueryExecutionStage() const {
@@ -67,7 +79,9 @@ namespace MC {
 		std::string                         _name;
 
 		std::atomic<unsigned int>           _executionStage;
-		bool                                _exitFlag;
+
+		volatile bool                       _exitFlag;
+		volatile bool                       _suspendFlag;
 
 		std::unique_ptr<std::thread>       _pThread;
 		std::unique_ptr<MCFrameRenderer>   _pRenderer;

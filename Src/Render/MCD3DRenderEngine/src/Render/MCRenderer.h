@@ -93,6 +93,9 @@ namespace MC {
 		/*	Called as a consequence of setting a new state. If the new state requires a new renderer
 			or renderers then a new scene should be re-created as well. */
 		void InitializeNewScene();
+
+		/* Called via the update method. This method is called when a resize is required. */
+		void HandleResize();
 	};
 
 }

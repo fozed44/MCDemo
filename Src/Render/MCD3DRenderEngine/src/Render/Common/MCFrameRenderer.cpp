@@ -111,6 +111,25 @@ namespace MC {
 
 		_hCPUDepthStencil = MCREGlobals::pMCD3D->GetDepthStencilCPUHandle();
 		_hGPUDepthStencil = MCREGlobals::pMCD3D->GetDepthStencilGPUHandle();
+
+		int width;
+		int height;
+		
+		MCREGlobals::pMCDXGI->GetFrameBufferSize(&width, &height);
+
+		_viewPort = {};
+		_viewPort.TopLeftX = 0.0f;
+		_viewPort.TopLeftY = 0.0f;
+		_viewPort.Width    = static_cast<float>(width);
+		_viewPort.Height   = static_cast<float>(height);
+		_viewPort.MinDepth = 0.0f;
+		_viewPort.MaxDepth = 1.0f;
+
+		_scissorRect.top    = 0;
+		_scissorRect.left   = 0;
+		_scissorRect.right  = width;
+		_scissorRect.bottom = height;
+
 	}
 
 #pragma endregion

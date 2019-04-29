@@ -120,23 +120,10 @@ int Sandbox() {
 	MSG msg = {};
 	
 	__int64 frameCount = 1;
-
-	MC::MCFrame3D frame;
-	frame.Camera.Position = { 0.0f, 0.0f, -10.0f };
-	frame.Camera.LookAt   = { 0.0f, 0.0f, 0.0f };
 	
-	/// TEST CODE
-	{
-		MC::MCStaticMesh<MC::MCVertex1Color, DXGI_FORMAT_R16_UINT> tMesh(std::string("testMesh"));
-		MC::GeometryGeneration::GenerateCubeMesh(
-			{ 0.0f, 0.0f, 0.0f },
-			3.0f, 3.0f, 3.0f,
-			&tMesh
-		);
-	}
-
 	const __int64 frameCountBufferSize = 50;
 	float frameCountBuffer[frameCountBufferSize];
+
 	MC::MCSpaceFrame *pNextFrame = new MC::MCSpaceFrame();
 	pNextFrame->FrameType       = MC::MC_FRAME_TYPE_MCFRAME_SPACE;
 	pNextFrame->Camera.Position = { 0.0f, 0.0f, -10.0f };
@@ -170,12 +157,11 @@ int Sandbox() {
 		else {
 			masterTimer->Tick();
 
-			frame.Camera.Position.x = MC::MCREGlobals::pRenderWindow->GetRadius()*sinf(MC::MCREGlobals::pRenderWindow->GetPhi())*cosf(MC::MCREGlobals::pRenderWindow->GetTheta());
-			frame.Camera.Position.z = MC::MCREGlobals::pRenderWindow->GetRadius()*sinf(MC::MCREGlobals::pRenderWindow->GetPhi())*sinf(MC::MCREGlobals::pRenderWindow->GetTheta());
-			frame.Camera.Position.y = MC::MCREGlobals::pRenderWindow->GetRadius()*cosf(MC::MCREGlobals::pRenderWindow->GetPhi());
-			frame.Time = masterTimer->TotalTime();
+			pNextFrame->Camera.Position.x = MC::MCREGlobals::pRenderWindow->GetRadius()*sinf(MC::MCREGlobals::pRenderWindow->GetPhi())*cosf(MC::MCREGlobals::pRenderWindow->GetTheta());
+			pNextFrame->Camera.Position.z = MC::MCREGlobals::pRenderWindow->GetRadius()*sinf(MC::MCREGlobals::pRenderWindow->GetPhi())*sinf(MC::MCREGlobals::pRenderWindow->GetTheta());
+			pNextFrame->Camera.Position.y = MC::MCREGlobals::pRenderWindow->GetRadius()*cosf(MC::MCREGlobals::pRenderWindow->GetPhi());
+			pNextFrame->Time = masterTimer->TotalTime();
 
-			//MC::MCREGlobals::pMCD3D->RenderFrame(&frame);
 			if (MC::MC_RESULT::OK == MC::MCREGlobals::pRenderEngine->ScheduleFrame(pNextFrame)) {
 				pNextFrame = new MC::MCSpaceFrame();
 				pNextFrame->FrameType       = MC::MC_FRAME_TYPE_MCFRAME_SPACE;

@@ -31,9 +31,6 @@ namespace MC {
 		/* Initialize the descriptor heaps. */
 		void InitializeDescriptorHeaps();
 
-		/* Initialize the constant buffer view. */
-		void InitializeConstantBufferView();
-
 	private:
 		ComPtr<ID3D12DescriptorHeap> _pCBVDescriptorHeap;
 		UINT                         _CBVDescriptorIncrementSize;
