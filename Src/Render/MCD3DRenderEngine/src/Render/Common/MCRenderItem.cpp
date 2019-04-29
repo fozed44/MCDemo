@@ -7,18 +7,26 @@ namespace MC {
 #pragma region ctor
 
 	MCRenderItem::MCRenderItem(
-		std::vector<std::unique_ptr<MCIMesh>> _meshes,
-		HShader        hShader, 
-		HRootSignature hRootSignature,
-		HPipelineState hPipelineState
+		std::unique_ptr<MCIMesh> pMeshes,
+		HShader                  hShader, 
+		HRootSignature           hRootSignature,
+		HPipelineState           hPipelineState
 	)
-		: _meshes{ _meshes },
-		  _hShader{std::move(hShader)},
+		: _hShader{std::move(hShader)},
 		  _hRootSignature{std::move(hRootSignature)},
 		  _hPipelineState{std::move(hPipelineState)}
 	{
 		// Render items can only be created on the main thread
-		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);		
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
+
+		_meshes.push_back(std::move(pMeshes));
+
+		_pObjectConstantBuffer = std::make_unique<MCUploadBuffer<ObjectConstants>>(
+			MCREGlobals::pMCDXGI->Get3DDevice(),
+			1,
+			true
+		);
+
 	}
 
 
@@ -35,6 +43,16 @@ namespace MC {
 		ID3D12GraphicsCommandList* pCommandList
 	) {
 		DirectX::XMMATRIX worldViewProj = worldMatrix * viewMatrix*projMatrix;
+
+		ObjectConstants oc;
+		DirectX::XMStoreFloat4x4(&oc.WorldViewProj, XMMatrixTranspose(worldViewProj));
+		_pObjectConstantBuffer->CopyData(0, oc);
+
+
+		pCommandList->SetGraphicsRootSignature(MCREGlobals::pRSManager->GetRootSignature(_hRootSignature));
+		pCommandList->SetPipelineState(MCREGlobals::pPSOManager->GetPipelineState(_hPipelineState));
+
+		pCommandList->SetGraphicsRootConstantBufferView(0, _pObjectConstantBuffer->Resource()->GetGPUVirtualAddress());
 
 		for (auto& mesh : _meshes) {
 			mesh->Draw(pCommandList);

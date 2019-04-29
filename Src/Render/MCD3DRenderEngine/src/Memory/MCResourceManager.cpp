@@ -5,6 +5,8 @@
 
 namespace MC {
 
+#pragma region ctor
+
 	MCResourceManager::MCResourceManager() 
 		: _uploadBufferFence{ 0 } {
 		assert(MCREGlobals::pMCDXGI);
@@ -35,7 +37,10 @@ namespace MC {
 		MCThrowIfFailed(_pCommandList->Close());
 	}
 
+#pragma endregion
 	
+#pragma region static buffer
+
 	MC_RESULT MCResourceManager::CreateStaticBufferAsync(void *pInitData, size_t numBytes, HResource* pResult) {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 
@@ -142,6 +147,8 @@ namespace MC {
 
 		return std::move(hResource);
 	}
+
+#pragma endregion
 
 	MC_RESULT MCResourceManager::GetResource(const HResource& handle, ID3D12Resource **ppResource) const {
 		auto unwrappedHandle = UnwrapHandle(handle);

@@ -5,6 +5,9 @@
 #include "../MCMesh.h"
 
 #include "CubeGenerator.h"
+#include "SphereGenerator.h"
+
+#include <vector>
 
 namespace MC { namespace GeometryGeneration {
 	template <typename tVertex, int tIndex>
@@ -15,16 +18,16 @@ namespace MC { namespace GeometryGeneration {
 	) {
 		tVertex vertexArray[8];
 		MCMesh<tVertex, tIndex>::INDEX_TYPE indexArray[36];
-		MC::Utilities::GenerateTestCube<tVertex, MCMesh<tVertex, tIndex>::INDEX_TYPE>(
+		MC::Utilities::GenerateCube<tVertex, MCMesh<tVertex, tIndex>::INDEX_TYPE>(
 			center.x, center.y, center.z,
 			width, height, depth,
 			vertexArray, sizeof(vertexArray),
 			indexArray, sizeof(indexArray)
 		);
 
-		pMesh->LoadData(vertexArray, sizeof(vertexArray), indexArray, sizeof(indexArray));
+		auto result = pMesh->LoadData(vertexArray, sizeof(vertexArray), indexArray, sizeof(indexArray));
 
-		return MC_RESULT::OK;
+		return result;
 	}
 
 	template <typename tVertex, int tIndex>
@@ -34,7 +37,18 @@ namespace MC { namespace GeometryGeneration {
 		unsigned int numSubdivisions,
 		MCMesh<tVertex, tIndex> *pMesh
 	) {
-		return MC_RESULT::OK;
+		using INDEX_TYPE = MCMesh<tVertex, tIndex>::INDEX_TYPE;
+		std::vector<tVertex>    verticies;
+		std::vector<INDEX_TYPE> indicies;
+
+		MC::Utilities::GenerateSphere(radius, center.x, center.y, center.z, &verticies, &indicies, numSubdivisions);
+
+		auto result = pMesh->LoadData(
+			&(*verticies.begin()), verticies.size() * sizeof(tVertex),
+			&(*indicies.begin()) , indicies.size()  * sizeof(INDEX_TYPE)
+		);
+
+		return result;
 	}
 
 }}

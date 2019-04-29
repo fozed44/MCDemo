@@ -89,11 +89,8 @@ namespace MC {
 
 		DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixLookAtLH(cameraPosition, cameraTarget, up);
 
-		DirectX::XMMATRIX projMatrix = DirectX::XMMatrixPerspectiveFovLH(_fov, _aspectRatio, 1.0f, _farPlane);
-
-		for (int x = 0; x < _renderItems.size(); ++x) {
-			_renderItems[x]->Render(viewMatrix, projMatrix, _pCommandList.Get());
-		}
+		DirectX::XMMATRIX projMatrix = DirectX::XMMatrixPerspectiveFovLH(_fov, MCREGlobals::pMCDXGI->GetAspectRatio(), 1.0f, _farPlane);
+		
 
 		_pCommandList->RSSetViewports(1, &_viewPort);
 		_pCommandList->RSSetScissorRects(1, &_scissorRect);
@@ -124,6 +121,26 @@ namespace MC {
 			0,
 			nullptr
 		);
+
+		_pCommandList->OMSetRenderTargets(
+			1,
+			&_hCPURenderTarget,
+			true,
+			&_hCPUDepthStencil
+		);
+
+		ID3D12DescriptorHeap* descriptorHeaps[] = { _pCBVDescriptorHeap.Get() };
+		//_pCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+
+		_pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		DirectX::XMMATRIX objectMatrix = DirectX::XMMatrixIdentity();
+
+		auto pRenderItems = _pScene->GetRenderItems();
+
+		for (int x = 0; x < pRenderItems->size(); ++x) {
+			(*pRenderItems)[x]->Render(viewMatrix, projMatrix, objectMatrix, _pCommandList.Get());
+		}
 
 		_pCommandList->ResourceBarrier(
 			1,

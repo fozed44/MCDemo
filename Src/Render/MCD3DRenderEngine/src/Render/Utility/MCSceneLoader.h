@@ -21,7 +21,7 @@ namespace MC {
 			switch (desc.Type) {
 			case MCGEOMETRY_MESH_TYPE::SPHERE: /*-------------------------------------------------------------*/
 			{
-				std::unique_ptr<MCStaticMesh<tVertex, INDEX_FORMAT>> pMesh = std::make_unique<MCStaticMesh<tVertex, INDEX_FORMAT>>();
+				std::unique_ptr<MCStaticMesh<tVertex, INDEX_FORMAT>> pMesh = std::make_unique<MCStaticMesh<tVertex, INDEX_FORMAT>>(std::string("Auto Generated Sphere"));
 
 				// TODO:
 				//	The result that is returned from GenerateSphereMesh is not checked. This result should be checked and if
@@ -31,7 +31,7 @@ namespace MC {
 				auto result = MC::GeometryGeneration::GenerateSphereMesh(desc.Scale.x, desc.Position, desc.NumSubdivisions, pMesh.get());
 
 				std::unique_ptr<MCRenderItem> pRenderItem = std::make_unique<MCRenderItem>(
-					std::vector<std::unique_ptr<MCIMesh>> { pMesh.release() },
+					std::move(pMesh),
 					MCREGlobals::pShaderManager->GetVertexShaderHandle<tVertex>(),
 					MCREGlobals::pRSManager->GetRootSignatureHandle(STANDARD_ROOT_SIGNATURE::DEFAULT),
 					MCREGlobals::pPSOManager->GetPipelineStateHandle(STANDARD_PSO::DEFAULT)
@@ -41,17 +41,17 @@ namespace MC {
 			}
 			case MCGEOMETRY_MESH_TYPE::CUBE: /*-------------------------------------------------------------*/
 			{
-				std::unique_ptr<MCStaticMesh<tVertex, INDEX_FORMAT>> pMesh = std::make_unique<MCStaticMesh<tVertex, INDEX_FORMAT>>();
+				std::unique_ptr<MCStaticMesh<tVertex, INDEX_FORMAT>> pMesh = std::make_unique<MCStaticMesh<tVertex, INDEX_FORMAT>>(std::string("Auto Generated Cube"));
 
 				// TODO:
 				//	The result that is returned from GenerateSphereMesh is not checked. This result should be checked and if
 				//  the result is a failure result a generic mesh (perhaps a cube) should be loaded in place of the failed
 				//  mesh.
 
-				auto result = MC::GeometryGeneration::GenerateCubeMesh(desc.Position, desc.Scale.x, desc.Scale.y, desc.Scale.z, desc.NumSubdivisions, pMesh.get());
+				auto result = MC::GeometryGeneration::GenerateCubeMesh(desc.Position, desc.Scale.x, desc.Scale.y, desc.Scale.z, pMesh.get());
 
 				std::unique_ptr<MCRenderItem> pRenderItem = std::make_unique<MCRenderItem>(
-					std::vector<std::unique_ptr<MCIMesh>> { pMesh.release() },
+					std::move(pMesh),
 					MCREGlobals::pShaderManager->GetVertexShaderHandle<tVertex>(),
 					MCREGlobals::pRSManager->GetRootSignatureHandle(STANDARD_ROOT_SIGNATURE::DEFAULT),
 					MCREGlobals::pPSOManager->GetPipelineStateHandle(STANDARD_PSO::DEFAULT)
@@ -62,6 +62,7 @@ namespace MC {
 			default:
 				MCTHROW("Invalid MCGEOMETRY_MESH_TYPE");
 			}
+			return nullptr;
 		}
 	private:
 		MCRenderScene* _pScene;

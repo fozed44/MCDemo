@@ -36,6 +36,8 @@ namespace MC {
 			will end up calling MCRenderScene::AddRenderItem to add the item to the scene. */
 		const MCSceneLoader* GetSceneLoader() { return _pSceneLoader.get(); }
 
+		const std::vector<std::unique_ptr<MCRenderItem>>* GetRenderItems() const { return &_renderItems; }
+
 	private: 
 		std::vector<std::unique_ptr<MCRenderItem>> _renderItems;
 		std::unique_ptr<MCSceneLoader>             _pSceneLoader;

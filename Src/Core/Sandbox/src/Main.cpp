@@ -141,6 +141,25 @@ int Sandbox() {
 	pNextFrame->FrameType       = MC::MC_FRAME_TYPE_MCFRAME_SPACE;
 	pNextFrame->Camera.Position = { 0.0f, 0.0f, -10.0f };
 	pNextFrame->Camera.LookAt   = { 0.0f, 0.0f, 0.0f };
+
+	MC::MCREGlobals::pRenderEngine->LoadGeometry(
+		MC::MCGEOMETRY_MESH_DESC{
+			MC::MCGEOMETRY_MESH_TYPE::CUBE,
+			{ 0.0f, 0.0f, 0.0f },
+			{ 3.0f, 3.0f, 3.0f },
+			4
+		}
+	);
+
+	MC::MCREGlobals::pRenderEngine->LoadGeometry(
+		MC::MCGEOMETRY_MESH_DESC{
+			MC::MCGEOMETRY_MESH_TYPE::SPHERE,
+			{ 0.0f, 3.0f, 3.0f },
+			{ 3.0f, 3.0f, 3.0f },
+			4
+		}
+	);
+
 	while (msg.message != WM_QUIT)
 	{
 		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))

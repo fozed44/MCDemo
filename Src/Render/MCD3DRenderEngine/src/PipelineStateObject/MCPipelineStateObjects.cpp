@@ -32,17 +32,17 @@ namespace MC { namespace PSOs {
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
 		ZeroMemory(&psoDesc, sizeof(psoDesc));
 
-		psoDesc.InputLayout = { MCVertex1Color_desc, _countof(MCVertex1Color_desc) };
-		psoDesc.pRootSignature = standardRootSignature;
-		psoDesc.VS = MCREGlobals::pShaderManager->GetByteCode(STANDARD_SHADER::DEFAULT_VERTEX);
-		psoDesc.PS = MCREGlobals::pShaderManager->GetByteCode(STANDARD_SHADER::DEFAULT_PIXEL);
-		psoDesc.RasterizerState = rasterizerDesc;
-		psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-		psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
-		psoDesc.SampleMask = UINT_MAX;
+		psoDesc.InputLayout           = { MCVertex1Color_desc, _countof(MCVertex1Color_desc) };
+		psoDesc.pRootSignature        = standardRootSignature;
+		psoDesc.VS                    = MCREGlobals::pShaderManager->GetByteCode(STANDARD_SHADER::DEFAULT_VERTEX);
+		psoDesc.PS                    = MCREGlobals::pShaderManager->GetByteCode(STANDARD_SHADER::DEFAULT_PIXEL);
+		psoDesc.RasterizerState       = rasterizerDesc;
+		psoDesc.BlendState            = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+		psoDesc.DepthStencilState     = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+		psoDesc.SampleMask            = UINT_MAX;
 		psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-		psoDesc.NumRenderTargets = 1;
-		psoDesc.RTVFormats[0] = BACK_BUFFER_FORMAT;
+		psoDesc.NumRenderTargets      = 1;
+		psoDesc.RTVFormats[0]         = BACK_BUFFER_FORMAT;
 
 		psoDesc.SampleDesc.Count   = 1;
 		psoDesc.SampleDesc.Quality = 0;
@@ -51,11 +51,11 @@ namespace MC { namespace PSOs {
 
 		ComPtr<ID3D12PipelineState> pPipelineState;
 
-		MCREGlobals::pMCDXGI->Get3DDevice()->CreateGraphicsPipelineState(
+		MCThrowIfFailed(MCREGlobals::pMCDXGI->Get3DDevice()->CreateGraphicsPipelineState(
 			&psoDesc,
 			__uuidof(pPipelineState),
 			&pPipelineState
-		);
+		));
 
 		pPipelineState->SetName(L"Default PSO");
 

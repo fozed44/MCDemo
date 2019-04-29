@@ -15,7 +15,9 @@ namespace MC {
 	MCFrameRenderer::MCFrameRenderer(const std::string& name, unsigned int frameIndex, MCRenderScene* pScene) 
 		: _name{ name },
 		  _frameIndex{ frameIndex },
-		  _aspectRatio{ 1.0f },
+		// todo:
+		// delete me
+		  //_aspectRatio{ 1.0f },
 		  _fov{ 0.25f * 3.14159f },
 		  _farPlane{ 1000.0f },
 		  _pScene{ pScene } {
@@ -40,7 +42,7 @@ namespace MC {
 
 		InitializeCommandObjects();
 		InitializeViewPort();
-
+		
 		INIT_TRACE("End initialization of renderer {0}.", _name);
 	}
 

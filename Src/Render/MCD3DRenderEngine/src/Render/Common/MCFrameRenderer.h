@@ -4,6 +4,7 @@
 #include "../../Core/MCD3D.h"
 #include "../../Render/Common/MCRenderItem.h"
 #include "../Common/MCRenderScene.h"
+#include "../../Core/MCRenderObjects.h"
 
 #include <string>
 
@@ -52,7 +53,10 @@ namespace MC {
 		ComPtr<ID3D12DescriptorHeap>      _CBVDescriptorHeap;
 
 		DirectX::XMFLOAT4X4               _projectionMatrix;
-		float                             _aspectRatio;
+
+		// TODO:
+		// delete me
+		//float                             _aspectRatio;
 		float                             _fov;
 		float                             _farPlane;
 
@@ -79,6 +83,7 @@ namespace MC {
 		/* Identifies this renderer. This is the value passed to the name parameter of the constructor. */
 		std::string _name;
 
+	protected:
 		/* Pointer to the render scene. */
 		MCRenderScene* _pScene;
 	};

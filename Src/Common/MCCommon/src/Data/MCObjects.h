@@ -56,7 +56,7 @@ namespace MC {
 	typedef enum class MCGEOMETRY_MESH_TYPE {
 		CUBE	= 0,
 		SPHERE  = 1
-	};
+	} MCGEOMETRY_MESH_TYPE;
 
 	struct MCGEOMETRY_MESH_DESC {
 		MCGEOMETRY_MESH_TYPE Type;

@@ -5,6 +5,7 @@
 #include "../../Core/MCD3D.h"
 #include "../../RootSignature/MCRootSignatureManager.h"
 #include "../../PipelineStateObject/MCPipelineStateObjectManager.h"
+#include "../../Core/MCRenderObjects.h"
 
 namespace MC {
 
@@ -12,10 +13,10 @@ namespace MC {
 	{
 	public: /* ctor */
 		MCRenderItem(
-			std::vector<std::unique_ptr<MCIMesh>> _meshes,
-			HShader        hShader,
-			HRootSignature hRootSignature,
-			HPipelineState hPipelineState
+			std::unique_ptr<MCIMesh> pMeshes,
+			HShader                  hShader,
+			HRootSignature           hRootSignature,
+			HPipelineState           hPipelineState
 		);
 
 		~MCRenderItem();
@@ -38,6 +39,7 @@ namespace MC {
 		HShader                               _hShader;
 		HRootSignature						  _hRootSignature;
 		HPipelineState						  _hPipelineState;
+		std::unique_ptr<MCUploadBuffer<ObjectConstants>> _pObjectConstantBuffer;
 	};
 
 }

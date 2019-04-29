@@ -5,7 +5,7 @@
 namespace MC { namespace Utilities {
 
 	template<typename tVertex, typename tIndex> 
-	void GenerateTestCube(
+	void GenerateCube(
 		float centerx, float centery, float centerz,
 		float width, float height, float depth,
 		tVertex *pVertDest, size_t vertDestSize,
