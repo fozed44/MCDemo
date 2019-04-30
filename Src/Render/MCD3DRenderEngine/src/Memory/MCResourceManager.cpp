@@ -184,4 +184,9 @@ namespace MC {
 
 		return unwrappedHandle.pResource;
 	}
+
+	void MCResourceManager::OnResizing() {
+		MCThrowIfFailed(_pCommandAllocator->Reset());
+		MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));
+	}
 }

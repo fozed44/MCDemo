@@ -45,6 +45,8 @@ namespace MC {
 		inline MC_RESULT CreateStaticBufferAsync(void *pInitData, size_t numBytes, HResource* pResult);
 		HResource CreateStaticBufferSync (void *pInitData, size_t numBytes, bool syncLoad);
 
+		void OnResizing();
+
 	private:
 		HResource CreateConstantBuffer(size_t sizeInBytes);
 		HResource CreateDefaultBuffer(void *pInitData, unsigned __int64 sizeInBytes);

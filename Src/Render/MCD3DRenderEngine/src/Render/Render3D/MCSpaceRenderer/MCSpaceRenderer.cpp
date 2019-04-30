@@ -56,6 +56,11 @@ namespace MC {
 		INIT_TRACE("Initialization complete for renderer {0}.", Name());
 	}
 
+	void MCSpaceRenderer::OnResizing() {
+		MCThrowIfFailed(_pCommandAllocator->Reset());
+		MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));
+	}
+
 #pragma endregion
 
 

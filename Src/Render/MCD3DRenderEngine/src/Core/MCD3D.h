@@ -214,9 +214,7 @@ namespace MC {
 		D3D12_CPU_DESCRIPTOR_HANDLE GetDepthStencilCPUHandle();
 		D3D12_GPU_DESCRIPTOR_HANDLE GetDepthStencilGPUHandle();
 
-		/*
-		Call to resize the swap chain buffers. Will release and restore resources.
-		*/
+		/*	Call to resize the swap chain buffers. Will release and restore resources. */
 		void Resize();
 
 	private:
@@ -262,7 +260,6 @@ namespace MC {
 		// calling GXGIWrapper.CreateConfiguredOrDefault3DDevice or if the MCDXGI
 		// goes out of scope, this pointer will be destroyed.
 		ID3D12Device *_pDevice;
-
 	};
 
 }

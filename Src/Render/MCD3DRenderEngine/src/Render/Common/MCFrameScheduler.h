@@ -49,6 +49,8 @@ namespace MC {
 		/* Call to force the renderers to re-acquire their render targets. The executers must be paused. */
 		void ReAcuireRenderTargets();
 
+		void OnResizing();
+
 	private: /* Queue and Present. */
 		/*	The Queue and Present methods are called by (directly or indirectly) by UpdateSchedule. These are
 		the methods that perform the per-game-loop frame scheduling logic. */

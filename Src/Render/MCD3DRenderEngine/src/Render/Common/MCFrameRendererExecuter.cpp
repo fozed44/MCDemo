@@ -122,6 +122,12 @@ namespace MC {
 		_pRenderer->AcquireRenderTargetInfo();
 	}
 
+	void MCFrameRendererExecuter::OnResizing() {
+		assert(_executionStage.load() == MCFRAME_RENDERER_EXECUTION_STAGE_SUSPENDED);
+
+		_pRenderer->OnResizing();
+	}
+
 #pragma endregion
 
 #pragma region Render Loop

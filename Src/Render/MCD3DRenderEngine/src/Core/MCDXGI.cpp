@@ -212,6 +212,8 @@ namespace MC {
 			&_p3DDevice
 		));
 
+		DUMP_LIVE_OBJECTS_DETAIL;
+
 		INIT_INFO("Device successfully created.");
 
 		MCSAFE_RELEASE(pAdapter);
@@ -347,4 +349,16 @@ namespace MC {
 		assert(_pAdapter);
 		_pAdapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, pMemoryInfo);
 	}
+
+#ifdef _DEBUG
+	void MCDXGI::DumpLiveObjects(D3D12_RLDO_FLAGS flags) {
+		if (!MCREGlobals::InitialConfiguration.DEBUG_ENABLE_DX_DEBUG)
+			return;
+
+		ID3D12DebugDevice* pDebugDevice;
+		MCThrowIfFailed(_p3DDevice->QueryInterface(__uuidof(pDebugDevice), (void**)&pDebugDevice));
+
+		pDebugDevice->ReportLiveDeviceObjects(flags);
+	}
+#endif _DEBUG
 }

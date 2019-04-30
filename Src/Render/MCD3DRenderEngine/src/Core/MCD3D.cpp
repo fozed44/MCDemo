@@ -892,6 +892,9 @@ MCD3D::MCD3D()  {
 	_currentFence = 0;
 
 	Init3DDevice();
+
+	DUMP_LIVE_OBJECTS_DETAIL;
+
 	InitFence();
 	InitCommandQueue();
 	InitCommandAllocator();
@@ -938,7 +941,7 @@ void MCD3D::InitCommandQueue() {
 		&_pCommandQueue
 	));
 
-	_pCommandQueue->SetName(L"Command Queue");
+	_pCommandQueue->SetName(L"MCD3D Command Queue");
 
 	INIT_TRACE("End d3d12 command queue init.");
 }
@@ -952,7 +955,7 @@ void MCD3D::InitCommandAllocator() {
 		&_pCommandAllocator
 	));
 
-	_pCommandAllocator->SetName(L"Command Allocator");
+	_pCommandAllocator->SetName(L"MCD3D Command Allocator");
 
 	INIT_TRACE("End d3d12 command allocator queue inti.");
 }
@@ -969,7 +972,7 @@ void MCD3D::InitCommandList() {
 		&_pCommandList
 	));
 
-	_pCommandList->SetName(L"Default command list");
+	_pCommandList->SetName(L"MCD3D command list");
 
 	// The command queue should begin in a closed state because the render loop
 	// will expect it to be in a closed state.
@@ -1006,6 +1009,8 @@ void MCD3D::InitDescriptorHeaps() {
 	rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	MCThrowIfFailed(_pDevice->CreateDescriptorHeap(&rtvHeapDesc, __uuidof(_pRTVDescriptorHeap), &_pRTVDescriptorHeap));
 	
+	_pRTVDescriptorHeap->SetName(L"MCD3D Render Target Descriptor Heap");
+
 	// Depth Stencil Buffer Descriptor Heap *************************
 
 	D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
@@ -1014,6 +1019,8 @@ void MCD3D::InitDescriptorHeaps() {
 	dsvHeapDesc.Type  = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 	dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	MCThrowIfFailed(_pDevice->CreateDescriptorHeap(&dsvHeapDesc, __uuidof(_pDSVDescriptorHeap), &_pDSVDescriptorHeap));
+
+	_pDSVDescriptorHeap->SetName(L"MCD3D Depth Stencil Descriptor Heap");
 
 	_RTVDescriptorSize = _pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	_DSVDescriptorSize = _pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
@@ -1081,7 +1088,7 @@ void MCD3D::InitDepthStencilBuffer() {
 		__uuidof(_pDepthStencil),
 		&_pDepthStencil
 	));
-		_pDepthStencil->SetName(L"Depth stencil");
+		_pDepthStencil->SetName(L"MCD3D Depth stencil");
 
 	INIT_TRACE("End init depth stencil buffer.");
 }
@@ -1261,12 +1268,12 @@ void MCD3D::Resize() {
 	FlushCommandQueue();
 
 	// Reset the command list.
-	MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));
+	MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));	
 
 	for (int i = 0; i < FRAME_BUFFER_COUNT; ++i)
 		_ppRenderTargets[i].Reset();
 
-	_pDepthStencil.Reset();
+	unsigned int dsReleased = _pDepthStencil.Reset();
 
 	MCREGlobals::pMCDXGI->ForceResize();
 

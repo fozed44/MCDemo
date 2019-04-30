@@ -75,6 +75,11 @@ namespace MC {
 			executer->ReAcquireRenderTarget();
 	}
 
+	void MCFrameScheduler::OnResizing() {
+		for (auto&& executer : _ppExecuters)
+			executer->OnResizing();
+	}
+
 #pragma endregion
 
 #pragma endregion Queue and Present

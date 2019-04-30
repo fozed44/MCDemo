@@ -30,11 +30,17 @@ namespace MC {
 	  _pMCD3D = std::make_unique<MCD3D>();
 	  MCREGlobals::pMCD3D = _pMCD3D.get();
 
+	  DUMP_LIVE_OBJECTS_DETAIL;
+
 	  _pResourceManager = std::make_unique<MCResourceManager>();
 	  MCREGlobals::pResourceManager = _pResourceManager.get();
 
+	  DUMP_LIVE_OBJECTS_DETAIL;
+
 	  _pShaderManager = std::make_unique<MCShaderManager>();
 	  MCREGlobals::pShaderManager = _pShaderManager.get();
+
+	  DUMP_LIVE_OBJECTS_DETAIL;
 
 	  _pPSOManager = std::make_unique<MCPipelineStateObjectManager>();
 	  MCREGlobals::pPSOManager = _pPSOManager.get();

@@ -57,6 +57,8 @@ namespace MC {
 		   after a resize. */
 		void ReAcquireRenderTarget();
 
+		void OnResizing();
+
 	public: /* query */
 
 		MCFRAME_RENDERER_EXECUTION_STAGE QueryExecutionStage() const {

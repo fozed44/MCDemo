@@ -36,6 +36,8 @@ namespace MC {
 		/* for debugging... delete later.*/
 		unsigned int FrameIndex() { return _frameIndex; }
 
+		virtual void OnResizing() = 0;
+
 	protected: /* D3D12 Objects */
 		unsigned int					  _frameIndex;
 		ID3D12Resource*					  _pRenderTarget;

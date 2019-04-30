@@ -19,6 +19,8 @@ namespace MC {
 		void PrepareCommandLists(MCFrame *pVframe) override;
 		unsigned __int64 ExecuteCommandLists() override;
 
+		void OnResizing() override;
+
 	public: /* Render options. */
 
 		// SetRenderOptions is not thread safe and must be synchronized.
