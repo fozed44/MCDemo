@@ -212,8 +212,6 @@ namespace MC {
 			&_p3DDevice
 		));
 
-		DUMP_LIVE_OBJECTS_DETAIL;
-
 		INIT_INFO("Device successfully created.");
 
 		MCSAFE_RELEASE(pAdapter);
@@ -264,7 +262,7 @@ namespace MC {
 			nullptr,
 			nullptr,
 			&swapChain
-		));
+		));		
 		
 		MCThrowIfFailed(swapChain.As(&_pSwapChain));
 

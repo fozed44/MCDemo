@@ -147,6 +147,8 @@ namespace MC {
 			if (_suspendFlag) {
 				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_SUSPENDED);
 
+				MCREGlobals::pMCD3D->WaitForFenceValue(_previousFrameFenceValue);
+
 				while (!_exitFlag && _suspendFlag)
 					std::this_thread::sleep_for(std::chrono::milliseconds(10));
 

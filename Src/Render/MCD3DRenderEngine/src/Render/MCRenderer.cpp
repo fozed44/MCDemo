@@ -35,7 +35,6 @@ namespace MC {
 			MCTHROW("Error suspending an executer.");
 		}
 
-		MCREGlobals::pResourceManager->OnResizing();
 		_pScheduler->OnResizing();
 
 		MCREGlobals::pMCD3D->Resize();

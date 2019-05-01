@@ -892,9 +892,6 @@ MCD3D::MCD3D()  {
 	_currentFence = 0;
 
 	Init3DDevice();
-
-	DUMP_LIVE_OBJECTS_DETAIL;
-
 	InitFence();
 	InitCommandQueue();
 	InitCommandAllocator();
@@ -1268,13 +1265,13 @@ void MCD3D::Resize() {
 	FlushCommandQueue();
 
 	// Reset the command list.
-	MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));	
+	MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));
 
 	for (int i = 0; i < FRAME_BUFFER_COUNT; ++i)
 		_ppRenderTargets[i].Reset();
 
 	unsigned int dsReleased = _pDepthStencil.Reset();
-
+	
 	MCREGlobals::pMCDXGI->ForceResize();
 
 	InitRenderTargets();

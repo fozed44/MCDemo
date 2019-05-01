@@ -59,6 +59,9 @@ namespace MC {
 	void MCSpaceRenderer::OnResizing() {
 		MCThrowIfFailed(_pCommandAllocator->Reset());
 		MCThrowIfFailed(_pCommandList->Reset(_pCommandAllocator.Get(), nullptr));
+		_pRenderTarget->Release();
+		_pRenderTarget = nullptr;
+		MCThrowIfFailed(_pCommandList->Close());
 	}
 
 #pragma endregion
