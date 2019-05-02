@@ -10,12 +10,12 @@
 namespace MC {
 
 	typedef enum MCFRAME_RENDERER_EXECUTION_STAGE {
-		MCFRAME_RENDERER_EXECUTION_STAGE_NO_THREAD      = 0,
-		MCFRAME_RENDERER_EXECUTION_STAGE_FRAME_ACCEPTED = 1,
-		MCFRAME_RENDERER_EXECUTION_STAGE_CPU_RENDERING  = 2,
-		MCFRAME_RENDERER_EXECUTION_STAGE_WAITING_ON_GPU = 3,
-		MCFRAME_RENDERER_EXECUTION_STAGE_IDLE           = 4,
-		MCFRAME_RENDERER_EXECUTION_STAGE_SUSPENDED      = 5
+		NO_THREAD      = 0,
+		FRAME_ACCEPTED = 1,
+		CPU_RENDERING  = 2,
+		WAITING_ON_GPU = 3,
+		IDLE           = 4,
+		SUSPENDED      = 5
 	} MCFRAME_RENDERER_EXECUTION_STAGE;
 
 	class MCFrameRendererExecuter {
@@ -91,8 +91,6 @@ namespace MC {
 		std::unique_ptr<MCFrame>   	       _pNextFrame;
 
 		unsigned __int64                   _previousFrameFenceValue;
-
-		MCCriticalSectionLock              _lock;
 	};
 
 }

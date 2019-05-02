@@ -12,7 +12,7 @@ namespace MC {
 
 	MCFrameRendererExecuter::MCFrameRendererExecuter(const std::string& name)
 		: _name{ name },
-		  _executionStage{ MCFRAME_RENDERER_EXECUTION_STAGE_NO_THREAD },
+		  _executionStage{ MCFRAME_RENDERER_EXECUTION_STAGE::NO_THREAD },
 		  _exitFlag{ false },
 		  _pThread{nullptr},
 		  _pRenderer{nullptr},
@@ -21,8 +21,6 @@ namespace MC {
 
 		// An executer should only be created on the main thread.
 		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
-
-		MCCriticalSection::InitializeLock(&_lock);
 	}
 
 	MCFrameRendererExecuter::~MCFrameRendererExecuter() {
@@ -42,7 +40,7 @@ namespace MC {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 
 
-		if (_executionStage.load() != MCFRAME_RENDERER_EXECUTION_STAGE_IDLE)
+		if (_executionStage.load() != MCFRAME_RENDERER_EXECUTION_STAGE::IDLE)
 			return MC_RESULT::FAIL_NOT_READY;
 
 		assert(pFrame);
@@ -50,7 +48,7 @@ namespace MC {
 
 		_pNextFrame.reset(pFrame);
 
-		_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_FRAME_ACCEPTED);
+		_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE::FRAME_ACCEPTED);
 
 		return MC_RESULT::OK;
 	}
@@ -81,7 +79,7 @@ namespace MC {
 		//	We need to add some error checking so that if the render thread is not suspended after
 		//  a certain amount of time, we return an error code.
 
-		while (_executionStage.load() != MCFRAME_RENDERER_EXECUTION_STAGE_SUSPENDED)
+		while (_executionStage.load() != MCFRAME_RENDERER_EXECUTION_STAGE::SUSPENDED)
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
 		return MC_RESULT::OK;
@@ -99,7 +97,7 @@ namespace MC {
 		RENDER_TRACE("Render Executer {0} is starting thread for renderer {1}", _name, _pRenderer->Name());
 
 		_exitFlag = false;
-		_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_IDLE);
+		_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE::IDLE);
 		_pThread = std::make_unique<std::thread>(&MCFrameRendererExecuter::RenderLoop, this);
 	}
 
@@ -113,17 +111,17 @@ namespace MC {
 		// We should always exit the render thread with the next frame having been destroyed.
 		assert(!_pNextFrame);
 
-		_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_NO_THREAD);
+		_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE::NO_THREAD);
 	}
 
 	void MCFrameRendererExecuter::ReAcquireRenderTarget() {
-		assert(_executionStage.load() == MCFRAME_RENDERER_EXECUTION_STAGE_SUSPENDED);
+		assert(_executionStage.load() == MCFRAME_RENDERER_EXECUTION_STAGE::SUSPENDED);
 
 		_pRenderer->AcquireRenderTargetInfo();
 	}
 
 	void MCFrameRendererExecuter::OnResizing() {
-		assert(_executionStage.load() == MCFRAME_RENDERER_EXECUTION_STAGE_SUSPENDED);
+		assert(_executionStage.load() == MCFRAME_RENDERER_EXECUTION_STAGE::SUSPENDED);
 
 		_pRenderer->OnResizing();
 	}
@@ -145,21 +143,21 @@ namespace MC {
 
 		while (!_exitFlag) {
 			if (_suspendFlag) {
-				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_SUSPENDED);
+				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE::SUSPENDED);
 
 				MCREGlobals::pMCD3D->WaitForFenceValue(_previousFrameFenceValue);
 
 				while (!_exitFlag && _suspendFlag)
 					std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
-				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_IDLE);
+				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE::IDLE);
 			}
-			if (_executionStage.load() == MCFRAME_RENDERER_EXECUTION_STAGE_FRAME_ACCEPTED) {
+			if (_executionStage.load() == MCFRAME_RENDERER_EXECUTION_STAGE::FRAME_ACCEPTED) {
 				
-				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_WAITING_ON_GPU);
+				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE::WAITING_ON_GPU);
 					MCREGlobals::pMCD3D->WaitForFenceValue(_previousFrameFenceValue);
 				
-				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_CPU_RENDERING);
+				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE::CPU_RENDERING);
 					auto _pCurrentFrame = std::move(_pNextFrame);
 					_pRenderer->PrepareCommandLists(_pCurrentFrame.release());
 
@@ -171,7 +169,7 @@ namespace MC {
 
 					_previousFrameFenceValue = MCREGlobals::pMCD3D->GetNewFenceValue();
 
-				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE_IDLE);
+				_executionStage.store(MCFRAME_RENDERER_EXECUTION_STAGE::IDLE);
 			}
 		}
 

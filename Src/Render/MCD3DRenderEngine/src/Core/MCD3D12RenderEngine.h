@@ -54,16 +54,16 @@ namespace MC {
 
 		/* Set the render state. */
 		void SetRenderState(MC_RENDER_STATE renderState);
-	private: /* Private Members */
-		std::unique_ptr<MCRenderer>                   _pRenderer;
 	private: /* Instances that will be copied to MCREGlobals */
 		std::unique_ptr<MCRenderWindow>               _pRenderWindow;
+		std::unique_ptr<MCDXGI>                       _pMCDXGI;
 		std::unique_ptr<MCResourceManager>            _pResourceManager;
 		std::unique_ptr<MCShaderManager>              _pShaderManager;
 		std::unique_ptr<MCPipelineStateObjectManager> _pPSOManager;
 		std::unique_ptr<MCRootSignatureManager>       _pRSManager;
-		std::unique_ptr<MCDXGI>                       _pMCDXGI;
 		std::unique_ptr<MCD3D>                        _pMCD3D;
+	private: /* Private Members */
+		std::unique_ptr<MCRenderer>                   _pRenderer;
 	};
   
 }

@@ -14,7 +14,6 @@ namespace MC {
 
 		for(unsigned int x = 0; x < FRAME_BUFFER_COUNT; ++x)
 			_ppExecuters[x] = std::make_unique<MCFrameRendererExecuter>(std::string("Frame executer (") + std::to_string(x) + std::string(")"));
-		MCCriticalSection::InitializeLock(&_lock);
 	}
 
 
@@ -48,14 +47,14 @@ namespace MC {
 			for (unsigned int x = 0; x < FRAME_BUFFER_COUNT; ++x) {
 				// If this assertion fires, make sure that the executer has had its renderers released.
 				// This can be accomplished by calling this method with pRenderer == nullptr.
-				assert(_ppExecuters[x]->QueryExecutionStage() == MCFRAME_RENDERER_EXECUTION_STAGE_NO_THREAD);
+				assert(_ppExecuters[x]->QueryExecutionStage() == MCFRAME_RENDERER_EXECUTION_STAGE::NO_THREAD);
 				_ppExecuters[x]->SetFrameRenderer(std::unique_ptr<MCFrameRenderer>(ppRenderers[x]));
 			}
 		}
 	}
 
 	MC_RESULT MCFrameScheduler::SuspendSync() {
-		for (auto&& executer : _ppExecuters) {
+		for (auto& executer : _ppExecuters) {
 			auto result = executer->SuspendSync();
 
 			if (result != MC_RESULT::OK)
@@ -66,18 +65,26 @@ namespace MC {
 	}
 
 	void MCFrameScheduler::Unsuspend() {
-		for (auto&& executer : _ppExecuters)
+		for (auto& executer : _ppExecuters)
 			executer->Unsuspend();
 	}
 
 	void MCFrameScheduler::ReAcuireRenderTargets() {
-		for (auto&& executer : _ppExecuters)
+		for (auto& executer : _ppExecuters)
 			executer->ReAcquireRenderTarget();
 	}
 
 	void MCFrameScheduler::OnResizing() {
-		for (auto&& executer : _ppExecuters)
+		for (auto& executer : _ppExecuters)
 			executer->OnResizing();
+
+		/* Resizing causes the MCD3D to make a call to ID3D12SwapChain->ResizeBuffers. This call resets the current back-buffer,
+		   and in in turn, the next result of MCDXGI->GetCurrentBackBufferIndex will be 0. Since DX12 thinks the next buffer that
+		   will need to be rendered is back-buffer 0, AND since _ppExecuters[0] will always render to back buffer 0, we need to
+		   make sure that when the scheduler is un-suspended (we must be suspended if we are currently resizing) is starts back
+		   up on the correct back buffer index.
+		*/
+		_nextExecuterIndex = 0;
 	}
 
 #pragma endregion
@@ -87,7 +94,7 @@ namespace MC {
 	void MCFrameScheduler::TryQueueNextFrame() {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 		
-		if (_ppExecuters[_nextExecuterIndex]->QueryExecutionStage() != MCFRAME_RENDERER_EXECUTION_STAGE_IDLE
+		if (_ppExecuters[_nextExecuterIndex]->QueryExecutionStage() != MCFRAME_RENDERER_EXECUTION_STAGE::IDLE
 	     || _frameQueue.empty())
 			return;
 		

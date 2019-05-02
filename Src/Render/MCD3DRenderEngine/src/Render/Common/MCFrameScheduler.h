@@ -70,9 +70,6 @@ namespace MC {
 		std::queue<std::unique_ptr<MCFrame>>     _frameQueue;
 
 		unsigned int                             _nextExecuterIndex;
-		
-		MCCriticalSectionLock                    _lock;
-
 	};
 
 }

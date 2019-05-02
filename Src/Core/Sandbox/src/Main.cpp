@@ -120,7 +120,6 @@ int Sandbox() {
 	MSG msg = {};
 	
 	__int64 frameCount = 1;
-	
 	const __int64 frameCountBufferSize = 50;
 	float frameCountBuffer[frameCountBufferSize];
 

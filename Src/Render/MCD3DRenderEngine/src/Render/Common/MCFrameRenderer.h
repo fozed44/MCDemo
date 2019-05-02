@@ -40,7 +40,7 @@ namespace MC {
 
 	protected: /* D3D12 Objects */
 		unsigned int					  _frameIndex;
-		ID3D12Resource*					  _pRenderTarget;
+		ID3D12Resource*     			  _pRenderTarget;
 		ID3D12Resource*                   _pDepthStencil;
 
 		D3D12_CPU_DESCRIPTOR_HANDLE		  _hCPURenderTarget;
