@@ -28,28 +28,40 @@ namespace MC {
 		MCResourceManager& operator= (MCResourceManager&&) = delete;
 		~MCResourceManager() {}
 	public:
-		/*
-			The Instance method is required because the MCManagedKeyedHandleManager base class requires it.
-		*/
-		static MCResourceManager* Instance() {
-			return MCREGlobals::pResourceManager;
-		}
+		/* The Instance method is required because the MCManagedKeyedHandleManager base class requires it. */
+		static MCResourceManager* Instance() { return MCREGlobals::pResourceManager; }
 	public:
-		MC_RESULT GetResource(const MCResourceManager::HandleType& handle, ID3D12Resource** ppResource) const;
-		MC_RESULT GetResourceSync(MCResourceManager::HandleType& handle, ID3D12Resource **pResource);
+		/* GetResource attempts to get the resource pointed to by the given handle. The method can fail
+		   if the resource has not completed loading. */
+		MC_RESULT GetResource(const HResource& handle, ID3D12Resource **ppResource) const;
+		MC_RESULT GetResource(      HResource& handle, ID3D12Resource **pResource);
+
+		/* GetResourceSync attempts to et the resource pointed to by the given handle. The method call
+		   will block if the resource has not been loaded. */
+		MC_RESULT       GetResourceSync(MCResourceManager::HandleType& handle, ID3D12Resource **pResource);
 		ID3D12Resource *GetResourceSync(MCResourceManager::HandleType& handle);
 		
 
-		//MCResourceHandle CreateResource(MC_RESOURCE_MANAGER_RESOURCE_TYPE, size_t sizeInBytes);
-		
-		inline MC_RESULT CreateStaticBufferAsync(void *pInitData, size_t numBytes, HResource* pResult);
-		HResource CreateStaticBufferSync (void *pInitData, size_t numBytes, bool syncLoad);
+		MC_RESULT CreateStaticBufferAsync(void *pInitData, size_t numBytes, HResource* pResult);
+		HResource CreateStaticBufferSync (void *pInitData, size_t numBytes, bool       syncLoad);
 
-		void OnResizing();
+		MC_RESULT CreateDynamicBufferAsync(void *pInitData, size_t numBytes, HResource* pResult);
+		HResource CreateDynamicBufferSync (void *pInitData, size_t numBytes, bool       syncLoad);
+
+		MC_RESULT CreateDynamicConstantBufferAsync(void *pInitData, size_t numBytes, HResource* pResult);
+		HResource CreateDynamicConstantBufferSync (void *pInitData, size_t numBytes, bool       syncLoad);
+
+		MC_RESULT CreateStaticConstantBufferAsync(void *pInitData, size_t numBytes, HResource* pResult);
+		HResource CreateStaticConstantBufferSync (void *pInitData, size_t numBytes, bool       syncLoad);
+
+		MC_RESULT MapDynamicByfferAsync(HResource& handle, void *pData, size_t numBytes);
+		void      MapDynamicByfferSync (HResource& handle, void *pData, size_t numBytes);		
 
 	private:
+		size_t CalculateConstantBufferSize(size_t size) const;
+
 		HResource CreateConstantBuffer(size_t sizeInBytes);
-		HResource CreateDefaultBuffer(void *pInitData, unsigned __int64 sizeInBytes);
+		HResource CreateDefaultBuffer (void *pInitData, unsigned __int64 sizeInBytes);
 	private:
 		ComPtr<ID3D12CommandAllocator>     _pCommandAllocator;
 		ComPtr<ID3D12GraphicsCommandList>  _pCommandList;
@@ -59,4 +71,6 @@ namespace MC {
 		                                                       // being double accessed from two consecutive
 															   // CreateBuffer calls.
 	};
+
+	using HResource = MCResourceManager::HResource;
 }

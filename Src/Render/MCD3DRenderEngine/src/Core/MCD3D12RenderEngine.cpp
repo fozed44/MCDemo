@@ -66,7 +66,7 @@ namespace MC {
   }
 
   MCRENDER_ITEM_HANDLE MCD3D12RenderEngine::LoadGeometry(const MCGEOMETRY_MESH_DESC& desc) {
-	  return _pRenderer->GetSceneLoader()->LoadGeometry<MCVertex1Color, DXGI_FORMAT_R16_UINT>(desc);
+	  return _pRenderer->GetSceneLoader()->LoadGeometry<MCVertex1Color, DXGI_FORMAT_R32_UINT>(desc);
   }
 
 #pragma endregion

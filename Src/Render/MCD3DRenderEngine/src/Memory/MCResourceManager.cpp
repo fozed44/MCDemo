@@ -150,6 +150,18 @@ namespace MC {
 
 #pragma endregion
 
+#pragma region dynamic buffer
+
+	MC_RESULT MCResourceManager::CreateDynamicBufferAsync(void *pInitData, size_t numBytes, HResource* pResult) {
+
+	}
+
+	HResource MCResourceManager::CreateDynamicBufferSync(void *pInitData, size_t numBytes) {
+
+	}
+
+#pragma endregion
+
 	MC_RESULT MCResourceManager::GetResource(const HResource& handle, ID3D12Resource **ppResource) const {
 		auto unwrappedHandle = UnwrapHandle(handle);
 
@@ -183,5 +195,21 @@ namespace MC {
 		}
 
 		return unwrappedHandle.pResource;
+	}
+
+	size_t MCResourceManager::CalculateConstantBufferSize(size_t size) const {
+		/*
+		Constant buffers must be a multiple of the minimum hardware allocation size (usually 256 bytes),
+		So round up to the nearest multiple of 256. We do this by adding 255 and then masking off the lower
+		byte which stores all bits < 256
+
+		Example: Suppose a byte size of 300:
+		(300 + 255) & ~0x000000ff
+		(555) & 0xFFFFFF00
+		0x0000022B & 0xFFFFFF00 =
+		0x00000200 = 512
+
+		*/
+		return (size + 255) & ~255;
 	}
 }

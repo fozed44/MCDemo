@@ -7,8 +7,8 @@
 namespace MC { namespace Utilities {
 	
 	template<typename tVertex>
-	int GetIndexByPosition(const std::vector<tVertex> *pVerts, const DirectX::XMFLOAT3 *pLocation) {
-		for (int x = 0; x < (int)pVerts->size(); ++x) {
+	__int64 GetIndexByPosition(const std::vector<tVertex> *pVerts, const DirectX::XMFLOAT3 *pLocation) {
+		for (__int64 x = 0; x < (__int64)pVerts->size(); ++x) {
 			auto currentPosition = (*pVerts)[x].Position;
 			if(MC::MCMath::Abs(pLocation->x - currentPosition.x) < 0.001
 			&& MC::MCMath::Abs(pLocation->y - currentPosition.y) < 0.001
@@ -24,10 +24,10 @@ namespace MC { namespace Utilities {
 		std::vector<tVertex> tempVerts;
 		std::vector<tIndex>  tempIndicies;
 	
-		for (int i = 0; i < (int)pVerts->size(); ++i)
+		for (tIndex i = 0; i < (tIndex)pVerts->size(); ++i)
 			tempVerts.push_back((*pVerts)[i]);
 	
-		for (int i = 0; i < (int)pIndicies->size(); ++i)
+		for (tIndex i = 0; i < (tIndex)pIndicies->size(); ++i)
 			tempIndicies.push_back((*pIndicies)[i]);
 	
 		pVerts->clear();
@@ -43,8 +43,8 @@ namespace MC { namespace Utilities {
 		// *-----*-----*
 		// v0    m2     v2
 
-		UINT32 numTris = (UINT32)tempIndicies.size() / 3;
-		for (UINT32 i = 0; i < numTris; ++i)
+		tIndex numTris = (tIndex)tempIndicies.size() / 3;
+		for (tIndex i = 0; i < numTris; ++i)
 		{
 			tVertex v0 = (tempVerts)[(tempIndicies)[i * 3 + 0]];
 			tVertex v1 = (tempVerts)[(tempIndicies)[i * 3 + 1]];
@@ -96,12 +96,12 @@ namespace MC { namespace Utilities {
 			//
 			// Add new geometry.
 			//
-			uint16_t i0, i1, i2, i3, i4, i5;
-			int index;
+			tIndex i0, i1, i2, i3, i4, i5;
+			__int64 index;
 			
 			index = GetIndexByPosition(pVerts, &(v0.Position));
 			if (index == -1) {
-				i0 = (uint16_t)pVerts->size();
+				i0 = (tIndex)pVerts->size();
 				pVerts->push_back(v0);
 			}
 			else {
@@ -110,7 +110,7 @@ namespace MC { namespace Utilities {
 
 			index = GetIndexByPosition(pVerts, &(v1.Position));
 			if (index == -1) {
-				i1 = (uint16_t)pVerts->size();
+				i1 = (tIndex)pVerts->size();
 				pVerts->push_back(v1);
 			}
 			else {
@@ -119,7 +119,7 @@ namespace MC { namespace Utilities {
 
 			index = GetIndexByPosition(pVerts, &(v2.Position));
 			if (index == -1) {
-				i2 = (uint16_t)pVerts->size();
+				i2 = (tIndex)pVerts->size();
 				pVerts->push_back(v2);
 			}
 			else {
@@ -128,7 +128,7 @@ namespace MC { namespace Utilities {
 
 			index = GetIndexByPosition(pVerts, &(m0.Position));
 			if (index == -1) {
-				i3 = (uint16_t)pVerts->size();
+				i3 = (tIndex)pVerts->size();
 				pVerts->push_back(m0);
 			}
 			else {
@@ -137,7 +137,7 @@ namespace MC { namespace Utilities {
 
 			index = GetIndexByPosition(pVerts, &(m1.Position));
 			if (index == -1) {
-				i4 = (uint16_t)pVerts->size();
+				i4 = (tIndex)pVerts->size();
 				pVerts->push_back(m1);
 			}
 			else {
@@ -146,7 +146,7 @@ namespace MC { namespace Utilities {
 
 			index = GetIndexByPosition(pVerts, &(m2.Position));
 			if (index == -1) {
-				i5 = (uint16_t)pVerts->size();
+				i5 = (tIndex)pVerts->size();
 				pVerts->push_back(m2);
 			}
 			else {
@@ -212,7 +212,7 @@ namespace MC { namespace Utilities {
 		for (unsigned int i = 0; i < numSubdivisions; ++i) {
 			Subdivide(pVertDest, pIndDest);
 			if (i < 3) {
-				for (int x = 0; x < (int)pVertDest->size(); ++x) {
+				for (tIndex x = 0; x < (tIndex)pVertDest->size(); ++x) {
 					(*pVertDest)[x].Color.x = MC::MCMath::RandF();
 					(*pVertDest)[x].Color.y = MC::MCMath::RandF();
 					(*pVertDest)[x].Color.z = MC::MCMath::RandF();
@@ -221,7 +221,7 @@ namespace MC { namespace Utilities {
 			}
 		}
 
-		for (int i = 0; i < (int)pVertDest->size(); ++i) {
+		for (tIndex i = 0; i < (tIndex)pVertDest->size(); ++i) {
 
 			DirectX::XMVECTOR n = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&(*pVertDest)[i].Position));
 			DirectX::XMFLOAT3 r;
