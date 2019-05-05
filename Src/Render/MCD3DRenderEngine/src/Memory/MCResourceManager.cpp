@@ -152,13 +152,31 @@ namespace MC {
 
 #pragma region dynamic buffer
 
-	MC_RESULT MCResourceManager::CreateDynamicBufferAsync(void *pInitData, size_t numBytes, HResource* pResult) {
+	//MC_RESULT MCResourceManager::CreateDynamicBufferAsync(void *pInitData, size_t numBytes, HResource* pResult) {
+	//	MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 
-	}
+	//	// At this point we need to make sure that the GPU is done using the upload buffer
+	//	// from another create call.
+	//	if (MCREGlobals::pMCD3D->GetCurrentFenceValue() < _uploadBufferFence)
+	//		return MC_RESULT::FAIL_UPLOADING;
 
-	HResource MCResourceManager::CreateDynamicBufferSync(void *pInitData, size_t numBytes) {
+	//	// AlignSize aligns the buffer size to hardware dependent size.
+	//	auto alignedSize = CalculateConstantBufferSize(numBytes);
 
-	}
+	//	MCThrowIfFailed(MCREGlobals::pMCDXGI->Get3DDevice()->CreateCommittedResource(
+	//		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+	//		D3D12_HEAP_FLAG_NONE,
+	//		&CD3DX12_RESOURCE_DESC::Buffer(alignedSize),
+	//		D3D12_RESOURCE_STATE_GENERIC_READ,
+	//		nullptr,
+	//		__uuidof(_pUploadBuffer),
+	//		&_pUploadBuffer
+	//	))
+	//}
+
+	//HResource MCResourceManager::CreateDynamicBufferSync(void *pInitData, size_t numBytes) {
+
+	//}
 
 #pragma endregion
 

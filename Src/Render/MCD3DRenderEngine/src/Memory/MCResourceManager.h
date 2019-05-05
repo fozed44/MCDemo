@@ -45,7 +45,7 @@ namespace MC {
 		MC_RESULT CreateStaticBufferAsync(void *pInitData, size_t numBytes, HResource* pResult);
 		HResource CreateStaticBufferSync (void *pInitData, size_t numBytes, bool       syncLoad);
 
-		MC_RESULT CreateDynamicBufferAsync(void *pInitData, size_t numBytes, HResource* pResult);
+		/*MC_RESULT CreateDynamicBufferAsync(void *pInitData, size_t numBytes, HResource* pResult);
 		HResource CreateDynamicBufferSync (void *pInitData, size_t numBytes, bool       syncLoad);
 
 		MC_RESULT CreateDynamicConstantBufferAsync(void *pInitData, size_t numBytes, HResource* pResult);
@@ -55,7 +55,7 @@ namespace MC {
 		HResource CreateStaticConstantBufferSync (void *pInitData, size_t numBytes, bool       syncLoad);
 
 		MC_RESULT MapDynamicByfferAsync(HResource& handle, void *pData, size_t numBytes);
-		void      MapDynamicByfferSync (HResource& handle, void *pData, size_t numBytes);		
+		void      MapDynamicByfferSync (HResource& handle, void *pData, size_t numBytes);	*/	
 
 	private:
 		size_t CalculateConstantBufferSize(size_t size) const;

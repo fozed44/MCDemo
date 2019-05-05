@@ -41,7 +41,7 @@ namespace MC {
 		unsigned int freeSpace() {
 			return _emptyCount;
 		}
-		int add(const T_& a) {
+		MCLinearBufferAddress add(const T_& a) {
 			assert(_emptyCount); // emptyCount cannot be zero.
 			MCLinearBufferAddress pos = getNextEmptyElement();
 			if (pos < 0)
