@@ -80,22 +80,19 @@ namespace TMCCommon
 
 			more = test.pop(&result);
 
-			// We have only read the first element, since there is more data, more should be true.
+			// We have only read the first element, since this is not the last element, more should be true.
 			Assert::IsTrue(more);
 
 			more = test.pop(&result);
 
-			// There is no more data... more should be false.
-			Assert::IsFalse(more);
+			// This is still not the last element, more should still not be false.
+			Assert::IsTrue(more);
 
-			try {
-				// Now we should throw.
-				test.pop(&result);
-			}
-			catch (...) {
-				exceptionThrown = true;
-			}
-			Assert::IsTrue(exceptionThrown);
+			// There should be no more elements left.
+			more = test.pop(&result);
+
+			// So more should now be false.
+			Assert::IsFalse(exceptionThrown);
 		}
 	};
 }

@@ -105,7 +105,7 @@ namespace MC { namespace Utilities {
 				pVerts->push_back(v0);
 			}
 			else {
-				i0 = index;
+				i0 = static_cast<tIndex>(index);
 			}
 
 			index = GetIndexByPosition(pVerts, &(v1.Position));
@@ -114,7 +114,7 @@ namespace MC { namespace Utilities {
 				pVerts->push_back(v1);
 			}
 			else {
-				i1 = index;
+				i1 = static_cast<tIndex>(index);
 			}
 
 			index = GetIndexByPosition(pVerts, &(v2.Position));
@@ -123,7 +123,7 @@ namespace MC { namespace Utilities {
 				pVerts->push_back(v2);
 			}
 			else {
-				i2 = index;
+				i2 = static_cast<tIndex>(index);
 			}
 
 			index = GetIndexByPosition(pVerts, &(m0.Position));
@@ -132,7 +132,7 @@ namespace MC { namespace Utilities {
 				pVerts->push_back(m0);
 			}
 			else {
-				i3 = index;
+				i3 = static_cast<tIndex>(index);
 			}
 
 			index = GetIndexByPosition(pVerts, &(m1.Position));
@@ -141,7 +141,7 @@ namespace MC { namespace Utilities {
 				pVerts->push_back(m1);
 			}
 			else {
-				i4 = index;
+				i4 = static_cast<tIndex>(index);
 			}
 
 			index = GetIndexByPosition(pVerts, &(m2.Position));
@@ -150,7 +150,7 @@ namespace MC { namespace Utilities {
 				pVerts->push_back(m2);
 			}
 			else {
-				i5 = index;
+				i5 = static_cast<tIndex>(index);
 			}
 
 

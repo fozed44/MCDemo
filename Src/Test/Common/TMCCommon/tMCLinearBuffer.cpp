@@ -89,7 +89,7 @@ namespace TMCCommon
 			MCLinearBuffer<LinearBufferTestType, 1> testBuffer;
 			int pos;
 
-			pos = testBuffer.add({ 1,1, });
+			pos = testBuffer.add({ 1,1 });
 
 			Assert::AreEqual(1u, LinearBufferTestType::GetTotalAllocations());
 			Assert::AreEqual(0, pos);
@@ -103,7 +103,7 @@ namespace TMCCommon
 
 			Assert::AreEqual(0u, LinearBufferTestType::GetTotalAllocations());
 
-			pos = testBuffer.add({ 1,1, });
+			pos = testBuffer.add({ 1,1 });
 
 			Assert::AreEqual(1u, LinearBufferTestType::GetTotalAllocations());
 			Assert::AreEqual(0, pos);

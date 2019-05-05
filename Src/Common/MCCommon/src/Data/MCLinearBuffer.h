@@ -3,21 +3,22 @@
 #include "stdlib.h"
 #include "stdio.h"
 #include "assert.h"
+#include "shared_mutex"
 
 namespace MC {
-
+		
 	typedef int MCLinearBufferAddress;
 
-	template <typename T_, unsigned int N = 10>
+	template <typename T_, unsigned int N>
 	class MCLinearBuffer {
 	private:
-		enum MC_LINEAR_BUFFER_ELEMENT_FLAGS {
-			MC_LINEAR_BUFFER_ELEMENT_FLAGS_FREE = 0,
+		enum MC_LINEAR_BUFFER_ELEMENT_FLAGS : unsigned int {
+			MC_LINEAR_BUFFER_ELEMENT_FLAGS_FREE      = 0,
 			MC_LINEAR_BUFFER_ELEMENT_FLAGS_ALLOCATED = 1
 		};
 		struct MCLinearBufferElement {
 			unsigned int Flags;
-			T_ Payload; 
+			T_           Payload; 
 		};
 	public:
 		MCLinearBuffer()
@@ -26,6 +27,7 @@ namespace MC {
 			_pBuffer = static_cast<MCLinearBufferElement*>(malloc(sizeof(MCLinearBufferElement) * N));
 			memset(_pBuffer, 0, sizeof(MCLinearBufferElement) * N);
 		}
+		
 		~MCLinearBuffer() {
 			if (_pBuffer) {
 				for (int x = 0; x < N; ++x)
@@ -41,16 +43,25 @@ namespace MC {
 		unsigned int freeSpace() {
 			return _emptyCount;
 		}
-		MCLinearBufferAddress add(const T_& a) {
-			assert(_emptyCount); // emptyCount cannot be zero.
+		MCLinearBufferAddress add(const T_& a) {			
+			if (!_emptyCount)
+				return MCLinearBuffer::InvalidAddress;
+				
 			MCLinearBufferAddress pos = getNextEmptyElement();
+
 			if (pos < 0)
 				return pos;
+			
 			MCLinearBufferElement* ptr = &_pBuffer[pos];
-			ptr->Flags |= MC_LINEAR_BUFFER_ELEMENT_FLAGS_ALLOCATED;
+			
+			ptr->Flags  |= MC_LINEAR_BUFFER_ELEMENT_FLAGS_ALLOCATED;
 			ptr->Payload = a;
 
 			_emptyCount--;
+
+			assert(_emptyCount >= 0); // Ensure that _emptyCount >= 0 multi-threading
+									  // could cause an issue if the calling code is 
+									  // not careful.
 
 			return pos;
 		}
@@ -60,7 +71,12 @@ namespace MC {
 			
 			if (!(ptr->Flags & MC_LINEAR_BUFFER_ELEMENT_FLAGS_ALLOCATED)) {
 				_emptyCount--;
-				ptr->Flags |= MC_LINER_BUFFER_ELEMENT_FLAGS_ALLOCATED;
+
+				assert(_emptyCount >= 0); // Ensure that _emptyCount >= 0 multi-threading
+										  // could cause an issue if the calling code is 
+										  // not careful.
+
+				ptr->Flags |= MC_LINEAR_BUFFER_ELEMENT_FLAGS_ALLOCATED;
 			}
 			ptr->Payload = a;
 		}
@@ -73,16 +89,31 @@ namespace MC {
 				return;
 
 			ptr->Payload.~T_();
+			ptr->Flags = MC_LINEAR_BUFFER_ELEMENT_FLAGS_FREE;
 
-			memset(ptr, 0, sizeof(MCLinearBufferElement));
+#ifdef _DEBUG
+			char* chPtr = reinterpret_cast<char*>(ptr);
+			chPtr += sizeof(MCLinearBufferElement::Flags);
+			memset(chPtr, 0xAB, (sizeof(MCLinearBufferElement) - sizeof(MCLinearBufferElement::Flags)));
+#endif _DEBUG
 
 			_emptyCount++;
 		}
 		void clear() {
-			for (MCLinearBufferAddress x = 0; x < N; ++x)
-				if (_pBuffer[x].Flags & MC_LINEAR_BUFFER_ELEMENT_FLAGS_ALLOCATED)
-					_pBuffer[x].Payload.~T_();
-			memset(_pBuffer, 0, sizeof(MCLinearBufferElement) * N);
+			for (MCLinearBufferAddress x = 0; x < N; ++x) {
+				if (_pBuffer[x].Flags & MC_LINEAR_BUFFER_ELEMENT_FLAGS_ALLOCATED) {
+					MCLinearBufferElement* ptr = &_pBuffer[index];
+
+					ptr->Payload.~T_();
+					ptr->Flags = MC_LINEAR_BUFFER_ELEMENT_FLAGS_FREE;
+
+#ifdef _DEBUG
+					char* chPtr = reinterpret_cast<char*>(ptr);
+					chPtr += sizeof(MCLinearBufferElement::Flags);
+					memset(chPtr, 0xAB, (sizeof(MCLinearBufferElement) - sizeof(MCLinearBufferElement::Flags)));
+#endif _DEBUG
+				}
+			}
 			_emptyCount = N;
 		}
 		const T_* get(MCLinearBufferAddress index) const {
@@ -108,9 +139,9 @@ namespace MC {
 		MCLinearBufferAddress find(const T_& obj) {
 			MCLinearBufferElement *pCurrent;
 			for (MCLinearBufferAddress x = 0; x < N; ++x) {
-				pCurrent = _pBuffer[x];
-				if (pCurrent.Flags & MC_LINEAR_BUFFER_ELEMENT_FLAGS_ALLOCATED
-					&& pCurrent.Payload == obj)
+				pCurrent = &_pBuffer[x];
+				if (pCurrent->Flags & MC_LINEAR_BUFFER_ELEMENT_FLAGS_ALLOCATED
+			     && pCurrent->Payload == obj)
 					return x;
 			}
 			return MCLinearBuffer::InvalidAddress;
@@ -125,7 +156,7 @@ namespace MC {
 			return MCLinearBuffer::InvalidAddress;
 		}
 		MCLinearBufferElement *_pBuffer;
-		size_t _emptyCount;
+		size_t                 _emptyCount;	
 	};
 
 }

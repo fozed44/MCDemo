@@ -91,6 +91,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>false</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <PostBuildEvent>
       <Command>copy $(SolutionDir)Build\$(Platform)\$(Configuration)\*.* $(SolutionDir)bin\
@@ -103,6 +104,7 @@ copy $(SolutionDir)config\*.* $(SolutionDir)bin\Config\*.*</Command>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>false</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <PostBuildEvent>
       <Command>copy $(SolutionDir)Build\$(Platform)\$(Configuration)\*.* $(SolutionDir)bin\
@@ -117,6 +119,7 @@ copy $(SolutionDir)config\*.* $(SolutionDir)bin\Config\*.*</Command>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>false</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -135,6 +138,7 @@ copy $(SolutionDir)config\*.* $(SolutionDir)bin\Config\*.*</Command>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>false</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

@@ -24,7 +24,7 @@ namespace TMCCommon {
 
 			MC_CONSOLE_COMMAND cmd;
 
-			char *testCommand = "wire-frame";
+			char *testCommand = "WIREFRAME";
 
 			auto mcResult = parser.Parse(testCommand, strlen(testCommand), &cmd);
 
@@ -39,7 +39,7 @@ namespace TMCCommon {
 
 			MC_CONSOLE_COMMAND cmd;
 
-			char *testCommand = "wire-frame testArg";
+			char *testCommand = "WIREFRAME testArg";
 
 			auto mcResult = parser.Parse(testCommand, strlen(testCommand), &cmd);
 
@@ -57,7 +57,7 @@ namespace TMCCommon {
 
 			MC_CONSOLE_COMMAND cmd;
 
-			char *testCommand = "wire-frame testArg1 testArg2";
+			char *testCommand = "WIREFRAME testArg1 testArg2";
 
 			auto mcResult = parser.Parse(testCommand, strlen(testCommand), &cmd);
 
@@ -152,7 +152,7 @@ namespace TMCCommon {
 
 			MC_CONSOLE_COMMAND cmd;
 
-			char *testCommand = "  wire-frame testArg1 testArg2  ";
+			char *testCommand = "  WIREFRAME testArg1 testArg2  ";
 
 			auto mcResult = parser.Parse(testCommand, strlen(testCommand), &cmd);
 
@@ -172,7 +172,7 @@ namespace TMCCommon {
 
 			MC_CONSOLE_COMMAND cmd;
 
-			char *testCommand = "  wire-frame testArg1   testArg2  ";
+			char *testCommand = "  WIREFRAME testArg1   testArg2  ";
 
 			auto mcResult = parser.Parse(testCommand, strlen(testCommand), &cmd);
 

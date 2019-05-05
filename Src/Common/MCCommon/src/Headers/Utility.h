@@ -11,20 +11,40 @@
 	As better places for these items become available, it may be better to move them.
 */
 
+#define __USE_2017__
+
 inline std::wstring s2ws(const std::string& str)
 {
+#ifdef __USE_2017__
+	std::wstring result;
+
+	for (auto x : str)
+		result += (char)x;
+
+	return result;
+#else
 	using convert_typeX = std::codecvt_utf8<wchar_t>;
 	std::wstring_convert<convert_typeX, wchar_t> converterX;
 
 	return converterX.from_bytes(str);
+#endif
 }
 
 inline std::string ws2s(const std::wstring& wstr)
 {
+#ifdef __USE_2017__
+	std::string result;
+
+	for (auto x : wstr)
+		result += (char)x;
+
+	return result;
+#else
 	using convert_typeX = std::codecvt_utf8<wchar_t>;
 	std::wstring_convert<convert_typeX, wchar_t> converterX;
 
 	return converterX.to_bytes(wstr);
+#endif
 }
 
 inline std::string HrToString(HRESULT hr)
