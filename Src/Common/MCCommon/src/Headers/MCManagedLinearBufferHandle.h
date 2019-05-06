@@ -108,7 +108,7 @@ private:
 		}
 	};
 	MCLinearBuffer<ManagedContextItem, N> _buffer;
-	MCCriticalSectionLock       _lock;
+	MCCriticalSectionLock                 _lock;
 
 private:
 	friend HandleType;

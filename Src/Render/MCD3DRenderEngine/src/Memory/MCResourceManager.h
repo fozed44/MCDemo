@@ -2,22 +2,34 @@
 
 #include <thread>
 
-#include "../../../../Common/MCCommon/src/Headers/MCManagedKeyedHandle.h"
+#include "../../../../Common/MCCommon/src/Headers/MCManagedLinearBufferHandle.h"
 #include "../Core/MCD3D12Core.h"
 #include "../Core/MCREGlobals.h"
 #include "../../../../Common/MCCommon/src/Data/MCResult.h"
 
 using Microsoft::WRL::ComPtr;
 
+constexpr unsigned int MCRESOURCE_MANAGER_BUFFER_SIZE = 1000;
+
 namespace MC {
 
-	struct MCResourceHandle {
-		ID3D12Resource*  pResource;
-		unsigned __int64 FenceValue;
-		inline ID3D12Resource* Key() const noexcept { return pResource; }
+	enum class MCRESOURCE_DESCRIPTOR_TYPE {
+		INVALID                 = 0,
+		STATIC_BUFFER           = 1,
+		DYNAMIC_BUFFER          = 2,
+		STATIC_CONSTANT_BUFFER  = 3,
+		DYNAMIC_CONSTANT_BUFFER = 4
 	};
 
-	class MCResourceManager : public MCManagedKeyedHandleManager<MCResourceHandle, ID3D12Resource*, ComPtr<ID3D12Resource>, MCResourceManager> {
+	struct MCResourceDescriptor {
+		MCRESOURCE_DESCRIPTOR_TYPE DescriptorType;
+		ComPtr<ID3D12Resource>     pResource;
+		unsigned __int64           FenceValue;
+		void*                      MappedData;  // Only used by dynamic resources
+	};
+
+
+	class MCResourceManager : public MCManagedLinearBufferHandleManager<MCResourceDescriptor, MCRESOURCE_MANAGER_BUFFER_SIZE> {
 	public:
 		using HResource = MCResourceManager::HandleType;
 	public:
