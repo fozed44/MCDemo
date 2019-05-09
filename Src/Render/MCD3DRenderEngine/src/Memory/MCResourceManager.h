@@ -28,8 +28,13 @@ namespace MC {
 		void*                      MappedData;  // Only used by dynamic resources
 	};
 
+	struct MCResourceLocal {
+		ID3D12Resource*  pResource;
+		unsigned __int64 FenceValue;
+	};
 
-	class MCResourceManager : public MCManagedLinearBufferHandleManager<MCResourceDescriptor, MCRESOURCE_MANAGER_BUFFER_SIZE> {
+
+	class MCResourceManager : public MCManagedLinearBufferHandleManager<MCResourceDescriptor, MCResourceLocal, MCRESOURCE_MANAGER_BUFFER_SIZE> {
 	public:
 		using HResource = MCResourceManager::HandleType;
 	public:
