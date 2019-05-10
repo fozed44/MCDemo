@@ -34,7 +34,7 @@ namespace MC {
 	};
 
 
-	class MCResourceManager : public MCManagedLinearBufferHandleManager<MCResourceDescriptor, MCResourceLocal, MCRESOURCE_MANAGER_BUFFER_SIZE> {
+	class MCResourceManager : public MCManagedLinearBufferHandleManager<MCResourceDescriptor, MCResourceLocal, MCResourceManager, MCRESOURCE_MANAGER_BUFFER_SIZE> {
 	public:
 		using HResource = MCResourceManager::HandleType;
 	public:

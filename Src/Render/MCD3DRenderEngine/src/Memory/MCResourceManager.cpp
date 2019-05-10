@@ -119,17 +119,28 @@ namespace MC {
 		// its use of the upload buffer.
 		_uploadBufferFence = MCREGlobals::pMCD3D->GetNewFenceValue();
 
-		MCResourceHandle handle{
+		//MCResourceHandle handle {
+		//	defaultBuffer.Get(),
+		//	_uploadBufferFence // Reuse the fence value loaded for the upload buffer as the
+		//					   // fence value that will be used to let us know when the static
+		//					   // buffer is ready.
+		//};
+
+		MCResourceLocal local{
 			defaultBuffer.Get(),
-			_uploadBufferFence // Reuse the fence value loaded for the upload buffer as the
-							   // fence value that will be used to let us know when the static
-							   // buffer is ready.
+			_uploadBufferFence
 		};
 
+		MCResourceDescriptor desc{
+			MCRESOURCE_DESCRIPTOR_TYPE::STATIC_BUFFER,
+			std::move(defaultBuffer),
+			_uploadBufferFence,
+			nullptr
+		};
 
-		*pResult = std::move(this->CreateRef(
-			handle,
-			defaultBuffer
+		*pResult = std::move(this->CreateNewItem(
+			desc,
+			local
 		));
 
 		return MC_RESULT::OK;
@@ -139,11 +150,10 @@ namespace MC {
 		HResource hResource;
 		while (CreateStaticBufferAsync(pInitData, numBytes, &hResource) != MC_RESULT::OK) {}
 
-		auto unwrappedHandle = UnwrapHandle(hResource);
-		MCREGlobals::pMCD3D->WaitForFenceValue(unwrappedHandle.FenceValue);
+		MCREGlobals::pMCD3D->WaitForFenceValue(hResource._localData.FenceValue);
 
 		// Since we have already waited for the resource to load, set its fence value to 0.
-		unwrappedHandle.FenceValue = 0;
+		hResource._localData.FenceValue = 0;
 
 		return std::move(hResource);
 	}
@@ -181,18 +191,18 @@ namespace MC {
 #pragma endregion
 
 	MC_RESULT MCResourceManager::GetResource(const HResource& handle, ID3D12Resource **ppResource) const {
-		auto unwrappedHandle = UnwrapHandle(handle);
+		auto fenceValueAlias = handle._localData.FenceValue;
 
-		if (unwrappedHandle.FenceValue) {
-			if (MCREGlobals::pMCD3D->GetCurrentFenceValue() < unwrappedHandle.FenceValue)
+		if (fenceValueAlias) {
+			if (MCREGlobals::pMCD3D->GetCurrentFenceValue() < fenceValueAlias)
 				return MC_RESULT::FAIL_UPLOADING;
 
 			// Once we know the fence value has been reached, we set FenceValue to zero. This allows
 			// us to check the loaded status of the resource via if(FenceValue) rather than having
 			// to compare an actual fence value to GetCurrentFenceValue();
-			const_cast<MCResourceHandle&>(unwrappedHandle).FenceValue = 0;
+			const_cast<HResource&>(handle)._localData.FenceValue = 0;
 		}
-		*ppResource = unwrappedHandle.pResource;
+		*ppResource = handle._localData.pResource;
 		return MC_RESULT::OK;
 	}
 	MC_RESULT MCResourceManager::GetResourceSync(MCResourceManager::HandleType& handle, ID3D12Resource **ppResource){
@@ -200,19 +210,19 @@ namespace MC {
 		return MC_RESULT::OK;
 	}
 
-	ID3D12Resource *MCResourceManager::GetResourceSync(MCResourceManager::HandleType& handle){
-		auto unwrappedHandle = UnwrapHandle(handle);
+	ID3D12Resource *MCResourceManager::GetResourceSync(HResource& handle){
+		auto fenceValueAlias = handle._localData.FenceValue;
 
-		if (unwrappedHandle.FenceValue) {
-			MCREGlobals::pMCD3D->WaitForFenceValue(unwrappedHandle.FenceValue);
+		if (fenceValueAlias) {
+			MCREGlobals::pMCD3D->WaitForFenceValue(fenceValueAlias);
 
 			// Once we know the fence value has been reached, we set FenceValue to zero. This allows
 			// us to check the loaded status of the resource via if(FenceValue) rather than having
 			// to compare an actual fence value to GetCurrentFenceValue();
-			const_cast<MCResourceHandle&>(unwrappedHandle).FenceValue = 0;
+			const_cast<HResource&>(handle)._localData.FenceValue = 0;
 		}
 
-		return unwrappedHandle.pResource;
+		return handle._localData.pResource;
 	}
 
 	size_t MCResourceManager::CalculateConstantBufferSize(size_t size) const {
