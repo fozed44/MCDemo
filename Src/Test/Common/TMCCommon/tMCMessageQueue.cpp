@@ -30,6 +30,7 @@ namespace TMCCommon {
 	{
 		TEST_CLASS_INITIALIZE(UseNullLoggers) {
 			MC::MCLogHelper::SetNullLoggers();
+			MCThreads::RegisterCurrentThread("Unit test", MC_THREAD_CLASS::MAIN);
 		}
 
 		TEST_METHOD(Instantiate) {
@@ -41,8 +42,7 @@ namespace TMCCommon {
 			Assert::AreEqual(200, (int)queue.back_buffer_free());
 		}
 
-		TEST_METHOD(StoreData) {
-			MCThreads::RegisterCurrentThread("Unit test", MC_THREAD_CLASS::MAIN);
+		TEST_METHOD(StoreData) {			
 
 			MCMessageQueueWithMemoryBuffer<MC_MESSAGE128, 5, 200> queue("test queue");
 
@@ -66,7 +66,6 @@ namespace TMCCommon {
 		}
 
 		TEST_METHOD(MemoryReleasedAfterSwap) {
-			MCThreads::RegisterCurrentThread("Unit test", MC_THREAD_CLASS::MAIN);
 
 			MCMessageQueueWithMemoryBuffer<MC_MESSAGE128, 5, 200> queue("test queue");
 
@@ -98,7 +97,6 @@ namespace TMCCommon {
 		}
 
 		TEST_METHOD(WritePastBufferEndThrowsA) {
-			MCThreads::RegisterCurrentThread("Unit test", MC_THREAD_CLASS::MAIN);
 
 			MCMessageQueueWithMemoryBuffer<MC_MESSAGE128, 5, 200> queue("test queue");
 
@@ -118,7 +116,6 @@ namespace TMCCommon {
 		}
 
 		TEST_METHOD(WritePastBufferEndThrowsB) {
-			MCThreads::RegisterCurrentThread("Unit test", MC_THREAD_CLASS::MAIN);
 
 			MCMessageQueueWithMemoryBuffer<MC_MESSAGE128, 202, 200> queue("test queue");
 

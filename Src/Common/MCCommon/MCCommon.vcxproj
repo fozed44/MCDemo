@@ -138,6 +138,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Analyzers\MCIAnalyzer.h" />
+    <ClInclude Include="src\Analyzers\MCLinearBufferAnalyzer.h" />
     <ClInclude Include="src\Console\MCConsoleOutputTarget.h" />
     <ClInclude Include="src\Core\MCCommonCore.h" />
     <ClInclude Include="src\Global\MCCOGlobals.h" />

@@ -3,10 +3,11 @@
 #include "MCCriticalSection.h"
 #include "../Data/MCLinearBuffer.h"
 #include "../../../MCCommon/src/Headers/Utility.h"
+#include <memory>
 #include <assert.h>
 #include <map>
 
-#include "../Data/MCLinearBuffer.h"
+#include "../Analyzers/MCLinearBufferAnalyzer.h"
 
 namespace MC {
 	template <typename tManaged, typename tLocalHandleData, typename tDerived, unsigned int N>
@@ -38,9 +39,6 @@ namespace MC {
 		MCManagedLinearBufferHandle(MCManagedLinearBufferHandle&& o) {
 			if (this == &o)
 				return;
-
-			if (this->_bufferAddress != BufferType::InvalidAddress)
-				tManager::Instance()->RemoveRef(*this);
 
 			this->_bufferAddress = o._bufferAddress;
 			this->_localData     = o._localData;
@@ -98,7 +96,7 @@ namespace MC {
 		MCManagedLinearBufferHandleManager() {
 			MCCriticalSection::InitializeLock(&_lock);
 		}
-		~MCManagedLinearBufferHandleManager() {}
+		virtual ~MCManagedLinearBufferHandleManager() {}
 		MCManagedLinearBufferHandleManager(MCManagedLinearBufferHandleManager&)              = delete;
 		MCManagedLinearBufferHandleManager(MCManagedLinearBufferHandleManager&&)             = delete;
 		MCManagedLinearBufferHandleManager& operator= (MCManagedLinearBufferHandleManager&)  = delete;
@@ -108,16 +106,18 @@ namespace MC {
 		/* Call CreateNewItem to add a copy of obj to the linear buffer. A new handle is created using
 		   localHandleData as the data local to the handle. The new handle is returned to the caller. */
 		HandleType CreateNewItem(const ManagedType& obj, const tLocalHandleData localHandleData) {
+			MCLinearBufferAddress address;
+
 			ENTER_CRITICAL_SECTION(MCManagedLinearBufferHandle_CreateNewItem, &_lock);
 
-			auto address = _buffer.add(ManagedContextItem {
+			address = _buffer.add(ManagedContextItem {
 				obj,
 				1
 			});
 
-			return std::move(HandleType(address, localHandleData));
-
 			EXIT_CRITICAL_SECTION;
+
+			return std::move(HandleType(address, localHandleData));
 		}
 
 		/* Call AddRef to add a reference to buffer item referenced by 'handle'.
@@ -157,6 +157,10 @@ namespace MC {
 		};
 	protected:
 		using BufferType = MCLinearBuffer<ManagedContextItem, N>;
+	public: /* analyzers */
+#ifdef _DEBUG
+		std::unique_ptr<MCIAnalyzer> GetBufferAnalyzer() { return std::make_unique<MCLinearBufferAnalyzer<BufferType>>(&_buffer); }
+#endif _DEBUG
 	private:
 		BufferType            _buffer;
 		MCCriticalSectionLock _lock;

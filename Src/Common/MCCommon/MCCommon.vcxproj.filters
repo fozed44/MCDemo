@@ -78,6 +78,12 @@
     <ClInclude Include="src\Console\MCConsoleOutputTarget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Analyzers\MCLinearBufferAnalyzer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Analyzers\MCIAnalyzer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Source\Paths.cpp">

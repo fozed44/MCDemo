@@ -115,6 +115,7 @@ namespace MC {
 	public: /* RegisterDispatchTargets */
 
 		void RegisterDispatchTarget(MCMessageDispatchTarget* pDispatchTarget, MC_MESSAGE_VISIBILITY visibility);
+		void UnregisterDispatchTarget(MCMessageDispatchTarget* pDispatchTarget);
 
 	private:
 

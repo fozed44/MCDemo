@@ -2,6 +2,7 @@
 #include "../Core/MCD3D.h"
 #include "../Core/MCREGlobals.h"
 #include "../../../../Common/MCCommon/src/Data/MCThreads.h"
+#include "../../../../Common/MCCommon/src/Global/MCCOGlobals.h"
 
 namespace MC {
 
@@ -35,6 +36,17 @@ namespace MC {
 		);
 
 		MCThrowIfFailed(_pCommandList->Close());
+
+#ifdef _DEBUG
+		_pAnalyzer = new MCResourceAnalyzer(this, MCCOGlobals::pRouter);
+#endif _DEBUG
+	}
+
+	MCResourceManager::~MCResourceManager() {
+#ifdef _DEBUG
+		if (_pAnalyzer)
+			delete _pAnalyzer;
+#endif _DEBUG
 	}
 
 #pragma endregion

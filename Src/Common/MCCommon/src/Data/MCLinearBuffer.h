@@ -5,8 +5,15 @@
 #include "assert.h"
 #include "shared_mutex"
 
+#include <memory>
+
 namespace MC {
-		
+	
+	template<typename tBuffer>
+	class MCLinearBufferAnalyzer;
+
+	class MCIAnalyzer;
+
 	typedef int MCLinearBufferAddress;
 
 	template <typename T_, unsigned int N>
@@ -28,7 +35,7 @@ namespace MC {
 			memset(_pBuffer, 0, sizeof(MCLinearBufferElement) * N);
 		}
 		
-		~MCLinearBuffer() {
+		virtual ~MCLinearBuffer() {
 			if (_pBuffer) {
 				for (int x = 0; x < N; ++x)
 					if (_pBuffer[x].Flags & MC_LINEAR_BUFFER_ELEMENT_FLAGS_ALLOCATED)
@@ -40,9 +47,8 @@ namespace MC {
 		MCLinearBuffer(MCLinearBuffer&&)             = delete;
 		MCLinearBuffer& operator= (MCLinearBuffer&)  = delete;
 		MCLinearBuffer& operator= (MCLinearBuffer&&) = delete;
-		unsigned int freeSpace() {
-			return _emptyCount;
-		}
+		unsigned int freeSpace() { return _emptyCount; }
+		unsigned int size() { return N; }
 		MCLinearBufferAddress add(const T_& a) {			
 			if (!_emptyCount)
 				return MCLinearBuffer::InvalidAddress;
@@ -148,6 +154,11 @@ namespace MC {
 		}
 
 		static const MCLinearBufferAddress InvalidAddress = -1;
+
+	public: /* ***** ANALYSIS HELPERS ***** */
+
+		std::unique_ptr<MCIAnalyzer> CreateAnalyzer() { return std::make_unique<MCLinearBufferAnalyzer<MCLinearBuffer<T_, N>>>(_pBuffer); }
+
 	private:
 		MCLinearBufferAddress getNextEmptyElement() {
 			for (MCLinearBufferAddress x = 0; x < N; ++x)
@@ -156,7 +167,11 @@ namespace MC {
 			return MCLinearBuffer::InvalidAddress;
 		}
 		MCLinearBufferElement *_pBuffer;
-		size_t                 _emptyCount;	
+		size_t                 _emptyCount;
+
+		/* The ResourceAnalyzer has direct access to private data, even though it should always be
+		   accessing the data in a read only fashion. */
+		friend MCLinearBufferAnalyzer<MCLinearBuffer<T_,N>>;
 	};
 
 }

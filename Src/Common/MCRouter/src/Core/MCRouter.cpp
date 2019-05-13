@@ -41,8 +41,20 @@ namespace MC {
 #pragma region Dispatch Target Registration
 
 	void MCRouter::RegisterDispatchTarget(MCMessageDispatchTarget* pDispatchTarget, MC_MESSAGE_VISIBILITY visibility) {
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 		_dispatchTargets.push_back(pDispatchTarget);
 		_dispatchTargetVisibility.push_back(visibility);
+	}
+
+	void MCRouter::UnregisterDispatchTarget(MCMessageDispatchTarget* pDispatchTarget) {
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
+		auto size = _dispatchTargets.size();
+		for (unsigned int i = 0; i < size; i++) {
+			if (&(*_dispatchTargets[i]) == &(*pDispatchTarget)) {
+				_dispatchTargets         .erase(_dispatchTargets.begin() + i);
+				_dispatchTargetVisibility.erase(_dispatchTargetVisibility.begin() + i);
+			}
+		}
 	}
 
 #pragma endregion
@@ -156,6 +168,7 @@ namespace MC {
 #pragma region Update
 
 	void MCRouter::Update() {
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 		while (MC_RESULT::OK != Swap()) {}
 		Dispatch();
 	}

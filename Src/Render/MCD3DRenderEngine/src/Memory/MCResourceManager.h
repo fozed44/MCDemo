@@ -7,11 +7,15 @@
 #include "../Core/MCREGlobals.h"
 #include "../../../../Common/MCCommon/src/Data/MCResult.h"
 
+#include "MCResourceAnalyzer.h"
+
 using Microsoft::WRL::ComPtr;
 
 constexpr unsigned int MCRESOURCE_MANAGER_BUFFER_SIZE = 1000;
 
 namespace MC {
+
+	class MCResourceAnalyzer;
 
 	enum class MCRESOURCE_DESCRIPTOR_TYPE {
 		INVALID                 = 0,
@@ -43,7 +47,7 @@ namespace MC {
 		MCResourceManager(MCResourceManager&&)             = delete;
 		MCResourceManager& operator= (MCResourceManager&)  = delete;
 		MCResourceManager& operator= (MCResourceManager&&) = delete;
-		~MCResourceManager() {}
+		~MCResourceManager();
 	public:
 		/* The Instance method is required because the MCManagedKeyedHandleManager base class requires it. */
 		static MCResourceManager* Instance() { return MCREGlobals::pResourceManager; }
@@ -87,6 +91,15 @@ namespace MC {
 		unsigned __int64                   _uploadBufferFence; // Used to prevent the upload buffer from
 		                                                       // being double accessed from two consecutive
 															   // CreateBuffer calls.
+
+		/* The ResourceAnalyzer has direct access to private data, even though it should always be
+		   accessing the data in a read only fashion. */
+		/* The analyzer will be created in the constructor and will attach itself to the router in
+		   order to begin listening for analysis messages. */
+#ifdef _DEBUG
+		friend MCResourceAnalyzer;
+		MCResourceAnalyzer* _pAnalyzer;
+#endif _DEBUG
 	};
 
 	using HResource = MCResourceManager::HResource;

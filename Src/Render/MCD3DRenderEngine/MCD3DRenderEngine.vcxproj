@@ -156,6 +156,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Memory\MCResourceAnalyzer.h" />
     <ClInclude Include="src\Render\Common\MCRenderScene.h" />
     <ClInclude Include="src\Core\MCRenderObjects.h" />
     <ClInclude Include="src\Mesh\Geometry\CubeGenerator.h" />
@@ -194,6 +195,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Mesh\MCMesh.h" />
+    <ClCompile Include="src\Memory\MCResourceAnalyzer.cpp" />
     <ClCompile Include="src\Render\Common\MCRenderScene.cpp" />
     <ClCompile Include="src\PipelineStateObject\MCPipelineStateObjectManager.cpp" />
     <ClCompile Include="src\PipelineStateObject\MCPipelineStateObjects.cpp" />
