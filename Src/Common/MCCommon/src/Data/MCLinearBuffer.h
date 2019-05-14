@@ -49,6 +49,7 @@ namespace MC {
 		MCLinearBuffer& operator= (MCLinearBuffer&&) = delete;
 		unsigned int freeSpace() { return _emptyCount; }
 		unsigned int size() { return N; }
+		unsigned int element_byte_size() { return sizeof(MCLinearBufferElement); }
 		MCLinearBufferAddress add(const T_& a) {			
 			if (!_emptyCount)
 				return MCLinearBuffer::InvalidAddress;

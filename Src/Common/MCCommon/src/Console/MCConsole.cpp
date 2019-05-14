@@ -49,21 +49,17 @@ namespace MC {
 
 #pragma region Message Handlers
 
-	void MCConsole::NewKeyHandler(unsigned char vkKey) {
+	void MCConsole::NewKeyHandler(unsigned char ch) {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 
 		if (_pNext == _pEnd)
 			return;
 
-		if ((vkKey >= 0x30 && vkKey <= 0x39) // 0 - 9
-		 || (vkKey >= 0x41 && vkKey <= 0x5A) // A - Z
-		 ||	(VK_SPACE == vkKey)
-		 || (VK_OEM_1 <= vkKey && VK_OEM_3 >= vkKey)) {
-			char ascii = toascii(vkKey);
-			*_pNext = ascii;
+		if ((ch >= 0x20 && ch <= 0x7F)) { // [SPACE] - [DEL] 
+			*_pNext = ch;
 			_pNext++;
-			_pOutputTarget->WriteChar(ascii);
-		} else if (vkKey == VK_RETURN) {
+			_pOutputTarget->WriteChar(ch);
+		} else if (ch == VK_RETURN) {
 			MC_CONSOLE_COMMAND cmd;
 
 			*_pNext = '\0';
@@ -89,7 +85,7 @@ namespace MC {
 
 			_pOutputTarget->NewLine();
 			_pOutputTarget->Prompt();
-		} else if (vkKey == VK_ESCAPE) {
+		} else if (ch == VK_ESCAPE) {
 
 			_pNext = _pKeyBuffer;
 
@@ -97,16 +93,12 @@ namespace MC {
 			_pOutputTarget->Prompt();
 
 		}
-		else if (vkKey == VK_BACK) {
+		else if (ch == VK_BACK) {
 			if (_pNext > _pKeyBuffer) {
 				_pNext--;
 				_pOutputTarget->Backspace();
 			}
-
 		}
-
-		
-
 	}
 
 	void MCConsole::ConsoleOutputHandler(const char* pData) {

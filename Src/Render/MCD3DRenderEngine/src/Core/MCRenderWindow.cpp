@@ -72,9 +72,19 @@ namespace MC {
 			PostQuitMessage(0);
 			return 0;
 		case WM_KEYDOWN:
-			if (_keydownCallback)
-				_keydownCallback(static_cast<uint8_t>(wParam));
+			/*if (_keydownCallback)
+				_keydownCallback(static_cast<uint8_t>(wParam));*/
 			break;
+		case WM_CHAR:
+		{
+			auto charCode = wParam;
+			std::wstring s;
+			s += charCode;
+			auto byte = ws2s(s);
+			if (_keydownCallback)
+				_keydownCallback(static_cast<uint8_t>(*byte.c_str()));
+		}
+		break;
 		case WM_SIZE:
 			if (_resizeCallback)
 				_resizeCallback();

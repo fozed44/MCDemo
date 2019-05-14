@@ -24,7 +24,6 @@ namespace MC {
 	private:
 		void AnalyzeResourceManager();
 		std::string GenerateAnalysis();
-		std::string ActiveObjects();
 	private:
 		MCResourceManager*           _pManager;
 		MCRouter*                    _pRouter;
