@@ -38,16 +38,11 @@ namespace MC {
 		MCThrowIfFailed(_pCommandList->Close());
 
 #ifdef _DEBUG
-		_pAnalyzer = new MCResourceAnalyzer(this, MCCOGlobals::pRouter);
+		_pAnalyzer = std::make_unique<MCResourceAnalyzer>(this, MCCOGlobals::pRouter);
 #endif _DEBUG
 	}
 
-	MCResourceManager::~MCResourceManager() {
-#ifdef _DEBUG
-		if (_pAnalyzer)
-			delete _pAnalyzer;
-#endif _DEBUG
-	}
+	MCResourceManager::~MCResourceManager() {}
 
 #pragma endregion
 	

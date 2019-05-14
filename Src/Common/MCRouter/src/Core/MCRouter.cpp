@@ -42,17 +42,19 @@ namespace MC {
 
 	void MCRouter::RegisterDispatchTarget(MCMessageDispatchTarget* pDispatchTarget, MC_MESSAGE_VISIBILITY visibility) {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
-		_dispatchTargets.push_back(pDispatchTarget);
-		_dispatchTargetVisibility.push_back(visibility);
+		_dispatchTargets.push_back({ pDispatchTarget, visibility });
 	}
 
 	void MCRouter::UnregisterDispatchTarget(MCMessageDispatchTarget* pDispatchTarget) {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 		auto size = _dispatchTargets.size();
 		for (unsigned int i = 0; i < size; i++) {
-			if (&(*_dispatchTargets[i]) == &(*pDispatchTarget)) {
-				_dispatchTargets         .erase(_dispatchTargets.begin() + i);
-				_dispatchTargetVisibility.erase(_dispatchTargetVisibility.begin() + i);
+			if (&(*_dispatchTargets[i].first) == &(*pDispatchTarget)) {
+				_dispatchTargets.erase(_dispatchTargets.begin() + i);
+
+				// Once the dispatch target has been removed, we MUST exit this loop,
+				// the index positions for 'i' are now invalid.
+				return;
 			}
 		}
 	}
@@ -64,9 +66,9 @@ namespace MC {
 	void MCRouter::DispatchMessages32() {
 		MC_MESSAGE32 msg;
 		while (_pMessageQueue32->pop(&msg)) {
-			for (unsigned int x = 0; x < _dispatchTargets.size(); ++x) {
-				if (msg.Visibility & _dispatchTargetVisibility[x])
-					_dispatchTargets[x]->ProcessMessage32(msg);
+			for (auto& t : _dispatchTargets) {
+				if (msg.Visibility & t.second)
+					t.first->ProcessMessage32(msg);
 			}
 		}
 	}
@@ -74,9 +76,9 @@ namespace MC {
 	void MCRouter::DispatchMessages64() {
 		MC_MESSAGE64 msg;
 		while (_pMessageQueue64->pop(&msg)) {
-			for (unsigned int x = 0; x < _dispatchTargets.size(); ++x) {
-				if (msg.Visibility & _dispatchTargetVisibility[x])
-					_dispatchTargets[x]->ProcessMessage64(msg);
+			for (auto& t : _dispatchTargets) {
+				if (msg.Visibility & t.second)
+					t.first->ProcessMessage64(msg);
 			}
 		}
 	}
@@ -84,14 +86,14 @@ namespace MC {
 	void MCRouter::DispatchMessages128() {
 		MC_MESSAGE128 msg;
 		while (_pMessageQueue128->pop(&msg)) {
-			for (unsigned int x = 0; x < _dispatchTargets.size(); ++x) {
-				if (!(msg.Visibility & _dispatchTargetVisibility[x]))
+			for (auto& t : _dispatchTargets) {
+				if (!(msg.Visibility & t.second))
 					continue;
 				if (msg.Message & MC_MESSAGE_BIT_FLAGS_ADDRESSED) {
-					_dispatchTargets[x]->ProcessMessage128(msg, msg.pAddress);
+					t.first->ProcessMessage128(msg, msg.pAddress);
 				}
 				else {
-					_dispatchTargets[x]->ProcessMessage128(msg);
+					t.first->ProcessMessage128(msg);
 				}
 			}
 		}

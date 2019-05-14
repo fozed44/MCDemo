@@ -141,6 +141,7 @@
     <ClInclude Include="src\Core\MCMessageDispatchTarget.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\MCMessageDispatchTarget.cpp" />
     <ClCompile Include="src\Core\MCRouter.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

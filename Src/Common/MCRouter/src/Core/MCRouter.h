@@ -127,8 +127,7 @@ namespace MC {
 		std::unique_ptr<MCMessageQueue<MC_MESSAGE64,  ROUTER_QUEUE_SIZE>> _pMessageQueue64;
 		std::unique_ptr<MCMessageQueueWithMemoryBuffer<MC_MESSAGE128, ROUTER_QUEUE_SIZE, ROUTER_BUFFER_SIZE>> _pMessageQueue128;
 
-		std::vector<MCMessageDispatchTarget*> _dispatchTargets;
-		std::vector<MC_MESSAGE_VISIBILITY>    _dispatchTargetVisibility;
+		std::vector<std::pair<MCMessageDispatchTarget*, MC_MESSAGE_VISIBILITY>> _dispatchTargets;
 		
 		std::vector<std::thread::id> _writeLocks;
 		std::vector<std::thread::id> _readLocks;

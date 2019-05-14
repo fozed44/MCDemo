@@ -13,7 +13,7 @@ namespace MC {
 		: _pManager{ pManager },
 		  _pRouter { pRouter } {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
-		_pRouter->RegisterDispatchTarget(this, MC_MESSAGE_VISIBILITY_ANALYZE);
+		pRouter->RegisterDispatchTarget(this, MC_MESSAGE_VISIBILITY_ANALYZE);
 	}
 
 	MCResourceAnalyzer::~MCResourceAnalyzer() {
@@ -25,7 +25,7 @@ namespace MC {
 
 #pragma region process message overrides
 
-	void MCResourceAnalyzer::ProcessMessage128(const MC_MESSAGE128& message, const char* pData) {
+	void MCResourceAnalyzer::OnProcessMessage128(const MC_MESSAGE128& message, const char* pData) {
 		if (message.Message == MC_MESSAGE_CONSOLE_COMMAND_128) {
 			if(message.LOParam32 == MC_CONSOLE_COMMAND_CMD_ANALYZE_RESOURCE_MAN)
 				AnalyzeResourceManager();

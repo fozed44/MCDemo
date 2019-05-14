@@ -98,7 +98,7 @@ namespace MC {
 		   order to begin listening for analysis messages. */
 #ifdef _DEBUG
 		friend MCResourceAnalyzer;
-		MCResourceAnalyzer* _pAnalyzer;
+		std::unique_ptr<MCResourceAnalyzer> _pAnalyzer;
 #endif _DEBUG
 	};
 

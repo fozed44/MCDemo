@@ -30,8 +30,8 @@ namespace MC {
 		MCConsole& operator= (MCConsole&)  = delete;
 		MCConsole& operator= (MCConsole&&) = delete;
 	public: /* MCMessageDispatchTarget */
-		virtual void ProcessMessage32 (MC_MESSAGE32 message) override;
-		virtual void ProcessMessage128(const MC_MESSAGE128& message, const char* pData) override;
+		virtual void OnProcessMessage32 (MC_MESSAGE32 message) override;
+		virtual void OnProcessMessage128(const MC_MESSAGE128& message, const char* pData) override;
 	public: /* Router message handlers */
 		void NewKeyHandler        (unsigned char ch);
 		void ConsoleOutputHandler (const char* pData);

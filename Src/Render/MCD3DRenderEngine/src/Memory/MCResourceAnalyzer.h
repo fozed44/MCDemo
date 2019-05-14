@@ -19,7 +19,7 @@ namespace MC {
 		MCResourceAnalyzer& operator= (MCResourceAnalyzer&&) = delete;
 
 	protected:
-		virtual void ProcessMessage128(const MC_MESSAGE128& message, const char* pData) override;
+		virtual void OnProcessMessage128(const MC_MESSAGE128& message, const char* pData) override;
 
 	private:
 		void AnalyzeResourceManager();

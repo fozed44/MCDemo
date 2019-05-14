@@ -26,7 +26,7 @@ namespace MC {
 
 #pragma region Process Messages
 
-	void MCConsole::ProcessMessage32(MC_MESSAGE32 message) {
+	void MCConsole::OnProcessMessage32(MC_MESSAGE32 message) {
 		switch (message.Message) {
 		case MC_MESSAGE_KEY_DOWN_32:
 			NewKeyHandler(message.Param);
@@ -34,7 +34,7 @@ namespace MC {
 		}
 	}
 
-	void MCConsole::ProcessMessage128(const MC_MESSAGE128& message, const char* pData) {
+	void MCConsole::OnProcessMessage128(const MC_MESSAGE128& message, const char* pData) {
 		switch (message.Message) {
 		case MC_MESSAGE_CONSOLE_OUTPUT_128:
 			ConsoleOutputHandler(pData);
