@@ -10,15 +10,20 @@
 #include "MCD3D.h"
 #include "MCDXGI.h"
 #include "MCRenderWindow.h"
+#include "../../../../Common/MCCommon/src/Global/MCCOGlobals.h"
+#include "MCD3D12RenderEngineDispatcher.h"
 
 
 namespace MC {
 
   MCD3D12RenderEngine::MCD3D12RenderEngine(const RENDER_CONFIG *pConfiguration) {
 	  assert(!MCREGlobals::pRenderEngine);
-
+	  	  
 	  // Register the thread that is calling this thread as the main thread.
 	  MCThreads::RegisterCurrentThread("Main", MC_THREAD_CLASS::MAIN);
+
+	  _pRenderEngineDispatcher = std::make_unique<D3D12RenderEngineDispatcher>(MCCOGlobals::pRouter);
+	  MCREGlobals::pRenderEngineDispatcher = _pRenderEngineDispatcher.get();
 
 	  MCREGlobals::InitialConfiguration = *pConfiguration;
 	  _pRenderWindow = std::make_unique<MCRenderWindow>();

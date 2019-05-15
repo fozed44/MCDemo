@@ -44,8 +44,8 @@ namespace MC { namespace GeometryGeneration {
 		MC::Utilities::GenerateSphere(radius, center.x, center.y, center.z, &verticies, &indicies, numSubdivisions);
 
 		auto result = pMesh->LoadData(
-			&(*verticies.begin()), verticies.size() * sizeof(tVertex),
-			&(*indicies.begin()) , indicies.size()  * sizeof(INDEX_TYPE)
+			&(*verticies.begin()), static_cast<unsigned>(verticies.size() * sizeof(tVertex)),
+			&(*indicies.begin()) , static_cast<unsigned>(indicies.size()  * sizeof(INDEX_TYPE))
 		);
 
 		return result;

@@ -12,6 +12,7 @@ namespace MC {
 	class MCShaderManager;
 	class MCPipelineStateObjectManager;
 	class MCRootSignatureManager;
+	class D3D12RenderEngineDispatcher;
 	
 
 	/*
@@ -38,6 +39,7 @@ namespace MC {
 		static MCShaderManager              *pShaderManager;
 		static MCPipelineStateObjectManager *pPSOManager;
 		static MCRootSignatureManager       *pRSManager;
+		static D3D12RenderEngineDispatcher  *pRenderEngineDispatcher;
 		static RENDER_CONFIG        InitialConfiguration;
 	};
 }

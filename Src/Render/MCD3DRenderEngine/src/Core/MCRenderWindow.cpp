@@ -79,7 +79,7 @@ namespace MC {
 		{
 			auto charCode = wParam;
 			std::wstring s;
-			s += charCode;
+			s += static_cast<unsigned short>(charCode);
 			auto byte = ws2s(s);
 			if (_keydownCallback)
 				_keydownCallback(static_cast<uint8_t>(*byte.c_str()));

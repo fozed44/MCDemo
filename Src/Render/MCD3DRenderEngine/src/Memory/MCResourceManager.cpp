@@ -38,7 +38,11 @@ namespace MC {
 		MCThrowIfFailed(_pCommandList->Close());
 
 #ifdef _DEBUG
-		_pAnalyzer = std::make_unique<MCResourceAnalyzer>(this, MCCOGlobals::pRouter);
+		_pAnalysisDispatcher = std::make_unique<MCResourceAnalysisDispatcher>(
+			this,
+			reinterpret_cast<MCMessageDispatchTarget*>(MCREGlobals::pRenderEngineDispatcher),
+			MCCOGlobals::pRouter
+		);
 #endif _DEBUG
 	}
 

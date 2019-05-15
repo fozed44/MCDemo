@@ -55,6 +55,7 @@ namespace MC {
 		/* Set the render state. */
 		void SetRenderState(MC_RENDER_STATE renderState);
 	private: /* Instances that will be copied to MCREGlobals */
+		std::unique_ptr<D3D12RenderEngineDispatcher>  _pRenderEngineDispatcher;
 		std::unique_ptr<MCRenderWindow>               _pRenderWindow;
 		std::unique_ptr<MCDXGI>                       _pMCDXGI;
 		std::unique_ptr<MCResourceManager>            _pResourceManager;

@@ -13,7 +13,7 @@ namespace MC {
 	/* The size of the internal buffer. The console cannot create strings longer than this buffer. */
 	const int CONSOLE_KEY_BUFFER_SIZE = 1 * 1048;	
 
-	/* The job of MCConsole is to monitor the router for key board messages. The console keeps an internal
+	/* The job of MCConsole is to monitor the router for keyboard messages. The console keeps an internal
 	   buffer that is used as the 'target' of the key-strokes. In other words MCConsole monitors the router
 	   for keyboard messages that the console turns into strings. When a keyboard message for the enter key
 	   is detected, the console will then pass the current buffer to MCConsoleCommandParser to create an

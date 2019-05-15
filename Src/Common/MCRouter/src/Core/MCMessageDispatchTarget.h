@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MCMessage.h"
+#include "assert.h"
 #include <memory>
 #include <vector>
 
@@ -8,8 +9,13 @@ namespace MC {
 
 	class MCMessageDispatchTarget {
 	public: /* ctor */
-		MCMessageDispatchTarget() {}
-		virtual ~MCMessageDispatchTarget() {}
+		MCMessageDispatchTarget() : _pParent{ nullptr } {}
+		MCMessageDispatchTarget(MCMessageDispatchTarget* pParent, MC_MESSAGE_VISIBILITY visibility) {
+			assert(pParent);
+			pParent->RegisterDispatchTarget(this, visibility);
+			_pParent = pParent;
+		}
+		virtual ~MCMessageDispatchTarget() { if (_pParent) _pParent->UnregisterDispatchTarget(this); }
 	public: /* Default Message Processing */
 		        void ProcessMessage32   (      MC_MESSAGE32   message);
 		        void ProcessMessage64   (      MC_MESSAGE64   message);
@@ -24,6 +30,7 @@ namespace MC {
 		void RegisterDispatchTarget(MCMessageDispatchTarget* pDispatchTarget, MC_MESSAGE_VISIBILITY visibility);
 		void UnregisterDispatchTarget(MCMessageDispatchTarget* pDispatchTarget);
 	private:
+		MCMessageDispatchTarget* _pParent; // Note that a dispatch target is not required to have a parent.
 		std::vector<std::pair<MCMessageDispatchTarget*, MC_MESSAGE_VISIBILITY>> _dispatchTargets;
 	};
 }

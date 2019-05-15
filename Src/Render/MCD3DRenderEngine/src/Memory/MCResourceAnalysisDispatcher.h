@@ -9,14 +9,14 @@
 
 namespace MC {
 
-	class MCResourceAnalyzer : public MCMessageDispatchTarget {
+	class MCResourceAnalysisDispatcher : public MCMessageDispatchTarget {
 	public:
-		MCResourceAnalyzer(MCResourceManager* pManager, MCRouter* pRouter);
-		~MCResourceAnalyzer();
-		MCResourceAnalyzer(MCResourceAnalyzer&)              = delete;
-		MCResourceAnalyzer(MCResourceAnalyzer&&)             = delete;
-		MCResourceAnalyzer& operator= (MCResourceAnalyzer&)  = delete;
-		MCResourceAnalyzer& operator= (MCResourceAnalyzer&&) = delete;
+		MCResourceAnalysisDispatcher(MCResourceManager* pManager, MCMessageDispatchTarget* pParent, MCRouter* pRouter);
+		~MCResourceAnalysisDispatcher() {}
+		MCResourceAnalysisDispatcher(MCResourceAnalysisDispatcher&)              = delete;
+		MCResourceAnalysisDispatcher(MCResourceAnalysisDispatcher&&)             = delete;
+		MCResourceAnalysisDispatcher& operator= (MCResourceAnalysisDispatcher&)  = delete;
+		MCResourceAnalysisDispatcher& operator= (MCResourceAnalysisDispatcher&&) = delete;
 
 	protected:
 		virtual void OnProcessMessage128(const MC_MESSAGE128& message, const char* pData) override;

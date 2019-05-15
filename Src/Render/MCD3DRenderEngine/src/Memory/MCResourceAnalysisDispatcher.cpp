@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MCResourceAnalyzer.h"
+#include "MCResourceAnalysisDispatcher.h"
 #include "../../../../Common/MCCommon/src/Data/MCThreads.h"
 #include "../../../../Common/MCCommon/src/Data/MCThreads.h"
 #include "../../../../Common/MCCommon/src/Console/MCConsoleCommand.h"
@@ -9,23 +9,20 @@ namespace MC {
 
 #pragma region ctor
 
-	MCResourceAnalyzer::MCResourceAnalyzer(MCResourceManager *pManager, MCRouter* pRouter) 
-		: _pManager{ pManager },
-		  _pRouter { pRouter } {
+	MCResourceAnalysisDispatcher::MCResourceAnalysisDispatcher(MCResourceManager *pManager, MCMessageDispatchTarget* pParent, MCRouter* pRouter)
+		: MCMessageDispatchTarget(pParent, MC_MESSAGE_VISIBILITY_ANALYZE),
+		  _pManager{ pManager },
+		  _pRouter { pRouter  } {
+		assert(_pManager);
+		assert(_pRouter );
 		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
-		pRouter->RegisterDispatchTarget(this, MC_MESSAGE_VISIBILITY_ANALYZE);
-	}
-
-	MCResourceAnalyzer::~MCResourceAnalyzer() {
-		if (_pRouter)
-			_pRouter->UnregisterDispatchTarget(this);
 	}
 
 #pragma endregion
 
 #pragma region process message overrides
 
-	void MCResourceAnalyzer::OnProcessMessage128(const MC_MESSAGE128& message, const char* pData) {
+	void MCResourceAnalysisDispatcher::OnProcessMessage128(const MC_MESSAGE128& message, const char* pData) {
 		if (message.Message == MC_MESSAGE_CONSOLE_COMMAND_128) {
 			if(message.LOParam32 == MC_CONSOLE_COMMAND_CMD_ANALYZE_RESOURCE_MAN)
 				AnalyzeResourceManager();
@@ -36,7 +33,7 @@ namespace MC {
 
 #pragma region Analyze Resource Manager
 
-	void MCResourceAnalyzer::AnalyzeResourceManager() {
+	void MCResourceAnalysisDispatcher::AnalyzeResourceManager() {
 		// This method MUST be executed on the main thread because it accesses the router
 		// without using a router lock.
 		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
@@ -49,7 +46,7 @@ namespace MC {
 		strcpy_s(ptr, analysisResult.size() + 1, analysisResult.c_str());
 	}
 
-	std::string MCResourceAnalyzer::GenerateAnalysis() {
+	std::string MCResourceAnalysisDispatcher::GenerateAnalysis() {
 		auto linearBufferAnalyzer = _pManager->GetBufferAnalyzer();
 		return linearBufferAnalyzer->Analyze();
 	}
