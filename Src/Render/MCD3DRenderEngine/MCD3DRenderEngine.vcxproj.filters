@@ -123,10 +123,13 @@
     <ClInclude Include="src\Render\Utility\MCSceneLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\MCD3D12RenderEngineDispatcher.h">
+    <ClInclude Include="src\Messaging\D3D12RenderControlDispatchTarget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Memory\MCResourceAnalysisDispatcher.h">
+    <ClInclude Include="src\Messaging\D3D12RenderEngineDispatcher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Messaging\MCResourceAnalysisDispatchTarget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -206,7 +209,10 @@
     <ClCompile Include="src\Render\Utility\MCSceneLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Memory\MCResourceAnalysisDispatcher.cpp">
+    <ClCompile Include="src\Messaging\D3D12RenderControlDispatchTarget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Messaging\MCResourceAnalysisDispatchTarget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

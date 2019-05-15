@@ -7,7 +7,7 @@
 #include "../Core/MCREGlobals.h"
 #include "../../../../Common/MCCommon/src/Data/MCResult.h"
 
-#include "MCResourceAnalysisDispatcher.h"
+#include "MCResourceAnalysisDispatchTarget.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -15,7 +15,7 @@ constexpr unsigned int MCRESOURCE_MANAGER_BUFFER_SIZE = 1000;
 
 namespace MC {
 
-	class MCResourceAnalysisDispatcher;
+	class MCResourceAnalysisDispatchTarget;
 
 	enum class MCRESOURCE_DESCRIPTOR_TYPE {
 		INVALID                 = 0,
@@ -97,8 +97,8 @@ namespace MC {
 		/* The analyzer will be created in the constructor and will attach itself to the router in
 		   order to begin listening for analysis messages. */
 #ifdef _DEBUG
-		friend MCResourceAnalysisDispatcher;
-		std::unique_ptr<MCResourceAnalysisDispatcher> _pAnalysisDispatcher;
+		friend MCResourceAnalysisDispatchTarget;
+		std::unique_ptr<MCResourceAnalysisDispatchTarget> _pAnalysisDispatcher;
 #endif _DEBUG
 	};
 

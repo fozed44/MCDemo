@@ -156,8 +156,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Core\MCD3D12RenderEngineDispatcher.h" />
-    <ClInclude Include="src\Memory\MCResourceAnalysisDispatcher.h" />
+    <ClInclude Include="src\Messaging\D3D12RenderControlDispatchTarget.h" />
+    <ClInclude Include="src\Messaging\D3D12RenderEngineDispatcher.h" />
+    <ClInclude Include="src\Messaging\MCResourceAnalysisDispatchTarget.h" />
     <ClInclude Include="src\Render\Common\MCRenderScene.h" />
     <ClInclude Include="src\Core\MCRenderObjects.h" />
     <ClInclude Include="src\Mesh\Geometry\CubeGenerator.h" />
@@ -196,7 +197,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Mesh\MCMesh.h" />
-    <ClCompile Include="src\Memory\MCResourceAnalysisDispatcher.cpp" />
+    <ClCompile Include="src\Messaging\D3D12RenderControlDispatchTarget.cpp" />
+    <ClCompile Include="src\Messaging\MCResourceAnalysisDispatchTarget.cpp" />
     <ClCompile Include="src\Render\Common\MCRenderScene.cpp" />
     <ClCompile Include="src\PipelineStateObject\MCPipelineStateObjectManager.cpp" />
     <ClCompile Include="src\PipelineStateObject\MCPipelineStateObjects.cpp" />

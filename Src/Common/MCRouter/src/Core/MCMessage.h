@@ -10,7 +10,7 @@ namespace MC {
 		MC_MESSAGE_VISIBILITY_AUDIO   = 0x02,
 		MC_MESSAGE_VISIBILITY_GAME    = 0x04,
 		MC_MESSAGE_VISIBILITY_CONSOLE = 0x08,
-		MC_MESSAGE_VISIBILITY_ANALYZE = 0x10,
+		MC_MESSAGE_VISIBILITY_SYSTEM  = 0x10,
 		MC_MESSAGE_VISIBILITY_ALL     = 0xFF
 	} MC_MESSAGE_VISIBILITY;
 
@@ -51,6 +51,12 @@ namespace MC {
 				Flags: not used.
 				Param: The target render state. The renderer will throw if Param !(MC_RENDERER_STATE). */
 
+		MC_MESSAGE_SET_PAUSE_STATE_32          = 0x0004 | MC_MESSAGE_BIT_FLAGS_32_BIT,
+			/* Set the pause state (both on and off are set by this message).
+				Visibility: MC_RENDERER
+				Flags: not used.
+				Param: The pause state. !0 = pause, 0 = un-pause */
+
 		MC_MESSAGE_FRAME_READY_128             = 0x0001 | MC_MESSAGE_BIT_FLAGS_128_BIT | MC_MESSAGE_BIT_FLAGS_ADDRESSED,
 			/* The game logic has a new frame. 
 				Visibility:       MC_MESSAGE_VISIBILITY_RENDERER 
@@ -82,8 +88,8 @@ namespace MC {
 		MC_MESSAGE            Message;
 		MC_MESSAGE_VISIBILITY Visibility;
 		union {
-			MC_MESSAGE_FLAGS  Flags;
 			uint8_t           Param;
+			MC_MESSAGE_FLAGS  Flags;
 		};
 	};
 	static_assert(sizeof(MC_MESSAGE32) == 4, "sizeof(MC_MESSAGE32) should be 4 bytes!!!");
