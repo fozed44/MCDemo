@@ -38,7 +38,8 @@
 	Remarks:
 		The messaging system is built on three ideas / systems.
 
-		1) It provides a method for any thread to post a message.
+		1) It provides a method for any thread to post a message, conversely all messages must be posted to the
+		   router.
 
 		2) It provides a method for any MessageDispatchTarget to register in order to be notified
 		   of messages.
@@ -62,6 +63,7 @@
 		6) Use message visibility flags to prevent irrelevant dispatch targets from having to
 		   needlessly processes worthless messages.
 
+		7) Use the PostConsoleMessage() as a helper method to post a console message.
 
 */
 
@@ -117,11 +119,21 @@ namespace MC {
 		void RegisterDispatchTarget(MCMessageDispatchTarget* pDispatchTarget, MC_MESSAGE_VISIBILITY visibility);
 		void UnregisterDispatchTarget(MCMessageDispatchTarget* pDispatchTarget);
 
-	private:
+	public: /* Helper Methods */
+
+		/* Call PostConsoleMessage from the main thread, or from within write locks. */
+		void PostConsoleMessage(const char* pMsg);
+
+		/* Call PostConsoleMessageLocked from outside of the main thread, NOT within write locks. */
+		void PostConsoleMessageLocked(const char* pMsg);
+
+	private: /* Private Methods */
 
 		void DispatchMessages32();
 		void DispatchMessages64();
 		void DispatchMessages128();
+
+	private: /* Private Data */
 
 		std::unique_ptr<MCMessageQueue<MC_MESSAGE32,  ROUTER_QUEUE_SIZE>> _pMessageQueue32;
 		std::unique_ptr<MCMessageQueue<MC_MESSAGE64,  ROUTER_QUEUE_SIZE>> _pMessageQueue64;

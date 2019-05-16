@@ -103,7 +103,6 @@ namespace MC {
 
 #pragma region Read Write Locks
 
-
 	void MCRouter::AddReadLock() {
 		ENTER_CRITICAL_SECTION(MCMessageQueue_add_read_lock, &_lock);
 
@@ -166,6 +165,29 @@ namespace MC {
 
 
 #pragma endregion
+
+#pragma region Console Message Helpers
+
+	void MCRouter::PostConsoleMessage(const char* pMsg) {
+		auto len = strlen(pMsg) + 1;
+		auto ptr = PushTo({
+			MC_MESSAGE_CONSOLE_OUTPUT_128,
+			MC_MESSAGE_VISIBILITY_CONSOLE },
+			static_cast<unsigned short>(len)
+		);
+		// TODO
+		//	This could be an issue. len = strlen + 1, im not sure how strcopy_s copies...
+		//  does it implicitly include a null terminator?
+		strcpy_s(ptr, len, pMsg);
+	}
+
+	void MCRouter::PostConsoleMessageLocked(const char* pMsg) {
+		AddWriteLock();
+		PostConsoleMessage(pMsg);
+		ReleaseWriteLock();
+	}
+
+#pragma region
 
 #pragma region Update
 

@@ -24,9 +24,6 @@
     <ClInclude Include="src\Core\MCMessageQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\MCMessageDispatcher.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Core\MCMessageDispatchTarget.h">
       <Filter>Header Files</Filter>
     </ClInclude>

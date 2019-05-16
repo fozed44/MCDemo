@@ -11,7 +11,7 @@
 #include "MCDXGI.h"
 #include "MCRenderWindow.h"
 #include "../../../../Common/MCCommon/src/Global/MCCOGlobals.h"
-#include "MCD3D12RenderEngineDispatcher.h"
+#include "../Messaging/D3D12RenderEngineDispatcher.h"
 
 
 namespace MC {

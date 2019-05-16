@@ -7,7 +7,7 @@
 #include "../Core/MCREGlobals.h"
 #include "../../../../Common/MCCommon/src/Data/MCResult.h"
 
-#include "MCResourceAnalysisDispatchTarget.h"
+#include "../Messaging/MCResourceAnalysisDispatchTarget.h"
 
 using Microsoft::WRL::ComPtr;
 

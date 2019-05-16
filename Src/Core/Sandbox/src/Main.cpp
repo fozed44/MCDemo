@@ -110,10 +110,7 @@ int Sandbox() {
 
 	auto tempConsoleLogTarget = std::make_unique<TempConsoleOutputTarget>();
 
-	auto pConsole = std::make_unique<MC::MCConsole>(
-		[](size_t size) { return MC::MCCOGlobals::pRouter->AllocateMessageStorage(static_cast<unsigned short>(size)); },
-		tempConsoleLogTarget.get()
-	);
+	auto pConsole = std::make_unique<MC::MCConsole>(tempConsoleLogTarget.get());
 
 	MC::MCCOGlobals::pRouter->RegisterDispatchTarget(pConsole.get(), MC::MC_MESSAGE_VISIBILITY_ALL);
 

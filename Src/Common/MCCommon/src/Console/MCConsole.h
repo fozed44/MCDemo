@@ -20,10 +20,8 @@ namespace MC {
 	   MC_CONSOLE_COMMAND object by parsing the buffer.
 	*/
 	class MCConsole : public MCMessageDispatchTarget {
-	public:
-		using tAllocator = char*(*)(size_t size);
 	public: /* ctor */
-		MCConsole(tAllocator ptAllocator, MCConsoleOutputTarget* pOutputTarget);
+		MCConsole(MCConsoleOutputTarget* pOutputTarget);
 		~MCConsole();
 		MCConsole(MCConsole&)              = delete;
 		MCConsole(MCConsole&&)             = delete;
