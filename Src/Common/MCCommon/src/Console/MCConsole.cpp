@@ -113,11 +113,6 @@ namespace MC {
 			output += std::string(" param #") + std::to_string(x) + std::string(" ") + std::string(pCommand->pParameterData[x]);
 		}
 
-		/*MC_MESSAGE128 msg{};
-		msg.Message    = MC_MESSAGE_CONSOLE_OUTPUT_128;
-		msg.Visibility = MC_MESSAGE_VISIBILITY_CONSOLE;
-		auto ptr = MCCOGlobals::pRouter->PushTo(msg, static_cast<unsigned short>(output.size() + 1));
-		strcpy_s(ptr, output.size() + 1, output.c_str());*/
 		MCCOGlobals::pRouter->PostConsoleMessage(output.c_str());
 	}
 }

@@ -40,26 +40,18 @@ namespace MC {
 		auto cmd = std::string(pParam);
 		std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
 
-		if (cmd == "off") {
-			pRouter->Push(MC_MESSAGE32{
-				MC_MESSAGE_SET_RENDERER_STATE_32,
-				MC_MESSAGE_VISIBILITY_RENDER,
-				(uint8_t)MC_RENDER_STATE_OFF
-			});
-		}
-
-		if (cmd == "space") {
-			pRouter->Push(MC_MESSAGE32{
-				MC_MESSAGE_SET_RENDERER_STATE_32,
-				MC_MESSAGE_VISIBILITY_RENDER,
-				(uint8_t)MC_RENDER_STATE_SPACE
-			});
-		}
+		
 	}
 
 	void HandleFirstRendererParameter(char **pParams, unsigned char totalParams, MCRouter* pRouter) {
 		auto cmd = std::string(pParams[0]);
 		std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+
+		std::string cmd2;
+		if (totalParams == 2) {
+			cmd2 = std::string(pParams[1]);
+			std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+		}
 
 		if (cmd == "pause") {
 			pRouter->Push(MC_MESSAGE32 { 
@@ -79,7 +71,21 @@ namespace MC {
 			// TODO Add a warning message if we are short parameters
 			if (totalParams < 2)
 				return;
-			HandleSetStateRendererParameter(pParams[1], pRouter);
+			if (cmd2 == "off") {
+				pRouter->Push(MC_MESSAGE32{
+					MC_MESSAGE_SET_RENDERER_STATE_32,
+					MC_MESSAGE_VISIBILITY_RENDER,
+					(uint8_t)MC_RENDER_STATE_OFF
+					});
+			}
+
+			if (cmd2 == "space") {
+				pRouter->Push(MC_MESSAGE32{
+					MC_MESSAGE_SET_RENDERER_STATE_32,
+					MC_MESSAGE_VISIBILITY_RENDER,
+					(uint8_t)MC_RENDER_STATE_SPACE
+					});
+			}
 		}
 	}
 

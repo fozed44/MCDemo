@@ -54,6 +54,9 @@ namespace MC {
 
 		/* Set the render state. */
 		void SetRenderState(MC_RENDER_STATE renderState);
+
+		/* Set the pause state. */
+		MC_RESULT SetPauseState(bool pauseState);
 	private: /* Instances that will be copied to MCREGlobals */
 		std::unique_ptr<D3D12RenderEngineDispatcher>  _pRenderEngineDispatcher;
 		std::unique_ptr<MCRenderWindow>               _pRenderWindow;

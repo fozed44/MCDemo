@@ -74,6 +74,13 @@ namespace MC {
 	  return _pRenderer->GetSceneLoader()->LoadGeometry<MCVertex1Color, DXGI_FORMAT_R32_UINT>(desc);
   }
 
+  MC_RESULT MCD3D12RenderEngine::SetPauseState(bool pauseState) {
+	  if (!_pRenderer)
+		  return MC_RESULT::FAIL_OFF;
+
+	  
+  }
+
 #pragma endregion
 
 }
