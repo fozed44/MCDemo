@@ -128,13 +128,6 @@ namespace MC {
 		// its use of the upload buffer.
 		_uploadBufferFence = MCREGlobals::pMCD3D->GetNewFenceValue();
 
-		//MCResourceHandle handle {
-		//	defaultBuffer.Get(),
-		//	_uploadBufferFence // Reuse the fence value loaded for the upload buffer as the
-		//					   // fence value that will be used to let us know when the static
-		//					   // buffer is ready.
-		//};
-
 		MCResourceLocal local{
 			defaultBuffer.Get(),
 			_uploadBufferFence

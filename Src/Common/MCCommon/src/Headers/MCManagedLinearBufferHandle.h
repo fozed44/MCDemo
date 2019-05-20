@@ -139,7 +139,7 @@ namespace MC {
 		void RemoveRef(const HandleType& handle) {
 			ENTER_CRITICAL_SECTION(MCManagedLinearBufferHandleManager_RemoveRef, &_lock);
 			ManagedContextItem *ptr = _buffer.get(handle.get_buffer_address());
-			auto newCount = ptr->RefCount--;
+			auto newCount = --ptr->RefCount;
 
 			assert(newCount >= 0);
 
