@@ -73,6 +73,10 @@ namespace MC {
 
 	MC_RESULT MCFrameRendererExecuter::SuspendSync() {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
+
+		if (!_pThread)
+			return MC_RESULT::FAIL_NO_OBJECT;
+
 		_suspendFlag = true;
 
 		// TODO
@@ -107,6 +111,8 @@ namespace MC {
 		RENDER_TRACE("Renderer Executer {0} is stopping thread for renderer {1}", _name, (_pRenderer ? _pRenderer->Name() : std::string("nullptr")));
 		_exitFlag = true;
 		_pThread->join();
+
+		_pThread = nullptr;
 
 		// We should always exit the render thread with the next frame having been destroyed.
 		assert(!_pNextFrame);

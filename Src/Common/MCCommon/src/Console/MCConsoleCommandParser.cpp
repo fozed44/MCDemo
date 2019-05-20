@@ -6,11 +6,9 @@ namespace MC {
 	MCConsoleCommandParser::MCConsoleCommandParser(tAllocator allocator) {
 		_fpAllocator = allocator;
 		_commandMap = {
-			{ "report-router-memory", MC_CONSOLE_COMMAND_CMD_REPORT_ROUTER_MEMORY },
-			{ "wire-frame",           MC_CONSOLE_COMMAND_CMD_WIRE_FRAME },
-			{ "analyze-resource-man", MC_CONSOLE_COMMAND_CMD_ANALYZE_RESOURCE_MAN },
-			{ "renderer",             MC_CONSOLE_COMMAND_CMD_RENDERER },
-			{ "analyze",              MC_CONSOLE_COMMAND_CMD_ANALYZE }
+			{ "report",     MC_CONSOLE_COMMAND_CMD::REPORT },
+			{ "wire-frame", MC_CONSOLE_COMMAND_CMD::WIRE_FRAME },
+			{ "render",     MC_CONSOLE_COMMAND_CMD::RENDER }
 		};
 	}
 
@@ -22,7 +20,7 @@ namespace MC {
 		auto result = ParseStrings(pBuffer, bufferSize, &commandStrings);
 
 		if (result != MC_RESULT::OK) {
-			pCommand->Command = MC_CONSOLE_COMMAND_CMD_INVALID;
+			pCommand->Command        = MC_CONSOLE_COMMAND_CMD::INVALID;
 			pCommand->ParameterCount = 0;
 			pCommand->pParameterData = nullptr;
 			return result;
@@ -30,7 +28,7 @@ namespace MC {
 
 		pCommand->Command = TranslateCommand(commandStrings[0]);
 
-		if (pCommand->Command == MC_CONSOLE_COMMAND_CMD_INVALID) {
+		if (pCommand->Command == MC_CONSOLE_COMMAND_CMD::INVALID) {
 			pCommand->ParameterCount = 0;
 			pCommand->pParameterData = nullptr;
 			return MC_RESULT::FAIL_INVALID_DATA;
@@ -93,7 +91,7 @@ namespace MC {
 	MC_CONSOLE_COMMAND_CMD MCConsoleCommandParser::TranslateCommand(const std::string& command) {
 		auto commandMapElement = _commandMap.find(command);
 		if (commandMapElement == _commandMap.end())
-			return MC_CONSOLE_COMMAND_CMD_INVALID;
+			return MC_CONSOLE_COMMAND_CMD::INVALID;
 		return commandMapElement->second;
 	}
 

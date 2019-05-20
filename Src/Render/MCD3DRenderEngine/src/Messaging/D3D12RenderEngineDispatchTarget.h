@@ -2,6 +2,7 @@
 
 #include "../../../../Common/MCRouter/src/Core/MCMessageDispatchTarget.h"
 #include "../../../../Common/MCRouter/src/Core/MCRouter.h"
+#include "../Render/MCRenderer.h"
 
 namespace MC {
 
@@ -22,7 +23,7 @@ namespace MC {
 
 	private:
 		void SetPauseState(bool pauseState);
-		void HandleRendererCommand(unsigned char parameterCount, char **pParameterData);
+		void SetRenderState(MC_RENDER_STATE state);
 	private:
 		MCRouter* _pRouter;
 	};

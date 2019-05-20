@@ -29,7 +29,7 @@ namespace TMCCommon {
 			auto mcResult = parser.Parse(testCommand, strlen(testCommand), &cmd);
 
 			Assert::AreEqual((int)MC_RESULT::OK, (int)mcResult);
-			Assert::AreEqual((int)MC_CONSOLE_COMMAND_CMD_WIRE_FRAME, (int)cmd.Command);
+			Assert::AreEqual((int)MC_CONSOLE_COMMAND_CMD::WIRE_FRAME, (int)cmd.Command);
 			Assert::AreEqual(0, (int)cmd.ParameterCount);
 			Assert::AreEqual(nullptr, (char*)cmd.pParameterData);
 		}
@@ -44,7 +44,7 @@ namespace TMCCommon {
 			auto mcResult = parser.Parse(testCommand, strlen(testCommand), &cmd);
 
 			Assert::AreEqual((int)MC_RESULT::OK, (int)mcResult);
-			Assert::AreEqual((int)MC_CONSOLE_COMMAND_CMD_WIRE_FRAME, (int)cmd.Command);
+			Assert::AreEqual((int)MC_CONSOLE_COMMAND_CMD::WIRE_FRAME, (int)cmd.Command);
 			Assert::AreEqual(1, (int)cmd.ParameterCount);
 			Assert::AreEqual("testArg", cmd.pParameterData[0]);
 
@@ -62,7 +62,7 @@ namespace TMCCommon {
 			auto mcResult = parser.Parse(testCommand, strlen(testCommand), &cmd);
 
 			Assert::AreEqual((int)MC_RESULT::OK, (int)mcResult);
-			Assert::AreEqual((int)MC_CONSOLE_COMMAND_CMD_WIRE_FRAME, (int)cmd.Command);
+			Assert::AreEqual((int)MC_CONSOLE_COMMAND_CMD::WIRE_FRAME, (int)cmd.Command);
 			Assert::AreEqual(2, (int)cmd.ParameterCount);
 			Assert::AreEqual("testArg1", cmd.pParameterData[0]);
 			Assert::AreEqual("testArg2", cmd.pParameterData[1]);
@@ -82,7 +82,7 @@ namespace TMCCommon {
 			auto mcResult = parser.Parse(testCommand, strlen(testCommand), &cmd);
 
 			Assert::AreEqual((int)MC_RESULT::FAIL_INVALID_DATA, (int)mcResult);
-			Assert::AreEqual((int)MC_CONSOLE_COMMAND_CMD_INVALID, (int)cmd.Command);
+			Assert::AreEqual((int)MC_CONSOLE_COMMAND_CMD::INVALID, (int)cmd.Command);
 			Assert::AreEqual(0, (int)cmd.ParameterCount);
 			Assert::AreEqual(nullptr, (char*)cmd.pParameterData);
 		}
@@ -97,7 +97,7 @@ namespace TMCCommon {
 			auto mcResult = parser.Parse(testCommand, strlen(testCommand), &cmd);
 
 			Assert::AreEqual((int)MC_RESULT::FAIL_INVALID_DATA, (int)mcResult);
-			Assert::AreEqual((int)MC_CONSOLE_COMMAND_CMD_INVALID, (int)cmd.Command);
+			Assert::AreEqual((int)MC_CONSOLE_COMMAND_CMD::INVALID, (int)cmd.Command);
 			Assert::AreEqual(0, (int)cmd.ParameterCount);
 			Assert::AreEqual(nullptr, (char*)cmd.pParameterData);
 		}
@@ -112,7 +112,7 @@ namespace TMCCommon {
 			auto mcResult = parser.Parse(testCommand, strlen(testCommand), &cmd);
 
 			Assert::AreEqual((int)MC_RESULT::FAIL_INVALID_DATA, (int)mcResult);
-			Assert::AreEqual((int)MC_CONSOLE_COMMAND_CMD_INVALID, (int)cmd.Command);
+			Assert::AreEqual((int)MC_CONSOLE_COMMAND_CMD::INVALID, (int)cmd.Command);
 			Assert::AreEqual(0, (int)cmd.ParameterCount);
 			Assert::AreEqual(nullptr, (char*)cmd.pParameterData);
 		}
@@ -127,7 +127,7 @@ namespace TMCCommon {
 			auto mcResult = parser.Parse(testCommand, strlen(testCommand), &cmd);
 
 			Assert::AreEqual((int)MC_RESULT::FAIL_INVALID_DATA, (int)mcResult);
-			Assert::AreEqual((int)MC_CONSOLE_COMMAND_CMD_INVALID, (int)cmd.Command);
+			Assert::AreEqual((int)MC_CONSOLE_COMMAND_CMD::INVALID, (int)cmd.Command);
 			Assert::AreEqual(0, (int)cmd.ParameterCount);
 			Assert::AreEqual(nullptr, (char*)cmd.pParameterData);
 		}
@@ -142,7 +142,7 @@ namespace TMCCommon {
 			auto mcResult = parser.Parse(testCommand, strlen(testCommand), &cmd);
 
 			Assert::AreEqual((int)MC_RESULT::FAIL_INVALID_DATA, (int)mcResult);
-			Assert::AreEqual((int)MC_CONSOLE_COMMAND_CMD_INVALID, (int)cmd.Command);
+			Assert::AreEqual((int)MC_CONSOLE_COMMAND_CMD::INVALID, (int)cmd.Command);
 			Assert::AreEqual(0, (int)cmd.ParameterCount);
 			Assert::AreEqual(nullptr, (char*)cmd.pParameterData);
 		}
@@ -152,12 +152,12 @@ namespace TMCCommon {
 
 			MC_CONSOLE_COMMAND cmd;
 
-			char *testCommand = "  WIREFRAME testArg1 testArg2  ";
+			char *testCommand = "  wire-frame testArg1 testArg2  ";
 
 			auto mcResult = parser.Parse(testCommand, strlen(testCommand), &cmd);
 
 			Assert::AreEqual((int)MC_RESULT::OK, (int)mcResult);
-			Assert::AreEqual((int)MC_CONSOLE_COMMAND_CMD_WIRE_FRAME, (int)cmd.Command);
+			Assert::AreEqual((int)MC_CONSOLE_COMMAND_CMD::WIRE_FRAME, (int)cmd.Command);
 			Assert::AreEqual(2, (int)cmd.ParameterCount);
 			Assert::AreEqual("testArg1", cmd.pParameterData[0]);
 			Assert::AreEqual("testArg2", cmd.pParameterData[1]);
@@ -172,12 +172,12 @@ namespace TMCCommon {
 
 			MC_CONSOLE_COMMAND cmd;
 
-			char *testCommand = "  WIREFRAME testArg1   testArg2  ";
+			char *testCommand = "  wire-frame testArg1   testArg2  ";
 
 			auto mcResult = parser.Parse(testCommand, strlen(testCommand), &cmd);
 
 			Assert::AreEqual((int)MC_RESULT::OK, (int)mcResult);
-			Assert::AreEqual((int)MC_CONSOLE_COMMAND_CMD_WIRE_FRAME, (int)cmd.Command);
+			Assert::AreEqual((int)MC_CONSOLE_COMMAND_CMD::WIRE_FRAME, (int)cmd.Command);
 			Assert::AreEqual(2, (int)cmd.ParameterCount);
 			Assert::AreEqual("testArg1", cmd.pParameterData[0]);
 			Assert::AreEqual("testArg2", cmd.pParameterData[1]);

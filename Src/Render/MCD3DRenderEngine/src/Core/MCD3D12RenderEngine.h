@@ -10,6 +10,10 @@
 
 namespace MC {
 
+	/* forward references to dispatch targets. */
+	class D3D12RenderSystemDispatchTarget;
+	class D3D12RenderEngineDispatchTarget;
+
 	/*
 		-- HANDLE ABSTRACTIONS --
 	
@@ -53,7 +57,7 @@ namespace MC {
 		MC_RESULT ScheduleFrame(MCFrame *pFrame);
 
 		/* Set the render state. */
-		void SetRenderState(MC_RENDER_STATE renderState);
+		MC_RESULT SetRenderState(MC_RENDER_STATE renderState);
 
 		/* Set the pause state. */
 		MC_RESULT SetPauseState(bool pauseState);
@@ -68,6 +72,11 @@ namespace MC {
 		std::unique_ptr<MCD3D>                        _pMCD3D;
 	private: /* Private Members */
 		std::unique_ptr<MCRenderer>                   _pRenderer;
+		
+		/* message dispatch targets */
+		std::unique_ptr<D3D12RenderSystemDispatchTarget> _pSystemDispatchTarget;
+		std::unique_ptr<D3D12RenderEngineDispatchTarget> _pEngineDispatchTarget;
+
 	};
   
 }

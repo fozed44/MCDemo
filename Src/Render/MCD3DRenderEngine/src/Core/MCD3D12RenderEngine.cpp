@@ -12,6 +12,8 @@
 #include "MCRenderWindow.h"
 #include "../../../../Common/MCCommon/src/Global/MCCOGlobals.h"
 #include "../Messaging/D3D12RenderEngineDispatcher.h"
+#include "../Messaging/D3D12RenderEngineDispatchTarget.h"
+#include "../Messaging/D3D12RenderSystemDispatchTarget.h"
 
 
 namespace MC {
@@ -49,6 +51,10 @@ namespace MC {
 
 	  /******************************************************************/
 
+	  /************ CREATE SYSTEM AND ENGING DISPATCH TARGETS ***********/
+	  _pSystemDispatchTarget = std::make_unique<D3D12RenderSystemDispatchTarget>(_pRenderEngineDispatcher.get(), MCCOGlobals::pRouter);
+	  _pEngineDispatchTarget = std::make_unique<D3D12RenderEngineDispatchTarget>(_pRenderEngineDispatcher.get(), MCCOGlobals::pRouter);
+
 	  _pRenderer = std::make_unique<MCRenderer>();
 
 	  MCREGlobals::pRenderEngine = this;
@@ -66,8 +72,8 @@ namespace MC {
 	  return _pRenderer->ScheduleFrame(pFrame);
   }
 
-  void MCD3D12RenderEngine::SetRenderState(MC_RENDER_STATE renderState) {
-	  _pRenderer->SetState(renderState);
+  MC_RESULT MCD3D12RenderEngine::SetRenderState(MC_RENDER_STATE renderState) {
+	  return _pRenderer->SetState(renderState);	  
   }
 
   MCRENDER_ITEM_HANDLE MCD3D12RenderEngine::LoadGeometry(const MCGEOMETRY_MESH_DESC& desc) {
@@ -76,9 +82,12 @@ namespace MC {
 
   MC_RESULT MCD3D12RenderEngine::SetPauseState(bool pauseState) {
 	  if (!_pRenderer)
-		  return MC_RESULT::FAIL_OFF;
+		  return MC_RESULT::FAIL_NO_OBJECT;
 
-	  
+	  if (pauseState)
+		  return _pRenderer->SuspendExecution();
+	  else
+		  return _pRenderer->UnsuspendExecution();
   }
 
 #pragma endregion

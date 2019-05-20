@@ -4,6 +4,8 @@
 #include "../../../../Common/MCCommon/src/Data/MCThreads.h"
 #include "../../../../Common/MCCommon/src/Global/MCCOGlobals.h"
 
+#include "MCResourceManagerAnalyzer.h"
+
 namespace MC {
 
 #pragma region ctor
@@ -38,11 +40,7 @@ namespace MC {
 		MCThrowIfFailed(_pCommandList->Close());
 
 #ifdef _DEBUG
-		_pAnalysisDispatcher = std::make_unique<MCResourceAnalysisDispatchTarget>(
-			this,
-			reinterpret_cast<MCMessageDispatchTarget*>(MCREGlobals::pRenderEngineDispatcher),
-			MCCOGlobals::pRouter
-		);
+		_pAnalyzer = std::make_unique<MCResourceManagerAnalyzer>(this);
 #endif _DEBUG
 	}
 

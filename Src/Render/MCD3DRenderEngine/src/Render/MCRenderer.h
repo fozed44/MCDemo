@@ -61,7 +61,7 @@ namespace MC {
 
 	public:
 		inline MC_RENDER_STATE GetState() const { return _state; }
-		void SetState(MC_RENDER_STATE state);
+		MC_RESULT SetState(MC_RENDER_STATE state);
 
 		/* Call Update once per game loop iteration. */
 		void Update();
@@ -84,10 +84,14 @@ namespace MC {
 			changes. */
 		const MCSceneLoader* GetSceneLoader() { return _pScene->GetSceneLoader(); }
 
+		/* Suspend or UnSuspend render execution. */
+		MC_RESULT SuspendExecution();
+		MC_RESULT UnsuspendExecution();
+
 	private:
-		MC_RENDER_STATE                     _state;
-		std::unique_ptr<MCFrameScheduler>   _pScheduler;
-		std::unique_ptr<MCRenderScene>      _pScene;
+		MC_RENDER_STATE                   _state;
+		std::unique_ptr<MCFrameScheduler> _pScheduler;
+		std::unique_ptr<MCRenderScene>    _pScene;
 
 	private:
 		/*	Called as a consequence of setting a new state. If the new state requires a new renderer

@@ -75,7 +75,7 @@ namespace MC {
 				MC_MESSAGE128 msg{};
 				msg.Message    = MC_MESSAGE_CONSOLE_COMMAND_128;
 				msg.Visibility = MC_MESSAGE_VISIBILITY_ALL;
-				msg.LOParam32  = cmd.Command;
+				msg.LOParam32  = static_cast<uint32_t>(cmd.Command);
 				auto ptr = MCCOGlobals::pRouter->PushTo<MC_CONSOLE_COMMAND>(msg);
 				*ptr = cmd;
 			}
@@ -108,7 +108,7 @@ namespace MC {
 
 	void MCConsole::ConsoleCommandHandler(const MC_CONSOLE_COMMAND* pCommand) {
 		std::string output("Ack console command: ");
-		output += std::string(std::to_string(pCommand->Command));
+		output += std::string(std::to_string(static_cast<uint32_t>(pCommand->Command)));
 		for (int x = 0; x < pCommand->ParameterCount; ++x) {
 			output += std::string(" param #") + std::to_string(x) + std::string(" ") + std::string(pCommand->pParameterData[x]);
 		}
