@@ -133,11 +133,11 @@ namespace MC {
 			_uploadBufferFence
 		};
 
-		MCResourceDescriptor desc{
-			MCRESOURCE_DESCRIPTOR_TYPE::STATIC_BUFFER,
-			std::move(defaultBuffer),
-			_uploadBufferFence,
-			nullptr
+		MCResourceDescriptor desc {
+			MCRESOURCE_DESCRIPTOR_TYPE::STATIC_BUFFER, // Descriptor type
+			std::move(defaultBuffer),                  // pResource
+			_uploadBufferFence,                        // FenceValue
+			nullptr                                    // MappedData
 		};
 
 		*pResult = std::move(this->CreateNewItem(
@@ -148,7 +148,7 @@ namespace MC {
 		return MC_RESULT::OK;
 	}
 
-	MCResourceManager::HandleType MCResourceManager::CreateStaticBufferSync(void *pInitData, size_t numBytes, bool syncLoad) {
+	HResource MCResourceManager::CreateStaticBufferSync(void *pInitData, size_t numBytes) {
 		HResource hResource;
 		while (CreateStaticBufferAsync(pInitData, numBytes, &hResource) != MC_RESULT::OK) {}
 
@@ -162,33 +162,54 @@ namespace MC {
 
 #pragma endregion
 
-#pragma region dynamic buffer
+#pragma region dynamic constant buffer
 
-	//MC_RESULT MCResourceManager::CreateDynamicBufferAsync(void *pInitData, size_t numBytes, HResource* pResult) {
-	//	MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
+	MC_RESULT MCResourceManager::CreateDynamicConstantBufferAsync(void *pInitData, size_t numBytes, HResource* pResult) {
+		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
 
-	//	// At this point we need to make sure that the GPU is done using the upload buffer
-	//	// from another create call.
-	//	if (MCREGlobals::pMCD3D->GetCurrentFenceValue() < _uploadBufferFence)
-	//		return MC_RESULT::FAIL_UPLOADING;
+		// At this point we need to make sure that the GPU is done using the upload buffer
+		// from another create call.
+		if (MCREGlobals::pMCD3D->GetCurrentFenceValue() < _uploadBufferFence)
+			return MC_RESULT::FAIL_UPLOADING;
 
-	//	// AlignSize aligns the buffer size to hardware dependent size.
-	//	auto alignedSize = CalculateConstantBufferSize(numBytes);
+		// AlignSize aligns the buffer size to hardware dependent size.
+		auto alignedSize = CalculateConstantBufferSize(numBytes);
 
-	//	MCThrowIfFailed(MCREGlobals::pMCDXGI->Get3DDevice()->CreateCommittedResource(
-	//		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
-	//		D3D12_HEAP_FLAG_NONE,
-	//		&CD3DX12_RESOURCE_DESC::Buffer(alignedSize),
-	//		D3D12_RESOURCE_STATE_GENERIC_READ,
-	//		nullptr,
-	//		__uuidof(_pUploadBuffer),
-	//		&_pUploadBuffer
-	//	))
-	//}
+		// The descriptor for the buffer we are going to be creating.
+		MCResourceDescriptor desc;
+		desc.DescriptorType = MCRESOURCE_DESCRIPTOR_TYPE::DYNAMIC_CONSTANT_BUFFER;
 
-	//HResource MCResourceManager::CreateDynamicBufferSync(void *pInitData, size_t numBytes) {
+		MCThrowIfFailed(MCREGlobals::pMCDXGI->Get3DDevice()->CreateCommittedResource(
+			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+			D3D12_HEAP_FLAG_NONE,
+			&CD3DX12_RESOURCE_DESC::Buffer(alignedSize),
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			__uuidof(desc.pResource),
+			&desc.pResource
+		));
 
-	//}
+		MCThrowIfFailed(desc.pResource->Map(0, nullptr, reinterpret_cast<void**>(&desc.pMappedData)));
+
+		memcpy(desc.pMappedData, pInitData, numBytes);
+
+		*pResult = std::move(this->CreateNewItem(
+			desc,
+			{
+				desc.pResource.Get(),
+				reinterpret_cast<unsigned __int64>(desc.pMappedData)
+			}
+		));
+
+		return MC_RESULT::OK;
+	}
+
+	HResource MCResourceManager::CreateDynamicConstantBufferSync(void *pInitData, size_t numBytes) {
+		HResource hResource;
+		while (CreateDynamicConstantBufferAsync(pInitData, numBytes, &hResource) != MC_RESULT::OK) {}
+
+		return std::move(hResource);
+	}
 
 #pragma endregion
 

@@ -26,9 +26,7 @@ namespace MC {
 			1,
 			true
 		);
-
 	}
-
 
 	MCRenderItem::~MCRenderItem() { }
 

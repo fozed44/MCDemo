@@ -18,21 +18,24 @@ namespace MC {
 	enum class MCRESOURCE_DESCRIPTOR_TYPE {
 		INVALID                 = 0,
 		STATIC_BUFFER           = 1,
-		DYNAMIC_BUFFER          = 2,
-		STATIC_CONSTANT_BUFFER  = 3,
+		STATIC_CONSTANT_BUFFER  = 2,
+		DYNAMIC_BUFFER          = 3,
 		DYNAMIC_CONSTANT_BUFFER = 4
 	};
 
 	struct MCResourceDescriptor {
 		MCRESOURCE_DESCRIPTOR_TYPE DescriptorType;
 		ComPtr<ID3D12Resource>     pResource;
-		unsigned __int64           FenceValue;
-		void*                      MappedData;  // Only used by dynamic resources
+		unsigned __int64           FenceValue;   // Only used by static resources
+		void*                      pMappedData;  // Only used by dynamic resources
 	};
 
 	struct MCResourceLocal {
 		ID3D12Resource*  pResource;
-		unsigned __int64 FenceValue;
+		union {
+			unsigned __int64 FenceValue; // The fence value is required for static resources only
+			void           *pMappedData; // The mapped Data is required for dynamic resources only.
+		}
 	};
 
 
@@ -61,16 +64,30 @@ namespace MC {
 		ID3D12Resource *GetResourceSync(MCResourceManager::HandleType& handle);
 		
 
+		/* Create a static buffer. 
+			The async version can return MC_RESULT::FAIL_UPLOADING if the upload resource is unavailable.
+			Further, the async version will return as soon as the resource is queued to upload, it will not
+			wait for the initial data to be uploaded. 
+			
+			The sync version will block until the upload buffer is available AND the resource has been
+			uploaded to the card. */
 		MC_RESULT CreateStaticBufferAsync(void *pInitData, size_t numBytes, HResource* pResult);
-		HResource CreateStaticBufferSync (void *pInitData, size_t numBytes, bool       syncLoad);
+		HResource CreateStaticBufferSync (void *pInitData, size_t numBytes);
 
 		/*MC_RESULT CreateDynamicBufferAsync(void *pInitData, size_t numBytes, HResource* pResult);
-		HResource CreateDynamicBufferSync (void *pInitData, size_t numBytes, bool       syncLoad);
+		HResource CreateDynamicBufferSync (void *pInitData, size_t numBytes, bool       syncLoad); */
 
+		/* Create a dynamic constant buffer.
+			The async version can return MC_RESULT::FAIL_UPLOADING if the upload resource is unavailable.
+			Further, the async version will return as soon as the resource is queued to upload, it will not
+			wait for the initial data to be uploaded.
+
+			The sync version will block until the upload buffer is available AND the resource has been
+			uploaded to the card. */
 		MC_RESULT CreateDynamicConstantBufferAsync(void *pInitData, size_t numBytes, HResource* pResult);
-		HResource CreateDynamicConstantBufferSync (void *pInitData, size_t numBytes, bool       syncLoad);
+		HResource CreateDynamicConstantBufferSync (void *pInitData, size_t numBytes);
 
-		MC_RESULT CreateStaticConstantBufferAsync(void *pInitData, size_t numBytes, HResource* pResult);
+		/*MC_RESULT CreateStaticConstantBufferAsync(void *pInitData, size_t numBytes, HResource* pResult);
 		HResource CreateStaticConstantBufferSync (void *pInitData, size_t numBytes, bool       syncLoad);
 
 		MC_RESULT MapDynamicByfferAsync(HResource& handle, void *pData, size_t numBytes);

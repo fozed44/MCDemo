@@ -45,6 +45,8 @@ namespace MC {
 
 		MCRENDER_ITEM_HANDLE LoadGeometry(const MCGEOMETRY_MESH_DESC& desc);
 
+		MCRENDER_ITEM_HANDLE LoadDynamicGeometry(const MCGEOMETRY_MESH_DESC& desc);
+
 		/* Call update once per game loop iteration.*/
 		void      Update();
 
