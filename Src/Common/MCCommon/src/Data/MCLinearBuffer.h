@@ -9,7 +9,7 @@
 
 namespace MC {
 	
-	template<typename tBuffer>
+	template<typename tBufferElement, int bufferSize>
 	class MCLinearBufferAnalyzer;
 
 	class MCIAnalyzer;
@@ -49,6 +49,7 @@ namespace MC {
 		MCLinearBuffer& operator= (MCLinearBuffer&&) = delete;
 		unsigned int freeSpace() { return _emptyCount; }
 		unsigned int size() { return N; }
+		unsigned int used() { return N - _emptyCount; }
 		unsigned int element_byte_size() { return sizeof(MCLinearBufferElement); }
 		MCLinearBufferAddress add(const T_& a) {			
 			if (!_emptyCount)
@@ -154,6 +155,19 @@ namespace MC {
 			return MCLinearBuffer::InvalidAddress;
 		}
 
+		/* enumerate_all_used_addresses is a helper method that is used by the LinearBufferAnalyzer
+			to scan the buffer for non-empty elements. */
+#ifdef _DEBUG
+		std::vector<MCLinearBufferAddress> enumerate_all_used_addresses() {			
+			std::vector<MCLinearBufferAddress> result;
+			for (int x; x < N; x++) {
+				if (_pBufferr[x].Flags & MC_LINEAR_BUFFER_ELEMENT_FLAGS_ALLOCATED)
+					result.push_back(x);
+			}
+			return result;
+		}
+#endif _DEBUG
+
 		static const MCLinearBufferAddress InvalidAddress = -1;
 
 	public: /* ***** ANALYSIS HELPERS ***** */
@@ -172,7 +186,7 @@ namespace MC {
 
 		/* The ResourceAnalyzer has direct access to private data, even though it should always be
 		   accessing the data in a read only fashion. */
-		friend MCLinearBufferAnalyzer<MCLinearBuffer<T_,N>>;
+		friend MCLinearBufferAnalyzer<T_, N>;
 	};
 
 }

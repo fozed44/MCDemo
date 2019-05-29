@@ -7,19 +7,19 @@
 
 namespace MC {	
 
-	template <typename tBuffer>
+	template <typename tBufferElement, int bufferSize>
 	class MCLinearBufferAnalyzer : public MCIAnalyzer {
 	private: /* Analysis data. */
-		typedef struct MCLinearBufferAnalysis {
+		typedef struct MCLinearBufferSummary {
 			unsigned totalElements;
 			unsigned usedElements;
 			unsigned totalBytes;
 			unsigned usedBytes;
 			float    pctElements;
 			float    pctBytes;
-		} MCLinearBufferrAnalysis;
+		} MCLinearBufferrSummary;
 	public: /* Types */
-		using BufferType = tBuffer;
+		using BufferType = MCLinearBuffer<tBufferElement, bufferSize>;
 	public: /* ctor */
 		MCLinearBufferAnalyzer(BufferType* pBuffer) : _pBuffer{ pBuffer } {}
 		virtual ~MCLinearBufferAnalyzer() {}
@@ -29,7 +29,9 @@ namespace MC {
 		MCLinearBufferAnalyzer& operator= (MCLinearBufferAnalyzer&&) = delete;
 
 	public: /* MCIAnalyzer */
-		std::string Analyze() { return GenerateAnalysis(); }
+		std::string Summary() { return GenerateSummary(); }
+		std::string Detail(std::function<std::string(tBufferElement buffer, MCLinearBufferAddress address)> describeItem)  { return GenerateDetail(describeItem); }
+		std::string Detail() { std::string("Use Detail(func)!"); }
 	public:
 		unsigned count_used_elements() {
 			unsigned bufferSize    = _pBuffer->size();
@@ -49,7 +51,7 @@ namespace MC {
 		unsigned count_total_bytes() {
 			return _pBuffer->size() * _pBuffer->element_byte_size();
 		}
-		MCLinearBufferAnalysis AnalyzeInternal() {
+		MCLinearBufferSummary InternalSummary() {
 			MCLinearBufferAnalysis result;
 			result.totalElements = count_total_elements();
 			result.usedElements  = count_used_elements();
@@ -59,8 +61,8 @@ namespace MC {
 			result.pctBytes      = static_cast<float>(result.usedBytes)    / static_cast<float>(result.totalBytes);
 			return result;
 		}
-		std::string GenerateAnalysis() {
-			MCLinearBufferAnalysis analysis = AnalyzeInternal();
+		std::string GenerateSummary() {
+			MCLinearBufferSummary analysis = InternalSummary();
 			std::ostringstream elements; std::ostringstream bytes;
 			elements << analysis.usedElements << "/" << analysis.totalElements;
 			bytes    << analysis.usedBytes    << "/" << analysis.totalBytes;
@@ -70,6 +72,17 @@ namespace MC {
 			  << std::left << std::setw(20) << "Bytes Used/Total" << ":" << std::right << std::setw(10) << bytes.str()    << std::right << std::setw(8) << analysis.pctBytes    << "%" << std::endl;
 			return o.str();
 		}		
+		std::string GenerateDetail(std::function<std::string(tBufferElement buffem, MCLinearBufferAddress address)> describeItem) {
+			return
+				GenerateDetailForAllBufferItems(describeItem)
+			  + GenerateSummary();
+		}
+		std::string GenerateDetailForAllBufferItems(std::function<std::string(tBufferElement element, MCLinearBufferAddress address)> describeItem) {
+			std::ostringstream o;			
+			for (MCLinearBufferAddress address : _pBuffer->enumerate_all_used_addresses())
+				o << "\n" << describeItem(_pBuffer->get(address), address);
+			return o.str();
+		}
 	private:
 		BufferType* _pBuffer;
 	};

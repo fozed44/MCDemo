@@ -3,6 +3,9 @@
 #include "../../../../Common/MCCommon/src/Data/MCThreads.h"
 #include "../../../../Common/MCCommon/src/Console/MCConsoleCommand.h"
 
+#include <sstream>
+#include <iomanip>
+
 namespace MC {
 
 #pragma region ctor
@@ -17,17 +20,33 @@ namespace MC {
 
 #pragma region process message overrides
 
-	std::string MCResourceManagerAnalyzer::GetAnalysis() {
-		return GenerateAnalysis();
+	std::string MCResourceManagerAnalyzer::GetSummary() {
+		return GenerateSummary();
+	}
+
+	std::string MCResourceManagerAnalyzer::GetDetail() {
+		return GenerateDetail();
 	}
 
 #pragma endregion
 
 #pragma region Analyze Resource Manager
 
-	std::string MCResourceManagerAnalyzer::GenerateAnalysis() {
+	std::string MCResourceManagerAnalyzer::GenerateSummary() {
 		auto linearBufferAnalyzer = _pManager->GetBufferAnalyzer();
-		return linearBufferAnalyzer->Analyze();
+		return linearBufferAnalyzer->Summary();
+	}
+
+	std::string MCResourceManagerAnalyzer::GenerateDetail() {
+		auto linearBufferAnalyzer = reinterpret_cast<MCLinearBufferAnalyzer<MCManagedLinearBufferHandleManager::ManagedContextItem, MCRESOURCE_MANAGER_BUFFER_SIZE>*>(_pManager->GetBufferAnalyzer().get());
+		return linearBufferAnalyzer->Detail(
+			[](MC::MCResourceDescriptor element, MC::MCLinearBufferAddress address) {
+				std::ostringstream o;
+
+				o << std::left << std::setw(20) << element.dbgName;
+				return o.str();
+			}
+		);
 	}
 
 #pragma endregion

@@ -18,9 +18,11 @@ namespace MC {
 		MCResourceManagerAnalyzer& operator= (MCResourceManagerAnalyzer&)  = delete;
 		MCResourceManagerAnalyzer& operator= (MCResourceManagerAnalyzer&&) = delete;
 	public:
-		std::string GetAnalysis();
+		std::string GetSummary();
+		std::string GetDetail();
 	private:
-		std::string GenerateAnalysis();
+		std::string GenerateSummary();
+		std::string GenerateDetail();
 	private:
 		MCResourceManager*           _pManager;
 		MCRouter*                    _pRouter;

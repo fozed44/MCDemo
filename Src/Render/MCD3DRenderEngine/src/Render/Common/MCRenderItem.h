@@ -39,7 +39,7 @@ namespace MC {
 		HShader                               _hShader;
 		HRootSignature						  _hRootSignature;
 		HPipelineState						  _hPipelineState;
-		std::unique_ptr<MCUploadBuffer<ObjectConstants>> _pObjectConstantBuffer;
+		HResource                             _hObjectConstantBuffer;
 	};
 
 }

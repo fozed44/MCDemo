@@ -40,11 +40,7 @@ namespace MC {
 #pragma endregion
 
 #pragma region COMMAND: Renderer
-
-	void HandleFirstRendererParameter(char **pParams, unsigned char totalParams, MCRouter* pRouter) {
-		
-	}
-
+	
 	/* Handle the *render* console command. */
 	void D3D12RenderSystemDispatchTarget::HandleRenderCommand(unsigned char parameterCount, char **pParameterData) {
 		// If the command does not have a parameter then *render* doesn't do anything.
@@ -153,8 +149,12 @@ namespace MC {
 
 			/*********** report analyze resource-manager **********/
 #ifdef _DEBUG
-			if (param2 == "resource-manager") {
-				auto analysis = MCREGlobals::pResourceManager->GetAnalyzer()->GetAnalysis();
+			if (param2 == "resource-manager-summary") {
+				auto analysis = MCREGlobals::pResourceManager->GetAnalyzer()->GetSummary();
+				_pRouter->PostConsoleMessage(analysis.c_str());
+			}
+			if (param2 == "resource-manager-detail") {
+				auto analysis = MCREGlobals::pResourceManager->GetAnalyzer()->GetDetail();
 				_pRouter->PostConsoleMessage(analysis.c_str());
 			}
 #endif _DEBUG

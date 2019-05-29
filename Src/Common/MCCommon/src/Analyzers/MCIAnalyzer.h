@@ -11,6 +11,7 @@ namespace MC {
 	class MCIAnalyzer {
 	public:
 		virtual ~MCIAnalyzer() {}
-		virtual std::string Analyze() = 0;
+		virtual std::string Summary() = 0;
+		virtual std::string Detail()  = 0;
 	};
 }

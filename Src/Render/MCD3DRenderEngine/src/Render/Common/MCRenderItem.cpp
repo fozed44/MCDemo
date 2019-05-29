@@ -21,11 +21,12 @@ namespace MC {
 
 		_meshes.push_back(std::move(pMeshes));
 
-		_pObjectConstantBuffer = std::make_unique<MCUploadBuffer<ObjectConstants>>(
+		/*_hObjectConstantBuffer = std::make_unique<MCUploadBuffer<ObjectConstants>>(
 			MCREGlobals::pMCDXGI->Get3DDevice(),
 			1,
 			true
-		);
+		);*/
+		_hObjectConstantBuffer = MCREGlobals::pResourceManager->CreateDynamicConstantBuffer(nullptr, sizeof(ObjectConstants));
 	}
 
 	MCRenderItem::~MCRenderItem() { }
@@ -44,13 +45,13 @@ namespace MC {
 
 		ObjectConstants oc;
 		DirectX::XMStoreFloat4x4(&oc.WorldViewProj, XMMatrixTranspose(worldViewProj));
-		_pObjectConstantBuffer->CopyData(0, oc);
+		MCREGlobals::pResourceManager->MapDynamicConstantData(_hObjectConstantBuffer, &oc, sizeof(ObjectConstants));
 
 
 		pCommandList->SetGraphicsRootSignature(MCREGlobals::pRSManager->GetRootSignature(_hRootSignature));
 		pCommandList->SetPipelineState(MCREGlobals::pPSOManager->GetPipelineState(_hPipelineState));
 
-		pCommandList->SetGraphicsRootConstantBufferView(0, _pObjectConstantBuffer->Resource()->GetGPUVirtualAddress());
+		pCommandList->SetGraphicsRootConstantBufferView(0, MCREGlobals::pResourceManager->GetDynamicResource(_hObjectConstantBuffer)->GetGPUVirtualAddress());
 
 		for (auto& mesh : _meshes) {
 			mesh->Draw(pCommandList);

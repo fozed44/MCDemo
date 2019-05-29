@@ -77,10 +77,10 @@ namespace MC {
 			if (MC_RESULT::OK != createResourcesResult)
 				return createResourcesResult;
 
-			auto vertexBufferResource = MCResourceManager::Instance()->GetResourceSync(_hVertexBuffer);
+			auto vertexBufferResource = MCResourceManager::Instance()->GetStaticResourceSync(_hVertexBuffer);
 			vertexBufferResource->SetName(s2ws(Name() + std::string(" gpu vertex buffer")).c_str());
 
-			auto indexBufferResource = MCResourceManager::Instance()->GetResourceSync(_hIndexBuffer);
+			auto indexBufferResource = MCResourceManager::Instance()->GetStaticResourceSync(_hIndexBuffer);
 			indexBufferResource->SetName(s2ws(Name() + std::string(" gpu index buffer")).c_str());
 
 			// Next we add the entire mesh as a subMesh, allowing the client to call DrawSubMesh using the name of this mesh
@@ -180,8 +180,10 @@ namespace MC {
 			MCResourceManager::HandleType* hVertexBuffer,
 			MCResourceManager::HandleType* hIndexBuffer
 		) override {
-			*hVertexBuffer = std::move(MCResourceManager::Instance()->CreateStaticBufferSync(pVert, vSize, true));
-			*hIndexBuffer  = std::move(MCResourceManager::Instance()->CreateStaticBufferSync(pIndicies, iSize, true));
+			*hVertexBuffer = std::move(MCResourceManager::Instance()->CreateStaticBufferSync(pVert, vSize));
+			*hIndexBuffer  = std::move(MCResourceManager::Instance()->CreateStaticBufferSync(pIndicies, iSize));
+			SET_MCRESUORCE_DBG_NAME(*hVertexBuffer, std::string(std::string(Name()) + " vertex buffer").c_str());
+			SET_MCRESUORCE_DBG_NAME(*hIndexBuffer,  std::string(std::string(Name()) + " index buffer").c_str());
 			return MC_RESULT::OK;
 		}
 	};

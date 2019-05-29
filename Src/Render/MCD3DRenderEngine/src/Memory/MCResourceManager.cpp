@@ -164,13 +164,8 @@ namespace MC {
 
 #pragma region dynamic constant buffer
 
-	MC_RESULT MCResourceManager::CreateDynamicConstantBufferAsync(void *pInitData, size_t numBytes, HResource* pResult) {
+	HResource MCResourceManager::CreateDynamicConstantBuffer(void *pInitData, size_t numBytes) {
 		MCTHREAD_ASSERT(MC_THREAD_CLASS::MAIN);
-
-		// At this point we need to make sure that the GPU is done using the upload buffer
-		// from another create call.
-		if (MCREGlobals::pMCD3D->GetCurrentFenceValue() < _uploadBufferFence)
-			return MC_RESULT::FAIL_UPLOADING;
 
 		// AlignSize aligns the buffer size to hardware dependent size.
 		auto alignedSize = CalculateConstantBufferSize(numBytes);
@@ -191,30 +186,29 @@ namespace MC {
 
 		MCThrowIfFailed(desc.pResource->Map(0, nullptr, reinterpret_cast<void**>(&desc.pMappedData)));
 
-		memcpy(desc.pMappedData, pInitData, numBytes);
+		if(pInitData)
+			memcpy(desc.pMappedData, pInitData, numBytes);
 
-		*pResult = std::move(this->CreateNewItem(
+		return std::move(this->CreateNewItem(
 			desc,
 			{
 				desc.pResource.Get(),
 				reinterpret_cast<unsigned __int64>(desc.pMappedData)
 			}
 		));
-
-		return MC_RESULT::OK;
 	}
 
-	HResource MCResourceManager::CreateDynamicConstantBufferSync(void *pInitData, size_t numBytes) {
-		HResource hResource;
-		while (CreateDynamicConstantBufferAsync(pInitData, numBytes, &hResource) != MC_RESULT::OK) {}
-
-		return std::move(hResource);
+	MC_RESULT MCResourceManager::MapDynamicConstantData(const HResource& hResource, void *pData, size_t numBytes) {
+		memcpy(hResource._localData.pMappedData, pData, numBytes);
+		return MC_RESULT::OK;
 	}
 
 #pragma endregion
 
-	MC_RESULT MCResourceManager::GetResource(const HResource& handle, ID3D12Resource **ppResource) const {
-		auto fenceValueAlias = handle._localData.FenceValue;
+#pragma region Get Resource
+
+	MC_RESULT MCResourceManager::GetStaticResourceAsync(const HResource& hResource, ID3D12Resource **ppResource) const {
+		auto fenceValueAlias = hResource._localData.FenceValue;
 
 		if (fenceValueAlias) {
 			if (MCREGlobals::pMCD3D->GetCurrentFenceValue() < fenceValueAlias)
@@ -223,18 +217,14 @@ namespace MC {
 			// Once we know the fence value has been reached, we set FenceValue to zero. This allows
 			// us to check the loaded status of the resource via if(FenceValue) rather than having
 			// to compare an actual fence value to GetCurrentFenceValue();
-			const_cast<HResource&>(handle)._localData.FenceValue = 0;
+			const_cast<HResource&>(hResource)._localData.FenceValue = 0;
 		}
-		*ppResource = handle._localData.pResource;
-		return MC_RESULT::OK;
-	}
-	MC_RESULT MCResourceManager::GetResourceSync(MCResourceManager::HandleType& handle, ID3D12Resource **ppResource){
-		*ppResource = GetResourceSync(handle);
+		*ppResource = hResource._localData.pResource;
 		return MC_RESULT::OK;
 	}
 
-	ID3D12Resource *MCResourceManager::GetResourceSync(HResource& handle){
-		auto fenceValueAlias = handle._localData.FenceValue;
+	ID3D12Resource *MCResourceManager::GetStaticResourceSync(const HResource& hResource) const {
+		auto fenceValueAlias = hResource._localData.FenceValue;
 
 		if (fenceValueAlias) {
 			MCREGlobals::pMCD3D->WaitForFenceValue(fenceValueAlias);
@@ -242,11 +232,28 @@ namespace MC {
 			// Once we know the fence value has been reached, we set FenceValue to zero. This allows
 			// us to check the loaded status of the resource via if(FenceValue) rather than having
 			// to compare an actual fence value to GetCurrentFenceValue();
-			const_cast<HResource&>(handle)._localData.FenceValue = 0;
+			const_cast<HResource&>(hResource)._localData.FenceValue = 0;
 		}
 
-		return handle._localData.pResource;
+		return hResource._localData.pResource;
 	}
+
+	ID3D12Resource *MCResourceManager::GetDynamicResource(const HResource &hResource) {
+		return hResource._localData.pResource;
+	}
+
+#pragma endregion
+
+#pragma region debug name
+
+#ifdef _DEBUG
+	void MCResourceManager::SetDbgName(HResource& hResource, const char* dbgName) {
+		auto pDescriptor = GetManagedItem(hResource);
+		pDescriptor->dbgName = dbgName;
+	}
+#endif _DEBUG
+
+#pragma endregion
 
 	size_t MCResourceManager::CalculateConstantBufferSize(size_t size) const {
 		/*

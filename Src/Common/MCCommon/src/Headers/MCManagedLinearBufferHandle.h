@@ -147,6 +147,11 @@ namespace MC {
 				_buffer.clear(handle.get_buffer_address());
 			EXIT_CRITICAL_SECTION;
 		}
+
+		/* Get the address of the item managed by the handle. */
+		ManagedType *GetManagedItem(const HandleType& handle) {
+			return _buffer.get(handle.get_buffer_address());
+		}
 	private:
 		struct ManagedContextItem {
 			ManagedType managedItem;
@@ -159,7 +164,7 @@ namespace MC {
 		using BufferType = MCLinearBuffer<ManagedContextItem, N>;
 	public: /* analyzers */
 #ifdef _DEBUG
-		std::unique_ptr<MCIAnalyzer> GetBufferAnalyzer() { return std::make_unique<MCLinearBufferAnalyzer<BufferType>>(&_buffer); }
+		std::unique_ptr<MCIAnalyzer> GetBufferAnalyzer() { return std::make_unique<MCLinearBufferAnalyzer<ManagedContextItem, N>>(&_buffer); }
 #endif _DEBUG
 	private:
 		BufferType            _buffer;
