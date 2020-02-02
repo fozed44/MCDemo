@@ -8,6 +8,7 @@
 
 namespace MC {
 
+	/* General result enum to be used all over the MC framework. */
 	typedef enum class MC_RESULT : unsigned int {
 		OK					  = 0x00000000,
 		FAIL				  = 0x08000000,
@@ -24,5 +25,6 @@ namespace MC {
 		ERROR_OUT_OF_MEMORY   = 0x80000001,
 	} MC_RESULT;
 
+	/* Returns a string representation of MC_RESULT. */
 	std::string to_string(MC_RESULT result);
 }
